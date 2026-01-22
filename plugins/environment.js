@@ -279,19 +279,24 @@ cmd({
     filename: __filename
 },
     async (conn, mek, m, { from, args, isCreator, reply }) => {
-        if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+        if (!isCreator) return reply("*❌ Only the owner can use this command!*");
 
         const status = args[0]?.toLowerCase();
-        // Default value for AUTO_VIEW_STATUS is "false"
-        if (args[0] === "on") {
-            config.AUTO_STATUS_SEEN = "true";
-            return reply("Auto-viewing of statuses is now enabled.");
-        } else if (args[0] === "off") {
-            config.AUTO_STATUS_SEEN = "false";
-            return reply("Auto-viewing of statuses is now disabled.");
-        } else {
-            return reply(`*🫟 ᴇxᴀᴍᴘʟᴇ:  .ᴀᴜᴛᴏ-sᴇᴇɴ ᴏɴ*`);
+        if (!["on", "off"].includes(status)) {
+            return reply("*📝 Usage:  .auto-seen on|off*");
         }
+
+        config.AUTO_STATUS_SEEN = status === "on" ? "true" : "false";
+        const statusIcon = status === "on" ? "✅" : "❌";
+        const seenMsg = `╔════════════════════════════╗
+║   👁️  *AUTO-SEEN* 👁️    ║
+╚════════════════════════════╝
+
+${statusIcon} Status: *${status.toUpperCase()}*
+${status === "on" ? "🟢 Viewing all statuses" : "🔴 Auto-view disabled"}
+Saved ✓`;
+
+        return reply(seenMsg);
     });
 //--------------------------------------------
 // AUTO_LIKE_STATUS COMMANDS
@@ -304,19 +309,24 @@ cmd({
     filename: __filename
 },
     async (conn, mek, m, { from, args, isCreator, reply }) => {
-        if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+        if (!isCreator) return reply("*❌ Only the owner can use this command!*");
 
         const status = args[0]?.toLowerCase();
-        // Default value for AUTO_LIKE_STATUS is "false"
-        if (args[0] === "on") {
-            config.AUTO_STATUS_REACT = "true";
-            return reply("Auto-liking of statuses is now enabled.");
-        } else if (args[0] === "off") {
-            config.AUTO_STATUS_REACT = "false";
-            return reply("Auto-liking of statuses is now disabled.");
-        } else {
-            return reply(`Example: . status-react on`);
+        if (!["on", "off"].includes(status)) {
+            return reply("*📝 Usage:  .status-react on|off*");
         }
+
+        config.AUTO_STATUS_REACT = status === "on" ? "true" : "false";
+        const statusIcon = status === "on" ? "✅" : "❌";
+        const reactMsg = `╔════════════════════════════╗
+║   😊 *STATUS REACT* 😊   ║
+╚════════════════════════════╝
+
+${statusIcon} Status: *${status.toUpperCase()}*
+${status === "on" ? "❤️  Reacting to statuses with emojis" : "🔴 Auto-react disabled"}
+Saved ✓`;
+
+        return reply(reactMsg);
     });
 
 //--------------------------------------------
