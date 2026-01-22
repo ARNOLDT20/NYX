@@ -1,96 +1,137 @@
-# 🤖 NYX MD - WhatsApp Bot
+#  NYX MD - WhatsApp Bot
 
 <div align="center">
+
+![NYX Typing Animation](assets/typing-animation.svg)
+
+**The Ultimate WhatsApp Bot with 100+ Advanced Commands**
 
 [![Node.js](https://img.shields.io/badge/Node.js->=20-brightgreen?style=for-the-badge&logo=node.js)](https://nodejs.org)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 [![GitHub](https://img.shields.io/badge/GitHub-NYX-black?style=for-the-badge&logo=github)](https://github.com/blazetech-glitch/NYX)
-
-*Advanced WhatsApp Bot with 100+ Commands | Multi-Platform Support*
-
-![NYX Typing Animation](assets/typing-animation.svg)
+[![Version](https://img.shields.io/badge/Version-3.0.0-green?style=for-the-badge)]()
 
 </div>
 
 ---
 
-## 🚀 Getting Started
+##  Key Features
 
-### Quick Setup (Local)
+<table>
+<tr>
+<td>
 
-```bash
+###  Media & Download
+- YouTube Music/Video
+- Instagram Posts/Reels
+- TikTok Videos
+- Facebook Videos
+- Ringtone Downloads
+
+</td>
+<td>
+
+###  Admin Tools
+- Group Management
+- Member Control
+- Auto-Kick Bad Links
+- Welcome/Goodbye
+- Status Reactions
+
+</td>
+</tr>
+<tr>
+<td>
+
+###  Smart Features
+- AI Chat Integration
+- Auto Typing Indicator
+- Auto Recording Indicator
+- Message Auto-React
+- Status Auto-Seen
+
+</td>
+<td>
+
+###  Creative Tools
+- Sticker Converter
+- Image Editor
+- Fancy Text
+- Meme Generator
+- And 80+ more!
+
+</td>
+</tr>
+</table>
+
+---
+
+##  Installation
+
+### Local Setup
+
+\\\ash
 git clone https://github.com/blazetech-glitch/NYX.git
 cd NYX
 npm install
 node index.js
-```
+\\\
 
-Scan QR code on first run or provide `SESSION_ID` from `.env`
+**First Run**: Scan QR code or provide SESSION_ID from .env
 
-### Docker Setup
+### Docker
 
-```bash
+\\\ash
 docker build -t nyx-bot .
-docker run -e SESSION_ID="your_id" nyx-bot
-```
+docker run -e SESSION_ID="your_session_id" nyx-bot
+\\\
 
 ---
 
-## ✨ Features
+##  Configuration
 
-- 100+ Advanced Commands
-- YouTube/Music Download
-- Auto Status Reactions  
-- Group Management Tools
-- AI Chat Integration
-- Sticker Converter
-- Media Tools (Image/Video)
-- Anti-Link Protection
-- Admin Controls
-- Multi-Platform Deployment
+| Variable | Value | Purpose |
+|----------|-------|---------|
+| SESSION_ID | your_session_id | WhatsApp authentication (required) |
+| OWNER_NUMBER | 255627417402 | Primary owner |
+| PREFIX | . | Command trigger character |
+| MODE | public | Bot mode (public/private/groups) |
+| AUTO_TYPING | true | Show typing indicator |
+| ANTI_LINK | true | Block link sharing |
 
 ---
 
-## ⚙️ Configuration
+##  Popular Commands
 
-### Required Variables
+\\\
+Media Commands
+.play <query>           Play music from YouTube
+.video <query>          Download video
+.song <name>            Download song
+.tiktok <url>           Download TikTok video
+.instagram <url>        Download Instagram post
 
-```env
-SESSION_ID=your_session_id        # WhatsApp session (required)
-OWNER_NUMBER=255627417402         # Primary owner number
-PREFIX=.                           # Command prefix
-MODE=public                        # public|private|inbox|groups
-```
+Admin Commands
+.owner                  Get bot info
+.mode <type>            Change bot mode
+.group-info             Group information
+.antilink               Toggle anti-link
+.welcome                Toggle welcome message
 
-### Optional Features
-
-```env
-AUTO_TYPING=true                  # Show typing indicator
-AUTO_RECORDING=true               # Show recording indicator
-AUTO_STATUS_SEEN=true             # Auto view statuses
-AUTO_STATUS_REACT=true            # Auto react to statuses
-ANTI_LINK=true                    # Block link sharing
-WELCOME=false                     # Welcome new members
-ALWAYS_ONLINE=false               # Always online status
-```
-
----
-
-## 📚 Commands
-
-| Category | Examples |
-|----------|----------|
-| 🎵 Media | `.play`, `.video`, `.song`, `.tiktok`, `.instagram` |
-| 👑 Owner | `.owner`, `.mode`, `.auto-typing`, `.env-list` |
-| 📢 Group | `.antilink`, `.welcome`, `.goodbye`, `.group-info` |
-| ⚙️ Settings | `.auto-seen`, `.status-react`, `.prefix` |
-| 🎨 Tools | 80+ additional creative & utility commands |
+Fun Commands
+.meme                   Random meme
+.joke                   Random joke
+.ship <name1> <name2>   Ship two people
+.fancy <text>           Fancy text conversion
+\\\
 
 ---
 
-## 🌐 Deploy
+##  Deploy Anywhere
 
 <div align="center">
+
+**Choose your platform and get started in minutes!**
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
 [![](assets/btn-railway.svg)](https://railway.app)
@@ -101,43 +142,39 @@ ALWAYS_ONLINE=false               # Always online status
 
 </div>
 
-**Quick Deploy:**
-- **Heroku**: Click button above → Set `SESSION_ID` → Deploy
-- **Railway/Render**: Connect GitHub → Set env vars → Deploy
-- **Koyeb**: `koyeb app create --docker blazetech-glitch/NYX`
-- **Ubuntu VPS**: `git clone`, `npm install`, `npm start`
-- **Cloudflare**: `wrangler init` → `wrangler publish`
+| Platform | Description |
+|----------|-------------|
+| **Heroku** | Click deploy button  Set env vars  Done  |
+| **Railway** | Connect GitHub  Set vars  Auto deploy  |
+| **Render** | Link repo  Configure  Deploy  |
+| **Koyeb** | \koyeb app create --docker blazetech-glitch/NYX\ |
+| **Cloudflare** | \wrangler init\  \wrangler publish\ |
+| **Ubuntu VPS** | Clone  Install  \
+pm start\ |
 
 ---
 
-## � Project Structure
+##  Built With
 
-```
-NYX/
-├── index.js           Entry point
-├── config.js          Configuration
-├── command.js         Command handler
-├── plugins/           100+ command plugins
-├── lib/               Utility functions
-├── data/              Database & storage
-├── assets/            SVG & resources
-└── sessions/          WhatsApp sessions
-```
+<div align="center">
 
----
+![Node.js](https://img.shields.io/badge/Node.js_20+-339933?logo=node.js&logoColor=white&style=for-the-badge)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black&style=for-the-badge)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white&style=for-the-badge)
+![FFmpeg](https://img.shields.io/badge/FFmpeg-007808?logo=ffmpeg&logoColor=white&style=for-the-badge)
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white&style=for-the-badge)
 
-## 🛠️ Tech Stack
+</div>
 
-- **Runtime**: Node.js 20+
-- **Framework**: @whiskeysockets/baileys 6.7.20
-- **Media**: FFmpeg, fluent-ffmpeg
-- **Downloads**: ytdl-core, @dark-yasiya/yt-dl.js
-- **Database**: SQLite3
-- **Deployment**: Heroku, Railway, Koyeb, Render, VPS, Cloudflare
+**Core Dependencies:**
+- @whiskeysockets/baileys (WhatsApp automation)
+- ytdl-core (YouTube downloader)
+- fluent-ffmpeg (Media processing)
+- SQLite3 (Database)
 
 ---
 
-## 👥 Connect With Us
+##  Connect With Us
 
 <div align="center">
 
@@ -148,17 +185,17 @@ NYX/
 [![](assets/btn-channel.svg)](https://whatsapp.com/channel/0029VbC49Bb2P59togOaEF2E)
 [![](assets/btn-community.svg)](https://chat.whatsapp.com/IrmNcI7Wn0C4bdLC70xVPJ)
 
-**Lead Developer**: [BLAZE TECH](https://wa.me/255627417402) 🇹🇿
+**Lead Developer**: [BLAZE TECH](https://wa.me/255627417402) 
 
 </div>
 
 ---
 
-## � Security & License
+##  Security & License
 
-- Keep `SESSION_ID` private in `.env`
+- Keep \SESSION_ID\ private in \.env\
 - Never share credentials publicly
-- Enable `ANTI_LINK` in group chats
+- Enable \ANTI_LINK\ in group chats
 - Monitor bot logs regularly
 
 **License**: MIT - For educational purposes only  
@@ -168,6 +205,6 @@ NYX/
 
 <div align="center">
 
-**Made with ❤️ by BLAZE TECH** | NYX MD v3.0.0
+**Made with  by BLAZE TECH** | NYX MD v3.0.0
 
 </div>
