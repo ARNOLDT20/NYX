@@ -8,7 +8,7 @@ cmd({
     alias: ['status', 'live'],
     desc: 'Check uptime and system status',
     category: 'main',
-    react: '🧚‍♂️',
+        react: '🟢',
     filename: __filename
 },
     async (conn, mek, m, { from, sender, reply }) => {
