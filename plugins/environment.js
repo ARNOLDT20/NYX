@@ -242,22 +242,31 @@ cmd({
     filename: __filename
 },
     async (conn, mek, m, { from, args, isCreator, reply }) => {
-        if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+        if (!isCreator) return reply("*❌ Only the owner can use this command!*");
 
         const status = args[0]?.toLowerCase();
         if (!["on", "off"].includes(status)) {
-            return reply("*🫟 ᴇxᴀᴍᴘʟᴇ: .ᴀᴜᴛᴏ-ʀᴇᴄᴏʀᴅɪɴɢ ᴏɴ*");
+            return reply("*📝 Usage:  .auto-recording on|off*");
         }
 
         config.AUTO_RECORDING = status === "on" ? "true" : "false";
         saveConfig('AUTO_RECORDING', config.AUTO_RECORDING);
+        
+        const statusIcon = status === "on" ? "✅" : "❌";
+        const recordMsg = `╔════════════════════════════╗
+║   🎙️  *AUTO-RECORDING* 🎙️   ║
+╚════════════════════════════╝
+
+${statusIcon} Status: *${status.toUpperCase()}*
+${status === "on" ? "🔴 Bot is recording..." : "⚫ Recording stopped"}
+Saved to config.env ✓`;
+        
         if (status === "on") {
             try { await conn.sendPresenceUpdate("recording", from); } catch (e) { }
-            return reply("Auto recording is now enabled. Bot is recording...");
         } else {
             try { await conn.sendPresenceUpdate("available", from); } catch (e) { }
-            return reply("Auto recording has been disabled.");
         }
+        return reply(recordMsg);
     });
 //--------------------------------------------
 // AUTO_VIEW_STATUS COMMANDS
