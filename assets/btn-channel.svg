@@ -1,0 +1,18 @@
+<svg width="150" height="40" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .button-bg { fill: #25D366; }
+      .button-text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 600; fill: white; }
+      .button-icon { fill: white; }
+    </style>
+  </defs>
+  
+  <rect class="button-bg" width="150" height="40" rx="6"/>
+  
+  <!-- Channel/Broadcast Icon -->
+  <g transform="translate(6, 9)">
+    <path class="button-icon" d="M17 10.5V7c0 0.55-0.45 1-1 1H4c-0.55 0-1-0.45-1-1v3.5C3 9.45 2.55 9 2 9s-1 0.45-1 1V7c0-1.65 1.35-3 3-3h12c1.65 0 3 1.35 3 3v3.5c0 0.55-0.45 1-1 1s-1-0.45-1-1zM16.5 16H3.5c-0.83 0-1.5-0.67-1.5-1.5v-3c0-0.83 0.67-1.5 1.5-1.5h13c0.83 0 1.5 0.67 1.5 1.5v3c0 0.83-0.67 1.5-1.5 1.5zm0-4H3.5v3h13v-3z"/>
+  </g>
+  
+  <text class="button-text" x="42" y="26">Channel</text>
+</svg>

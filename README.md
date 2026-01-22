@@ -178,9 +178,14 @@ NYX/
 | **Lead Developer** | BLAZE TECH | [WhatsApp](https://wa.me/255627417402) |
 | **Co-Developer** | Team Member | [WhatsApp](https://wa.me/255754206718) |
 
-**GitHub**: [@blazetech-glitch](https://github.com/blazetech-glitch)  
-**Channel**: [WhatsApp Updates](https://whatsapp.com/channel/0029VbC49Bb2P59togOaEF2E)  
-**Community**: [WhatsApp Group](https://chat.whatsapp.com/IrmNcI7Wn0C4bdLC70xVPJ)
+<div style="margin-top: 20px;">
+
+[![](assets/btn-github.svg)](https://github.com/blazetech-glitch)
+[![](assets/btn-whatsapp.svg)](https://wa.me/255627417402)
+[![](assets/btn-channel.svg)](https://whatsapp.com/channel/0029VbC49Bb2P59togOaEF2E)
+[![](assets/btn-community.svg)](https://chat.whatsapp.com/IrmNcI7Wn0C4bdLC70xVPJ)
+
+</div>
 
 </div>
 
