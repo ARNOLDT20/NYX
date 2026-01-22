@@ -23,20 +23,31 @@ cmd({
         const platform = `${os.type()} ${os.release()} ${os.arch()}`;
         const cpu = os.cpus()[0].model;
 
-        const text = `*┏────〘 BOT INFO 〙───⊷*\n` +
-            `*┃* *Name:* ${config.BOT_NAME || pkg.name || 'NYX MD'}\n` +
-            `*┃* *Owner:* ${config.OWNER_NAME || 'Owner'}\n` +
-            `*┃* *Prefix:* ${config.PREFIX || '.'}\n` +
-            `*┃* *Version:* ${pkg.version || '1.0.0'}\n` +
-            `*┃* *Commands:* ${totalCmds}\n` +
-            `*┃* *Uptime:* ${up}\n` +
-            `*┃* *Memory:* ${usedMB} MB / ${totalMB} MB\n` +
-            `*┃* *Node:* ${node}\n` +
-            `*┃* *Platform:* ${platform}\n` +
-            `*┃* *CPU:* ${cpu}\n` +
-            `*┃* *Group Link:* ${config.GROUP_LINK || 'Not set'}\n` +
-            `*┃* *Channel:* ${config.CHANNEL_LINK || 'Not set'}\n` +
-            `*┗──────────────⊷*`;
+        const text = `╔════════════════════════════╗
+║   🤖 *BOT INFORMATION* 🤖  ║
+╚════════════════════════════╝
+
+╭─────────────────────────────╮
+│ 📋 *DETAILS*
+├─────────────────────────────┤
+│ 🏷️  Name: *${config.BOT_NAME || pkg.name || 'NYX MD'}*
+│ 👑 Owner: *${config.OWNER_NAME || 'Owner'}*
+│ 🔑 Prefix: *${config.PREFIX || '.'}*
+│ 📦 Version: *${pkg.version || '3.0.0'}*
+│ 🧩 Commands: *${totalCmds}*
+├─────────────────────────────┤
+│ ⏱️  Uptime: ${up}
+│ 💾 Memory: ${usedMB} MB / ${totalMB} MB
+│ 🖥️  Platform: ${platform}
+│ 🔧 Node: ${node}
+│ ⚙️  CPU: ${cpu.substring(0, 25)}...
+├─────────────────────────────┤
+│ 🌐 Links
+│ 🔗 Group: ${config.GROUP_LINK ? '[Join](' + config.GROUP_LINK + ')' : '❌ Not Set'}
+│ 📢 Channel: ${config.CHANNEL_LINK ? '[Follow](' + config.CHANNEL_LINK + ')' : '❌ Not Set'}
+╰─────────────────────────────╯
+
+*> Powered by @whiskeysockets/baileys*`;
 
         await conn.sendMessage(from, { text, contextInfo: { mentionedJid: [sender] } }, { quoted: mek });
 

@@ -21,18 +21,31 @@ cmd({
             const platform = `${os.type()} ${os.release()} ${os.arch()}`;
             const cpu = os.cpus()[0].model;
 
-            const aliveText = `*┏────〘 ${config.BOT_NAME || 'NYX MD'} 〙───⊷*
-*┃* *👑 Owner:* ${config.OWNER_NAME || 'Owner'}
-*┃* *🔹 Prefix:* ${config.PREFIX || '.'}
-*┃* *🧩 Version:* 1.0.0 Beta
-*┃* *📁 Commands:* ${totalCmds}
-*┃* *⏱ Uptime:* ${up}
-*┃* *💾 Memory:* ${usedMB} MB / ${totalMB} MB
-*┃* *🖥 Platform:* ${platform}
-*┃* *⚙️ CPU:* ${cpu}
-*┃* *🔗 Group:* ${config.GROUP_LINK || 'Not set'}
-*┃* *🔔 Channel:* ${config.CHANNEL_LINK || 'Not set'}
-*┗──────────────⊷*`;
+            const aliveText = `╔════════════════════════════╗
+║    ✨ *${config.BOT_NAME || 'NYX MD'}* ✨    ║
+║   🤖 STATUS: ALIVE 🤖   ║
+╚════════════════════════════╝
+
+╭─────────────────────────────╮
+│ 📊 *SYSTEM INFORMATION*
+├─────────────────────────────┤
+│ 👑 Owner: ${config.OWNER_NAME || 'Owner'}
+│ 🔑 Prefix: ${config.PREFIX || '.'}
+│ 🏷️  Version: 3.0.0
+│ 📦 Commands: ${totalCmds}
+├─────────────────────────────┤
+│ ⏱️  Uptime: ${up}
+│ 💾 Memory: ${usedMB}MB / ${totalMB}MB
+│ 🖥️  Platform: ${platform}
+│ ⚙️  CPU: ${cpu.substring(0, 30)}...
+├─────────────────────────────┤
+│ 🔗 Group: ${config.GROUP_LINK ? '✅ Active' : '❌ Not Set'}
+│ 📢 Channel: ${config.CHANNEL_LINK ? '✅ Active' : '❌ Not Set'}
+├─────────────────────────────┤
+│ 🟢 Status: *ONLINE & READY*
+╰─────────────────────────────╯
+
+*> Made with ❤️ by BLAZE TECH*`;
 
             // try to send an image (alive image) with the card
             try {

@@ -54,21 +54,22 @@ cmd({
       return `${h}h ${m}m ${s}s`;
     };
 
-    // 🌟 BEAUTIFUL HEADER
-    let menu = `
-╔═══════════════╗
-   ☢️  ${toUpperStylized('NYX MD')}  ☢️
-╚═══════════════╝
-╭───────────────────⟡
-│ 👤 ᴜꜱᴇʀ : @${sender.split("@")[0]}
-│ ⏱️ ʀᴜɴᴛɪᴍᴇ : ${uptime()}
-│ ⚙️ ᴍᴏᴅᴇ : ${config.MODE}
-│ 🔑 ᴘʀᴇғɪx : 「 ${config.PREFIX} 」
-│ 👑 ᴏᴡɴᴇʀ : ${config.OWNER_NAME}
-│ 🧩 ᴘʟᴜɢɪɴꜱ : ${commands.length}
-│ 🛠️ ᴅᴇᴠ : BLAZE TEAM
-│ 🚀 ᴠᴇʀꜱɪᴏɴ : 2.0.0
-╰───────────────────⟡`;
+    // 🌟 BEAUTIFUL HEADER WITH COLORS
+    let menu = `╔════════════════════════════════╗
+║        ✨ *NYX MD* ✨       ║
+║    🤖 Command Menu v3.0.0 🤖   ║
+╚════════════════════════════════╝
+
+╭─────────────────────────────────╮
+│ 👤 User: @${sender.split("@")[0]}
+│ ⏱️  Runtime: ${uptime()}
+│ ⚙️  Mode: ${config.MODE.toUpperCase()}
+│ 🔑 Prefix: 「 ${config.PREFIX} 」
+│ 👑 Owner: ${config.OWNER_NAME}
+│ 🧩 Plugins: ${commands.length}
+│ 🛠️  Developer: BLAZE TECH
+│ 📅 ${time} • ${date}
+╰─────────────────────────────────╯`;
 
     // Group commands by category
     const categories = {};
@@ -80,25 +81,21 @@ cmd({
       }
     }
 
-    // 🌈 ROYAL CATEGORY STYLE
+    // 🌈 COLORFUL CATEGORY STYLE WITH BUTTONS
     for (const cat of Object.keys(categories).sort()) {
       const emoji = emojiByCategory[cat] || '✨';
-      menu += `
-
-╭═══════════════⟡
-│ ${emoji}  ${toUpperStylized(cat)}  ${toUpperStylized('Menu')}
-╰═══════════════⟡`;
+      menu += `\n\n╭─────────────────────────────────╮
+│ ${emoji} *${toUpperStylized(cat).toUpperCase()} MENU*
+├─────────────────────────────────┤`;
       for (const cmd of categories[cat].sort()) {
-        menu += `
-│ ✦ ${prefix}${cmd}`;
+        menu += `\n│ ▸ ${prefix}${cmd}`;
       }
-      menu += `
-╰───────────────────⟡`;
+      menu += `\n╰─────────────────────────────────╯`;
     }
 
-    menu += `
-
-✨ ${config.DESCRIPTION || toUpperStylized('Explore the power of NYX MD')} ✨`;
+    menu += `\n\n╔════════════════════════════════╗
+║   🌟 ${config.DESCRIPTION || toUpperStylized('Explore the power of NYX MD')} 🌟   ║
+╚════════════════════════════════╝\n\n*📱 Need help?*\n🔗 Group: ${config.GROUP_LINK ? '[Join](' + config.GROUP_LINK + ')' : 'Not Set'}\n📢 Channel: ${config.CHANNEL_LINK ? '[Follow](' + config.CHANNEL_LINK + ')' : 'Not Set'}\n\n*Made with ❤️ by BLAZE TECH* | *v3.0.0*`;
 
     // Context info
     const imageContextInfo = {
