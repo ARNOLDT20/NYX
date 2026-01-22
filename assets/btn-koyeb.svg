@@ -1,0 +1,21 @@
+<svg width="150" height="40" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .button-bg { fill: #242628; }
+      .button-text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 600; fill: #F0F0F0; }
+      .button-icon { fill: #F0F0F0; }
+    </style>
+  </defs>
+  
+  <rect class="button-bg" width="150" height="40" rx="6"/>
+  
+  <!-- Koyeb Icon -->
+  <g transform="translate(6, 8)">
+    <circle class="button-icon" cx="6" cy="6" r="2"/>
+    <circle class="button-icon" cx="12" cy="6" r="2"/>
+    <circle class="button-icon" cx="9" cy="12" r="2"/>
+    <path class="button-icon" stroke="#F0F0F0" stroke-width="1" fill="none" d="M6 8 L9 10 M12 8 L9 10"/>
+  </g>
+  
+  <text class="button-text" x="42" y="26">Koyeb</text>
+</svg>

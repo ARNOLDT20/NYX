@@ -1,0 +1,19 @@
+<svg width="150" height="40" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .button-bg { fill: #0B0D0E; }
+      .button-text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 600; fill: #0DFFFF; }
+      .button-icon { fill: #0DFFFF; }
+    </style>
+  </defs>
+  
+  <rect class="button-bg" width="150" height="40" rx="6"/>
+  
+  <!-- Railway Icon -->
+  <g transform="translate(6, 8)">
+    <path class="button-icon" d="M8 4v12h2V4H8zm6 0v12h2V4h-2zm-12 0v12h2V4H2z"/>
+    <rect class="button-icon" x="2" y="2" width="14" height="2" rx="1"/>
+  </g>
+  
+  <text class="button-text" x="38" y="26">Railway</text>
+</svg>
