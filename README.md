@@ -1,10 +1,10 @@
-#  NYX MD - WhatsApp Bot
+﻿#  NYX MD - WhatsApp Bot
 
 <div align="center">
 
 ![NYX Typing Animation](assets/typing-animation.svg)
 
-**The Ultimate WhatsApp Bot with 100+ Advanced Commands**
+** The Ultimate WhatsApp Bot with 100+ Advanced Commands **
 
 [![Node.js](https://img.shields.io/badge/Node.js->=20-brightgreen?style=for-the-badge&logo=node.js)](https://nodejs.org)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
@@ -22,21 +22,21 @@
 <td>
 
 ###  Media & Download
-- YouTube Music/Video
-- Instagram Posts/Reels
-- TikTok Videos
-- Facebook Videos
-- Ringtone Downloads
+-  YouTube Music/Video
+-  Instagram Posts/Reels
+-  TikTok Videos
+-  Facebook Videos
+-  Ringtone Downloads
 
 </td>
 <td>
 
 ###  Admin Tools
-- Group Management
-- Member Control
-- Auto-Kick Bad Links
-- Welcome/Goodbye
-- Status Reactions
+-  Group Management
+-  Member Control
+-  Auto-Kick Bad Links
+-  Welcome/Goodbye
+-  Status Reactions
 
 </td>
 </tr>
@@ -44,21 +44,21 @@
 <td>
 
 ###  Smart Features
-- AI Chat Integration
-- Auto Typing Indicator
-- Auto Recording Indicator
-- Message Auto-React
-- Status Auto-Seen
+-  AI Chat Integration
+-  Auto Typing Indicator
+-  Auto Recording Indicator
+-  Message Auto-React
+-  Status Auto-Seen
 
 </td>
 <td>
 
 ###  Creative Tools
-- Sticker Converter
-- Image Editor
-- Fancy Text
-- Meme Generator
-- And 80+ more!
+-  Sticker Converter
+-  Image Editor
+-  Fancy Text
+-  Meme Generator
+-  And 80+ more!
 
 </td>
 </tr>
@@ -68,30 +68,30 @@
 
 ##  Installation
 
-### Local Setup
+###  Local Setup
 
-\\\ash
+`ash
 git clone https://github.com/blazetech-glitch/NYX.git
 cd NYX
 npm install
 node index.js
-\\\
+`
 
-**First Run**: Scan QR code or provide SESSION_ID from .env
+** First Run**: Scan QR code or provide SESSION_ID from .env
 
-### Docker
+###  Docker
 
-\\\ash
+`ash
 docker build -t nyx-bot .
 docker run -e SESSION_ID="your_session_id" nyx-bot
-\\\
+`
 
 ---
 
 ##  Configuration
 
 | Variable | Value | Purpose |
-|----------|-------|---------|
+|:--------:|:-----:|:--------|
 | SESSION_ID | your_session_id | WhatsApp authentication (required) |
 | OWNER_NUMBER | 255627417402 | Primary owner |
 | PREFIX | . | Command trigger character |
@@ -103,27 +103,27 @@ docker run -e SESSION_ID="your_session_id" nyx-bot
 
 ##  Popular Commands
 
-\\\
-Media Commands
-.play <query>           Play music from YouTube
-.video <query>          Download video
-.song <name>            Download song
-.tiktok <url>           Download TikTok video
-.instagram <url>        Download Instagram post
+`
+ Media Commands
+  .play <query>         Play music from YouTube
+  .video <query>        Download video
+  .song <name>          Download song
+  .tiktok <url>         Download TikTok video
+  .instagram <url>      Download Instagram post
 
-Admin Commands
-.owner                  Get bot info
-.mode <type>            Change bot mode
-.group-info             Group information
-.antilink               Toggle anti-link
-.welcome                Toggle welcome message
+ Admin Commands
+  .owner                Get bot info
+  .mode <type>          Change bot mode
+  .group-info           Group information
+  .antilink             Toggle anti-link
+  .welcome              Toggle welcome message
 
-Fun Commands
-.meme                   Random meme
-.joke                   Random joke
-.ship <name1> <name2>   Ship two people
-.fancy <text>           Fancy text conversion
-\\\
+ Fun Commands
+  .meme                 Random meme
+  .joke                 Random joke
+  .ship <name1> <name2> Ship two people
+  .fancy <text>         Fancy text conversion
+`
 
 ---
 
@@ -131,7 +131,7 @@ Fun Commands
 
 <div align="center">
 
-**Choose your platform and get started in minutes!**
+** Choose your platform and get started in minutes!**
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
 [![](assets/btn-railway.svg)](https://railway.app)
@@ -143,13 +143,13 @@ Fun Commands
 </div>
 
 | Platform | Description |
-|----------|-------------|
-| **Heroku** | Click deploy button  Set env vars  Done  |
-| **Railway** | Connect GitHub  Set vars  Auto deploy  |
-| **Render** | Link repo  Configure  Deploy  |
-| **Koyeb** | \koyeb app create --docker blazetech-glitch/NYX\ |
-| **Cloudflare** | \wrangler init\  \wrangler publish\ |
-| **Ubuntu VPS** | Clone  Install  \
+|:--------:|:------------|
+| ** Heroku** | Click deploy button  Set env vars  Done  |
+| ** Railway** | Connect GitHub  Set vars  Auto deploy  |
+| ** Render** | Link repo  Configure  Deploy  |
+| ** Koyeb** | \koyeb app create --docker blazetech-glitch/NYX\ |
+| ** Cloudflare** | \wrangler init\  \wrangler publish\ |
+| ** Ubuntu VPS** | Clone  Install  \
 pm start\ |
 
 ---
@@ -166,11 +166,11 @@ pm start\ |
 
 </div>
 
-**Core Dependencies:**
-- @whiskeysockets/baileys (WhatsApp automation)
-- ytdl-core (YouTube downloader)
-- fluent-ffmpeg (Media processing)
-- SQLite3 (Database)
+** Core Dependencies:**
+-  **@whiskeysockets/baileys** - WhatsApp automation
+-  **ytdl-core** - YouTube downloader
+-  **fluent-ffmpeg** - Media processing
+-  **SQLite3** - Database
 
 ---
 
@@ -178,14 +178,14 @@ pm start\ |
 
 <div align="center">
 
-### BLAZE TECH Team
+###  BLAZE TECH Team
 
 [![](assets/btn-github.svg)](https://github.com/blazetech-glitch)
 [![](assets/btn-whatsapp.svg)](https://wa.me/255627417402)
 [![](assets/btn-channel.svg)](https://whatsapp.com/channel/0029VbC49Bb2P59togOaEF2E)
 [![](assets/btn-community.svg)](https://chat.whatsapp.com/IrmNcI7Wn0C4bdLC70xVPJ)
 
-**Lead Developer**: [BLAZE TECH](https://wa.me/255627417402) 
+** Lead Developer**: [BLAZE TECH](https://wa.me/255627417402) 
 
 </div>
 
@@ -193,18 +193,18 @@ pm start\ |
 
 ##  Security & License
 
-- Keep \SESSION_ID\ private in \.env\
-- Never share credentials publicly
-- Enable \ANTI_LINK\ in group chats
-- Monitor bot logs regularly
+-  Keep \SESSION_ID\ private in \.env\
+-  Never share credentials publicly
+-  Enable \ANTI_LINK\ in group chats
+-  Monitor bot logs regularly
 
-**License**: MIT - For educational purposes only  
-**Disclaimer**: Users responsible for WhatsApp Terms of Service compliance
+** License**: MIT - For educational purposes only  
+** Disclaimer**: Users responsible for WhatsApp Terms of Service compliance
 
 ---
 
 <div align="center">
 
-**Made with  by BLAZE TECH** | NYX MD v3.0.0
+** Made with  by BLAZE TECH** | *NYX MD v3.0.0*
 
 </div>
