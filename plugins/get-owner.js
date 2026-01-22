@@ -14,6 +14,17 @@ cmd({
   try {
     // React with loading emoji
     await sock.sendMessage(from, { react: { text: "📇", key: m.key } });
+    
+    // Send beautiful owner info message
+    const ownerText = `╔════════════════════════════╗
+║     👑 *OWNER CONTACT* 👑    ║
+╚════════════════════════════╝
+
+╭─────────────────────────────╮
+│ 📱 Getting owner contacts...
+╰─────────────────────────────╯`;
+
+    await sock.sendMessage(from, { text: ownerText, contextInfo: { mentionedJid: [from] } });
     await sock.sendPresenceUpdate("composing", from);
     await sleep(1000);
 
@@ -37,13 +48,13 @@ cmd({
       contactsList = [`${n1}@s.whatsapp.net`, `${n2}@s.whatsapp.net`];
     }
 
-    const displayName = config.OWNER_NAME || 'Bot Owner';
-    const contactsPayload = contactsList.map(jid => {
+    const displayName = config.OWNER_NAME || '👑 Bot Owner';
+    const contactsPayload = contactsList.map((jid, idx) => {
       const num = (typeof jid === 'string') ? jid.split('@')[0] : String(jid);
       const vcard = [
         'BEGIN:VCARD',
         'VERSION:3.0',
-        `FN:${displayName}`,
+        `FN:${displayName} #${idx + 1}`,
         `ORG:${config.BOT_NAME || 'NYX MD'};`,
         `TEL;type=CELL;type=VOICE;waid=${num}:${'+' + num}`,
         'END:VCARD'
@@ -53,11 +64,25 @@ cmd({
 
     await sock.sendMessage(from, {
       contacts: {
-        displayName: displayName,
+        displayName: `👑 ${displayName}`,
         contacts: contactsPayload
       }
     });
 
+    // Send success message with info
+    const successMsg = `╔════════════════════════════╗
+║      ✅ *SENT SUCCESS* ✅    ║
+╚════════════════════════════╝
+
+📞 Owner Contact Details:
+${contactsList.map((jid, i) => {
+  const num = (typeof jid === 'string') ? jid.split('@')[0] : String(jid);
+  return `  ${i + 1}. 📱 +${num}`;
+}).join('\n')}
+
+💬 Feel free to contact the owner!`;
+
+    await sock.sendMessage(from, { text: successMsg });
     await sock.sendMessage(from, { react: { text: "✅", key: m.key } });
 
   } catch (e) {
