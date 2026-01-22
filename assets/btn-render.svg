@@ -1,0 +1,18 @@
+<svg width="150" height="40" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .button-bg { fill: #46E3B4; }
+      .button-text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 600; fill: white; }
+      .button-icon { fill: white; }
+    </style>
+  </defs>
+  
+  <rect class="button-bg" width="150" height="40" rx="6"/>
+  
+  <!-- Render Icon -->
+  <g transform="translate(7, 8)">
+    <path class="button-icon" d="M8 2C5.24 2 3 4.24 3 7c0 2.76 2.24 5 5 5s5-2.24 5-5c0-2.76-2.24-5-5-5zm0 8c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/>
+  </g>
+  
+  <text class="button-text" x="44" y="26">Render</text>
+</svg>

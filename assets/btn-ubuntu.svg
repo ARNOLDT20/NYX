@@ -1,0 +1,21 @@
+<svg width="150" height="40" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .button-bg { fill: #FFA500; }
+      .button-text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 600; fill: white; }
+      .button-icon { fill: white; }
+    </style>
+  </defs>
+  
+  <rect class="button-bg" width="150" height="40" rx="6"/>
+  
+  <!-- Ubuntu/Linux Icon -->
+  <g transform="translate(6, 7)">
+    <circle class="button-icon" cx="6" cy="4" r="1.5"/>
+    <circle class="button-icon" cx="10" cy="6" r="1.5"/>
+    <circle class="button-icon" cx="8" cy="11" r="1.5"/>
+    <path class="button-icon" stroke="white" stroke-width="0.8" fill="none" d="M6 4 L10 6 M10 6 L8 11"/>
+  </g>
+  
+  <text class="button-text" x="46" y="26">Ubuntu</text>
+</svg>
