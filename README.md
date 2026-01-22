@@ -8,38 +8,7 @@
 
 *Advanced WhatsApp Bot with 100+ Commands | Multi-Platform Deployment Ready*
 
-<!-- Typing Animation -->
-<div style="display: flex; justify-content: center; margin: 20px 0;">
-  <svg width="200" height="60" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <style>
-        @keyframes typing {
-          0% { width: 0; }
-          50% { width: 100%; }
-          100% { width: 100%; }
-        }
-        @keyframes cursor {
-          0%, 49%, 100% { opacity: 1; }
-          50%, 99% { opacity: 0; }
-        }
-        .typing-text {
-          font-family: 'Courier New', monospace;
-          font-size: 20px;
-          fill: #00ff00;
-          animation: typing 4s steps(20, end) infinite;
-          white-space: nowrap;
-          overflow: hidden;
-        }
-        .cursor {
-          animation: cursor 0.7s infinite;
-        }
-      </style>
-    </defs>
-    <rect width="200" height="60" fill="#1a1a1a" rx="5"/>
-    <text x="10" y="40" class="typing-text">NYX MD Bot...</text>
-    <text x="180" y="40" class="cursor" font-size="20" fill="#00ff00">|</text>
-  </svg>
-</div>
+![NYX Typing Animation](assets/typing-animation.svg)
 
 [🚀 Quick Start](#-quick-start) • [⚙️ Configuration](#-configuration) • [📚 Commands](#-commands) • [🌐 Deploy](#-deployment) • [👥 Developers](#-developers)
 

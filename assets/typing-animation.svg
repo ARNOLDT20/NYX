@@ -1,0 +1,42 @@
+<svg width="300" height="80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @keyframes dot1 {
+        0%, 20% { opacity: 0; }
+        50% { opacity: 1; }
+        100% { opacity: 0; }
+      }
+      @keyframes dot2 {
+        0%, 35% { opacity: 0; }
+        65% { opacity: 1; }
+        100% { opacity: 0; }
+      }
+      @keyframes dot3 {
+        0%, 50% { opacity: 0; }
+        80% { opacity: 1; }
+        100% { opacity: 0; }
+      }
+      .dot {
+        font-size: 24px;
+        font-weight: bold;
+        fill: #25D366;
+      }
+      .dot1 { animation: dot1 1.4s infinite; }
+      .dot2 { animation: dot2 1.4s infinite; }
+      .dot3 { animation: dot3 1.4s infinite; }
+      .background { fill: #f0f0f0; rx: 10; }
+      .text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect class="background" width="300" height="80"/>
+  
+  <!-- WhatsApp-like message bubble -->
+  <text x="20" y="30" class="text">NYX MD is typing</text>
+  
+  <!-- Animated dots -->
+  <text x="80" y="50" class="dot dot1">●</text>
+  <text x="110" y="50" class="dot dot2">●</text>
+  <text x="140" y="50" class="dot dot3">●</text>
+</svg>
