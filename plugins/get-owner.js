@@ -1,6 +1,8 @@
 const { cmd } = require('../command');
 const config = require('../config');
 const { sleep } = require('../lib/functions');
+const fs = require('fs');
+const path = require('path');
 
 cmd({
   pattern: "owner",
@@ -10,36 +12,49 @@ cmd({
   filename: __filename
 }, async (sock, m, msg, { from }) => {
   try {
-    const number1 = config.OWNER_NUMBER; // primary owner
-    const number2 = config.OWNER_NUMBER2 || config.OWNER_NUMBER; // secondary owner (fallback to primary)
-    const name = config.OWNER_NAME || "Bot Owner";
-
     // React with loading emoji
     await sock.sendMessage(from, { react: { text: "📇", key: m.key } });
     await sock.sendPresenceUpdate("composing", from);
     await sleep(1000);
 
-    // Create vcards for both owners
-    const vcard1 =
-      'BEGIN:VCARD\n' +
-      'VERSION:3.0\n' +
-      `FN:${name}\n` +
-      `ORG:${config.BOT_NAME || 'NYX MD'};\n` +
-      `TEL;type=CELL;type=VOICE;waid=${number1}:${'+' + number1}\n` +
-      'END:VCARD';
+    // Try to read `assets/sudo.json` for owner JIDs; fallback to config numbers
+    let contactsList = [];
+    try {
+      const sudoPath = path.join(__dirname, '..', 'assets', 'sudo.json');
+      if (fs.existsSync(sudoPath)) {
+        const raw = fs.readFileSync(sudoPath, 'utf8');
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr) && arr.length) contactsList = arr;
+      }
+    } catch (e) {
+      console.error('Failed to read assets/sudo.json:', e);
+    }
 
-    const vcard2 =
-      'BEGIN:VCARD\n' +
-      'VERSION:3.0\n' +
-      `FN:${name}\n` +
-      `ORG:${config.BOT_NAME || 'NYX MD'};\n` +
-      `TEL;type=CELL;type=VOICE;waid=${number2}:${'+' + number2}\n` +
-      'END:VCARD';
+    // Fallback to config values if sudo.json is empty
+    if (!contactsList || contactsList.length === 0) {
+      const n1 = config.OWNER_NUMBER;
+      const n2 = config.OWNER_NUMBER2 || config.OWNER_NUMBER;
+      contactsList = [`${n1}@s.whatsapp.net`, `${n2}@s.whatsapp.net`];
+    }
+
+    const displayName = config.OWNER_NAME || 'Bot Owner';
+    const contactsPayload = contactsList.map(jid => {
+      const num = (typeof jid === 'string') ? jid.split('@')[0] : String(jid);
+      const vcard = [
+        'BEGIN:VCARD',
+        'VERSION:3.0',
+        `FN:${displayName}`,
+        `ORG:${config.BOT_NAME || 'NYX MD'};`,
+        `TEL;type=CELL;type=VOICE;waid=${num}:${'+' + num}`,
+        'END:VCARD'
+      ].join('\n');
+      return { vcard };
+    });
 
     await sock.sendMessage(from, {
       contacts: {
-        displayName: name,
-        contacts: [{ vcard: vcard1 }, { vcard: vcard2 }]
+        displayName: displayName,
+        contacts: contactsPayload
       }
     });
 

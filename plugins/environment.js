@@ -11,6 +11,32 @@ const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, sleep, fetchJson
 const { writeFileSync } = require('fs');
 const path = require('path');
 
+// Persist config changes to `config.env` so toggles survive restarts
+function saveConfig(key, value) {
+    try {
+        const envPath = path.join(__dirname, '..', 'config.env');
+        let content = '';
+        if (fs.existsSync(envPath)) content = fs.readFileSync(envPath, 'utf8');
+        const lines = content.split(/\r?\n/).filter(Boolean);
+        const kv = `${key}=${value}`;
+        let found = false;
+        const out = lines.map(line => {
+            if (line.startsWith(key + '=')) {
+                found = true;
+                return kv;
+            }
+            return line;
+        });
+        if (!found) out.push(kv);
+        fs.writeFileSync(envPath, out.join('\n'), 'utf8');
+        // Also update process.env so other code can read it immediately
+        process.env[key] = value;
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
 cmd({
     pattern: "admin-events",
     alias: ["adminevents"],
@@ -139,6 +165,7 @@ cmd({
         }
 
         config.AUTO_TYPING = status === "on" ? "true" : "false";
+        saveConfig('AUTO_TYPING', config.AUTO_TYPING);
         return reply(`Auto typing has been turned ${status}.`);
     });
 
@@ -213,11 +240,12 @@ cmd({
         }
 
         config.AUTO_RECORDING = status === "on" ? "true" : "false";
+        saveConfig('AUTO_RECORDING', config.AUTO_RECORDING);
         if (status === "on") {
-            await conn.sendPresenceUpdate("recording", from);
+            try { await conn.sendPresenceUpdate("recording", from); } catch (e) { }
             return reply("Auto recording is now enabled. Bot is recording...");
         } else {
-            await conn.sendPresenceUpdate("available", from);
+            try { await conn.sendPresenceUpdate("available", from); } catch (e) { }
             return reply("Auto recording has been disabled.");
         }
     });

@@ -489,16 +489,26 @@ async function connectToWA() {
     const sender = mek.key.fromMe ? (conn.user.id.split(':')[0] + '@s.whatsapp.net' || conn.user.id) : (mek.key.participant || mek.key.remoteJid)
     const senderNumber = sender.split('@')[0]
     const botNumber = conn.user.id.split(':')[0]
+    const botJid = botNumber + '@s.whatsapp.net'
     const pushname = mek.pushName || 'Sin Nombre'
     const isMe = botNumber.includes(senderNumber)
     const isOwner = ownerNumber.includes(senderNumber) || isMe
     const botNumber2 = await jidNormalizedUser(conn.user.id);
-    const groupMetadata = isGroup ? await conn.groupMetadata(from).catch(e => { }) : ''
-    const groupName = isGroup ? groupMetadata.subject : ''
-    const participants = isGroup ? await groupMetadata.participants : ''
-    const groupAdmins = isGroup ? await getGroupAdmins(participants) : ''
-    const isBotAdmins = isGroup ? groupAdmins.includes(botNumber2) : false
-    const isAdmins = isGroup ? groupAdmins.includes(sender) : false
+    const groupMetadata = isGroup ? await conn.groupMetadata(from).catch(e => { }) : null
+    const groupName = isGroup && groupMetadata ? groupMetadata.subject : ''
+    const participants = isGroup && groupMetadata ? groupMetadata.participants : []
+    const groupAdmins = isGroup ? await getGroupAdmins(participants) : []
+    const isBotAdmins = isGroup ? (Array.isArray(groupAdmins) && (
+      groupAdmins.includes(botNumber2) ||
+      groupAdmins.includes(botJid) ||
+      groupAdmins.includes(botNumber) ||
+      groupAdmins.some(a => typeof a === 'string' && a.includes(botNumber))
+    )) : false
+    const isAdmins = isGroup ? (Array.isArray(groupAdmins) && (
+      groupAdmins.includes(sender) ||
+      groupAdmins.includes(senderNumber + '@s.whatsapp.net') ||
+      groupAdmins.some(a => typeof a === 'string' && a.includes(senderNumber))
+    )) : false
     const isReact = m.message.reactionMessage ? true : false
     const reply = (teks) => {
       conn.sendMessage(from, { text: teks }, { quoted: mek })

@@ -5,6 +5,7 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const ffmpeg = require('fluent-ffmpeg');
+const ytdl = require('ytdl-core');
 
 cmd({
     pattern: "play",
@@ -154,6 +155,43 @@ cmd({
         }
 
         if (!success) {
+            // Final fallback: try downloading directly with ytdl-core
+            try {
+                console.log('Attempting fallback with ytdl-core...');
+                const info = await ytdl.getInfo(videoUrl);
+                const audioFormat = ytdl.chooseFormat(info.formats, { quality: 'highestaudio' });
+                if (audioFormat && audioFormat.url) {
+                    const stream = ytdl.downloadFromInfo(info, { quality: 'highestaudio' });
+
+                    await new Promise((resolve, reject) => {
+                        ffmpeg(stream)
+                            .audioCodec('libmp3lame')
+                            .audioBitrate(128)
+                            .format('mp3')
+                            .on('end', () => {
+                                resolve();
+                            })
+                            .on('error', (err) => {
+                                reject(err);
+                            })
+                            .save(outputPath);
+                    });
+
+                    if (fs.existsSync(outputPath)) {
+                        await conn.sendMessage(from, {
+                            audio: fs.readFileSync(outputPath),
+                            mimetype: 'audio/mpeg',
+                            fileName: `${title}.mp3`,
+                            ptt: false
+                        }, { quoted: mek });
+                        fs.unlinkSync(outputPath);
+                        success = true;
+                        await conn.sendMessage(from, { react: { text: "✅", key: mek.key } });
+                    }
+                }
+            } catch (ydlErr) {
+                console.warn('ytdl-core fallback failed:', ydlErr && ydlErr.message ? ydlErr.message : ydlErr);
+            }
             // Try one final fallback - send audio directly without conversion
             for (const api of apis) {
                 try {
