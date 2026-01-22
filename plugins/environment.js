@@ -157,16 +157,26 @@ cmd({
     filename: __filename
 },
     async (conn, mek, m, { from, args, isCreator, reply }) => {
-        if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+        if (!isCreator) return reply("*❌ Only the owner can use this command!*");
 
         const status = args[0]?.toLowerCase();
         if (!["on", "off"].includes(status)) {
-            return reply("*🫟 ᴇxᴀᴍᴘʟᴇ:  .ᴀᴜᴛᴏ-ᴛʏᴘɪɴɢ ᴏɴ*");
+            return reply("*📝 Usage:  .auto-typing on|off*");
         }
 
         config.AUTO_TYPING = status === "on" ? "true" : "false";
         saveConfig('AUTO_TYPING', config.AUTO_TYPING);
-        return reply(`Auto typing has been turned ${status}.`);
+        
+        const statusIcon = status === "on" ? "✅" : "❌";
+        const toggleMsg = `╔════════════════════════════╗
+║   ⌨️  *AUTO-TYPING* ⌨️   ║
+╚════════════════════════════╝
+
+${statusIcon} Status: *${status.toUpperCase()}*
+${status === "on" ? "🟢 Bot will type during operations" : "🔴 Typing disabled"}
+Saved to config.env ✓`;
+        
+        return reply(toggleMsg);
     });
 
 //mention reply 
