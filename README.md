@@ -94,9 +94,18 @@ AUTO_REACT=false                          # React to all messages
 
 ## 🌐 Deployment
 
-### ☁️ Heroku
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
+<div align="center">
 
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
+[![](assets/btn-railway.svg)](https://railway.app)
+[![](assets/btn-koyeb.svg)](https://koyeb.com)
+[![](assets/btn-cloudflare.svg)](https://workers.cloudflare.com)
+[![](assets/btn-render.svg)](https://render.com)
+[![](assets/btn-ubuntu.svg)](https://ubuntu.com)
+
+</div>
+
+### ☁️ Heroku
 ```bash
 heroku create nyx-bot
 git push heroku main
@@ -104,8 +113,7 @@ heroku config:set SESSION_ID=your_id
 ```
 
 ### 🚆 Railway
-Connect repo → Set `SESSION_ID` env var → Deploy  
-[railway.app](https://railway.app)
+Connect repo → Set `SESSION_ID` env var → Deploy
 
 ### 🎯 Koyeb
 ```bash
@@ -119,8 +127,7 @@ wrangler publish
 ```
 
 ### 🎨 Render
-Connect GitHub → Add env vars → Deploy  
-[render.com](https://render.com)
+Connect GitHub → Add env vars → Deploy
 
 ### 🖥️ VPS (Ubuntu/Debian)
 ```bash
