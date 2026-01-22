@@ -166,7 +166,7 @@ cmd({
 
         config.AUTO_TYPING = status === "on" ? "true" : "false";
         saveConfig('AUTO_TYPING', config.AUTO_TYPING);
-        
+
         const statusIcon = status === "on" ? "✅" : "❌";
         const toggleMsg = `╔════════════════════════════╗
 ║   ⌨️  *AUTO-TYPING* ⌨️   ║
@@ -175,7 +175,7 @@ cmd({
 ${statusIcon} Status: *${status.toUpperCase()}*
 ${status === "on" ? "🟢 Bot will type during operations" : "🔴 Typing disabled"}
 Saved to config.env ✓`;
-        
+
         return reply(toggleMsg);
     });
 
@@ -251,7 +251,7 @@ cmd({
 
         config.AUTO_RECORDING = status === "on" ? "true" : "false";
         saveConfig('AUTO_RECORDING', config.AUTO_RECORDING);
-        
+
         const statusIcon = status === "on" ? "✅" : "❌";
         const recordMsg = `╔════════════════════════════╗
 ║   🎙️  *AUTO-RECORDING* 🎙️   ║
@@ -260,7 +260,7 @@ cmd({
 ${statusIcon} Status: *${status.toUpperCase()}*
 ${status === "on" ? "🔴 Bot is recording..." : "⚫ Recording stopped"}
 Saved to config.env ✓`;
-        
+
         if (status === "on") {
             try { await conn.sendPresenceUpdate("recording", from); } catch (e) { }
         } else {

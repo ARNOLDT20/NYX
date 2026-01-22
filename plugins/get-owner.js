@@ -14,7 +14,7 @@ cmd({
   try {
     // React with loading emoji
     await sock.sendMessage(from, { react: { text: "📇", key: m.key } });
-    
+
     // Send beautiful owner info message
     const ownerText = `╔════════════════════════════╗
 ║     👑 *OWNER CONTACT* 👑    ║
@@ -76,9 +76,9 @@ cmd({
 
 📞 Owner Contact Details:
 ${contactsList.map((jid, i) => {
-  const num = (typeof jid === 'string') ? jid.split('@')[0] : String(jid);
-  return `  ${i + 1}. 📱 +${num}`;
-}).join('\n')}
+      const num = (typeof jid === 'string') ? jid.split('@')[0] : String(jid);
+      return `  ${i + 1}. 📱 +${num}`;
+    }).join('\n')}
 
 💬 Feel free to contact the owner!`;
 
