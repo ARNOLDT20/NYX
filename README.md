@@ -107,7 +107,7 @@ docker run -e SESSION_ID="your_session_id" nyx-bot
 
 ### Need a SESSION_ID to authenticate your bot?
 
-<a href="http://popkid-get-your-id-e1e23276b30a.herokuapp.com" target="_blank">
+<a href="http://popkid-get-your-id-e1e23276b30a.herokuapp.com/pair" target="_blank">
   <img alt="Get Session ID" src="https://img.shields.io/badge/✨_Get_Session_ID_✨-4a90e2?style=for-the-badge&logo=whatsapp&logoColor=white" />
 </a>
 
