@@ -290,7 +290,8 @@ async function connectToWA() {
 
     if (connection === 'close') {
       const code = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.statusCode;
-      console.log("Connection closed. Reason code:", code);
+      const errorMsg = lastDisconnect?.error?.message || '';
+      console.log("Connection closed. Reason code:", code, "Error:", errorMsg);
 
       // clear any keepalive intervals when connection closes
       try {
@@ -303,6 +304,32 @@ async function connectToWA() {
           keepAliveInterval = null;
         }
       } catch (e) { }
+
+      // Check for Bad MAC or session corruption errors
+      if (/Bad MAC|verifyMAC|Bad session|Session error/i.test(errorMsg)) {
+        console.error('❌ BAD MAC ERROR DETECTED: Session is corrupted');
+        console.error('🔄 Clearing session and forcing re-authentication...');
+        
+        // Clear corrupted session files
+        try {
+          const sessPath = __dirname + '/sessions/';
+          if (fs.existsSync(sessPath)) {
+            const files = fs.readdirSync(sessPath);
+            files.forEach(file => {
+              if (file !== '.gitkeep') {
+                fs.unlinkSync(sessPath + file);
+                console.log(`✅ Cleared: ${file}`);
+              }
+            });
+          }
+        } catch (err) {
+          console.error('Error clearing sessions:', err.message);
+        }
+        
+        console.log('⚠️ Please generate a NEW SESSION_ID and restart the bot.');
+        setTimeout(() => process.exit(1), 2000);
+        return;
+      }
 
       if (code !== DisconnectReason.loggedOut) {
         console.log("♻️ Reconnecting...");
