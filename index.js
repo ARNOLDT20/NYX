@@ -213,12 +213,41 @@ async function connectToWA() {
   })
 
   // Helper: detect auth/session errors and exit so Heroku can restart the dyno
-  const authErrorRegex = /getUSyncDevices|auth|401|loggedOut|AUTHENTICATION|Expired credentials|BAD_SESSION/i;
+  const authErrorRegex = /getUSyncDevices|auth|401|loggedOut|AUTHENTICATION|Expired credentials|BAD_SESSION|Bad MAC|verifyMAC|Bad session|Session error/i;
+  
   function handleAuthError(e) {
     try {
       if (!e) return;
       const msg = (e && (e.message || e.toString())) || '';
       console.error('Auth error check:', msg);
+      
+      // Check for Bad MAC error specifically
+      if (/Bad MAC|verifyMAC|Bad session/i.test(msg)) {
+        console.error('❌ SESSION CORRUPTION DETECTED: Bad MAC Error');
+        console.error('🔄 Clearing corrupted session files...');
+        
+        // Clear corrupted session files
+        try {
+          const sessPath = __dirname + '/sessions/';
+          if (fs.existsSync(sessPath)) {
+            const files = fs.readdirSync(sessPath);
+            files.forEach(file => {
+              if (file !== '.gitkeep') {
+                fs.unlinkSync(sessPath + file);
+                console.log(`✅ Deleted: ${file}`);
+              }
+            });
+          }
+        } catch (err) {
+          console.error('Error clearing sessions:', err.message);
+        }
+        
+        console.error('⚠️ SESSION RESET: Please generate a new SESSION_ID by scanning the QR code again.');
+        console.error('Exiting process to restart...');
+        setTimeout(() => process.exit(1), 2000);
+        return;
+      }
+      
       if (authErrorRegex.test(msg)) {
         console.error('Detected auth/session issue — exiting to allow restart.');
         setTimeout(() => process.exit(1), 1000);

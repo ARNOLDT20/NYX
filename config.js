@@ -88,4 +88,8 @@ module.exports = {
     // make true for welcome messages on group member add
     GOODBYE: process.env.GOODBYE || "true",
     // make true for goodbye messages on group member remove
+    HEROKU_API_KEY: process.env.HEROKU_API_KEY || "",
+    // Your Heroku API key for automatic redeploy
+    HEROKU_APP_NAME: process.env.HEROKU_APP_NAME || "",
+    // Your Heroku app name for automatic redeploy
 };
