@@ -84,8 +84,8 @@ module.exports = {
     // change it to 'same' if you want to resend deleted message in same chat
     AUTO_RECORDING: process.env.AUTO_RECORDING || "true",
     // make it true for auto recoding
-    WELCOME: process.env.WELCOME || "false",
+    WELCOME: process.env.WELCOME || "true",
     // make true for welcome messages on group member add
-    GOODBYE: process.env.GOODBYE || "false",
+    GOODBYE: process.env.GOODBYE || "true",
     // make true for goodbye messages on group member remove
 };
