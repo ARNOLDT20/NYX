@@ -107,54 +107,21 @@ docker run -e SESSION_ID="your_session_id" nyx-bot
 
 ### Need a SESSION_ID to authenticate your bot?
 
-Click the button below to generate your unique session ID instantly!
-
-<style>
-@keyframes glow {
-  0%, 100% { box-shadow: 0 0 5px rgba(74, 144, 226, 0.5), 0 0 10px rgba(74, 144, 226, 0.3); }
-  50% { box-shadow: 0 0 20px rgba(74, 144, 226, 0.8), 0 0 30px rgba(74, 144, 226, 0.6); }
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-.session-button {
-  display: inline-block;
-  padding: 15px 40px;
-  font-size: 18px;
-  font-weight: bold;
-  color: white;
-  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  text-decoration: none;
-  animation: glow 2s ease-in-out infinite, pulse 2s ease-in-out infinite;
-  box-shadow: 0 0 20px rgba(74, 144, 226, 0.8);
-  transition: all 0.3s ease;
-}
-
-.session-button:hover {
-  background: linear-gradient(135deg, #357abd 0%, #1e4d7b 100%);
-  transform: scale(1.08);
-  box-shadow: 0 0 30px rgba(74, 144, 226, 1);
-}
-</style>
-
-<a href="http://popkid-get-your-id-e1e23276b30a.herokuapp.com" class="session-button">✨ Get Session ID ✨</a>
+<a href="http://popkid-get-your-id-e1e23276b30a.herokuapp.com" target="_blank">
+  <img alt="Get Session ID" src="https://img.shields.io/badge/✨_Get_Session_ID_✨-4a90e2?style=for-the-badge&logo=whatsapp&logoColor=white" />
+</a>
 
 ### Steps:
-1. Click the button above
+1. Click the badge above
 2. Scan the QR code with your phone
 3. Copy your SESSION_ID
-4. Add it to your `.env` file
-5. Start the bot!
+4. Add it to your `.env` file:
 
 ```env
 SESSION_ID=your_generated_session_id_here
 ```
+
+5. Start the bot: `node index.js`
 
 </div>
 
