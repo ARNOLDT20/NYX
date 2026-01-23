@@ -151,7 +151,26 @@ const promptSessionID = () => {
 //===================SESSION-AUTH============================
 (async () => {
   try {
-    if (!fs.existsSync(__dirname + '/sessions/creds.json')) {
+    // Check if session file exists AND is valid
+    const sessionPath = __dirname + '/sessions/creds.json';
+    let sessionValid = false;
+    
+    if (fs.existsSync(sessionPath)) {
+      try {
+        // Try to parse the session file to verify it's not corrupted
+        const sessionContent = fs.readFileSync(sessionPath, 'utf8');
+        JSON.parse(sessionContent);
+        sessionValid = true;
+        console.log('✅ Session file is valid');
+      } catch (e) {
+        console.error('❌ Session file is corrupted:', e.message);
+        console.log('🔄 Deleting corrupted session...');
+        fs.unlinkSync(sessionPath);
+        sessionValid = false;
+      }
+    }
+    
+    if (!sessionValid && !fs.existsSync(sessionPath)) {
       if (!config.SESSION_ID) {
         // Only prompt if running locally, not on Heroku/production
         if (isProduction) {
@@ -174,12 +193,12 @@ const promptSessionID = () => {
           console.log('⚠️ Please check your SESSION_ID is correct');
           process.exit(1);
         }
-        fs.writeFile(__dirname + '/sessions/creds.json', data, () => {
+        fs.writeFile(sessionPath, data, () => {
           console.log("✅ SESSION-ID CONNECTED 🙂");
           connectToWA();
         });
       });
-    } else {
+    } else if (sessionValid || fs.existsSync(sessionPath)) {
       connectToWA();
     }
   } catch (err) {
@@ -214,18 +233,18 @@ async function connectToWA() {
 
   // Helper: detect auth/session errors and exit so Heroku can restart the dyno
   const authErrorRegex = /getUSyncDevices|auth|401|loggedOut|AUTHENTICATION|Expired credentials|BAD_SESSION|Bad MAC|verifyMAC|Bad session|Session error/i;
-  
+
   function handleAuthError(e) {
     try {
       if (!e) return;
       const msg = (e && (e.message || e.toString())) || '';
       console.error('Auth error check:', msg);
-      
+
       // Check for Bad MAC error specifically
       if (/Bad MAC|verifyMAC|Bad session/i.test(msg)) {
         console.error('❌ SESSION CORRUPTION DETECTED: Bad MAC Error');
         console.error('🔄 Clearing corrupted session files...');
-        
+
         // Clear corrupted session files
         try {
           const sessPath = __dirname + '/sessions/';
@@ -241,13 +260,13 @@ async function connectToWA() {
         } catch (err) {
           console.error('Error clearing sessions:', err.message);
         }
-        
+
         console.error('⚠️ SESSION RESET: Please generate a new SESSION_ID by scanning the QR code again.');
         console.error('Exiting process to restart...');
         setTimeout(() => process.exit(1), 2000);
         return;
       }
-      
+
       if (authErrorRegex.test(msg)) {
         console.error('Detected auth/session issue — exiting to allow restart.');
         setTimeout(() => process.exit(1), 1000);
@@ -309,7 +328,7 @@ async function connectToWA() {
       if (/Bad MAC|verifyMAC|Bad session|Session error/i.test(errorMsg)) {
         console.error('❌ BAD MAC ERROR DETECTED: Session is corrupted');
         console.error('🔄 Clearing session and forcing re-authentication...');
-        
+
         // Clear corrupted session files
         try {
           const sessPath = __dirname + '/sessions/';
@@ -325,7 +344,7 @@ async function connectToWA() {
         } catch (err) {
           console.error('Error clearing sessions:', err.message);
         }
-        
+
         console.log('⚠️ Please generate a NEW SESSION_ID and restart the bot.');
         setTimeout(() => process.exit(1), 2000);
         return;
@@ -495,11 +514,12 @@ async function connectToWA() {
   //=============readstatus=======
 
   conn.ev.on('messages.upsert', async (mek) => {
-    mek = mek.messages[0]
-    if (!mek.message) return
-    mek.message = (getContentType(mek.message) === 'ephemeralMessage')
-      ? mek.message.ephemeralMessage.message
-      : mek.message;
+    try {
+      mek = mek.messages[0]
+      if (!mek.message) return
+      mek.message = (getContentType(mek.message) === 'ephemeralMessage')
+        ? mek.message.ephemeralMessage.message
+        : mek.message;
     //console.log("New Message Detected:", JSON.stringify(mek, null, 2));
     if (config.READ_MESSAGE === 'true') {
       await conn.readMessages([mek.key]);  // Mark message as read
@@ -697,6 +717,10 @@ async function connectToWA() {
       }
     });
 
+    } catch (error) {
+      console.error('Error in messages.upsert handler:', error && (error.message || error.toString()));
+      handleAuthError(error);
+    }
   });
   //===================================================   
   conn.decodeJid = jid => {

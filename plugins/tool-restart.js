@@ -45,35 +45,35 @@ cmd({
     category: "owner",
     filename: __filename
 },
-async (conn, mek, m, {
-    from, quoted, body, isCmd, command, args, q,
-    isGroup, sender, senderNumber, botNumber2, botNumber,
-    pushname, isMe, isOwner, isCreator, groupMetadata,
-    groupName, participants, groupAdmins, isBotAdmins,
-    isAdmins, reply
-}) => {
-    try {
-        if (!isCreator) {
-            return reply("🚫 *This command is only for the bot owner (creator).*");
-        }
+    async (conn, mek, m, {
+        from, quoted, body, isCmd, command, args, q,
+        isGroup, sender, senderNumber, botNumber2, botNumber,
+        pushname, isMe, isOwner, isCreator, groupMetadata,
+        groupName, participants, groupAdmins, isBotAdmins,
+        isAdmins, reply
+    }) => {
+        try {
+            if (!isCreator) {
+                return reply("🚫 *This command is only for the bot owner (creator).*");
+            }
 
-        const { exec } = require("child_process");
-        reply("♻️ Restarting the bot...\n🚀 Triggering Heroku redeploy...");
-        await sleep(1500);
+            const { exec } = require("child_process");
+            reply("♻️ Restarting the bot...\n🚀 Triggering Heroku redeploy...");
+            await sleep(1500);
 
-        // Try Heroku redeploy first
-        const herokuTriggered = await triggerHerokuRedeploy(null);
-        
-        // Also restart PM2 locally
-        exec("pm2 restart all");
-        
-        if (herokuTriggered) {
-            console.log('✅ Both local and Heroku restart initiated');
+            // Try Heroku redeploy first
+            const herokuTriggered = await triggerHerokuRedeploy(null);
+
+            // Also restart PM2 locally
+            exec("pm2 restart all");
+
+            if (herokuTriggered) {
+                console.log('✅ Both local and Heroku restart initiated');
+            }
+        } catch (e) {
+            console.log(e);
+            reply(`${e}`);
         }
-    } catch (e) {
-        console.log(e);
-        reply(`${e}`);
-    }
-});
+    });
 
 module.exports = { triggerHerokuRedeploy };

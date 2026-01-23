@@ -39,7 +39,7 @@ cmd({
 
             // Trigger Heroku redeploy
             const herokuTriggered = await triggerHerokuRedeploy(reply);
-            
+
             // Also restart PM2 locally
             exec("pm2 restart all", (error, stdout, stderr) => {
                 if (error) {
