@@ -151,4 +151,82 @@ function shuffleArray(array) {
     const j = Math.floor(Math.random() * (i + 1));
     [array[i], array[j]] = [array[j], array[i]];
   }
-      }
+}
+
+// Viewonce Media Retrieval Command
+cmd({
+  pattern: 'etrive',
+  alias: ['viewonce', 'v1', 'disappear', 'secret'],
+  desc: 'Retrieve viewonce (disappearing) media with caption',
+  category: 'media',
+  use: '.etrive (reply to viewonce message)',
+  filename: __filename,
+}, async (conn, mek, msg, { from, sender, reply, quoted }) => {
+  try {
+    // Check if there's a quoted message
+    if (!quoted) {
+      return reply('❌ Please reply to a viewonce message to retrieve it.');
+    }
+
+    // Get the message content
+    const quotedMsg = quoted.message;
+    
+    if (!quotedMsg) {
+      return reply('❌ No message found to retrieve.');
+    }
+
+    // Check if it's a viewonce media
+    const isViewOnce = quotedMsg.imageMessage?.viewOnce || 
+                       quotedMsg.videoMessage?.viewOnce || 
+                       quotedMsg.audioMessage?.viewOnce;
+
+    if (!isViewOnce) {
+      return reply('⚠️ This message is not a viewonce media.');
+    }
+
+    // Determine media type and extract
+    let mediaBuffer = null;
+    let mediaType = '';
+
+    if (quotedMsg.imageMessage?.viewOnce) {
+      mediaBuffer = await conn.downloadMediaMessage(quotedMsg.imageMessage);
+      mediaType = 'image';
+    } else if (quotedMsg.videoMessage?.viewOnce) {
+      mediaBuffer = await conn.downloadMediaMessage(quotedMsg.videoMessage);
+      mediaType = 'video';
+    } else if (quotedMsg.audioMessage?.viewOnce) {
+      mediaBuffer = await conn.downloadMediaMessage(quotedMsg.audioMessage);
+      mediaType = 'audio';
+    }
+
+    if (!mediaBuffer) {
+      return reply('❌ Failed to retrieve media. Please try again.');
+    }
+
+    // Send the retrieved media with caption
+    const caption = '🔓 *Retrieved by NYX MD*\n_No secrets here_ 🔍';
+    
+    if (mediaType === 'image') {
+      await conn.sendMessage(from, {
+        image: mediaBuffer,
+        caption: caption
+      }, { quoted: mek });
+    } else if (mediaType === 'video') {
+      await conn.sendMessage(from, {
+        video: mediaBuffer,
+        caption: caption
+      }, { quoted: mek });
+    } else if (mediaType === 'audio') {
+      await conn.sendMessage(from, {
+        audio: mediaBuffer,
+        mimetype: 'audio/mpeg',
+        ptt: false
+      }, { quoted: mek });
+      await reply(caption);
+    }
+
+  } catch (error) {
+    console.error('Error retrieving viewonce media:', error);
+    reply('❌ Failed to retrieve viewonce media. Error: ' + error.message);
+  }
+});
