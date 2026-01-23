@@ -163,44 +163,120 @@ cmd({
   filename: __filename,
 }, async (conn, mek, msg, { from, sender, reply, quoted }) => {
   try {
-    // Check if there's a quoted message
-    if (!quoted) {
+    console.log('Etrive command triggered');
+    console.log('Quoted:', !!quoted);
+    console.log('Mek message keys:', mek.message ? Object.keys(mek.message) : 'No message');
+
+    // Direct check: Is the user replying to any message?
+    const contextInfo = mek.message?.extendedTextMessage?.contextInfo || 
+                       mek.message?.conversation?.contextInfo;
+    
+    const hasReply = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage ||
+                     mek.message?.imageMessage?.contextInfo?.quotedMessage ||
+                     mek.message?.videoMessage?.contextInfo?.quotedMessage;
+
+    if (!hasReply) {
+      console.log('No reply found in message');
       return reply('❌ Please reply to a viewonce message to retrieve it.');
     }
 
-    // Get the message content
-    const quotedMsg = quoted.message;
+    // Get quoted message from context
+    const quotedMessage = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage ||
+                         mek.message?.imageMessage?.contextInfo?.quotedMessage ||
+                         mek.message?.videoMessage?.contextInfo?.quotedMessage;
 
-    if (!quotedMsg) {
-      return reply('❌ No message found to retrieve.');
+    if (!quotedMessage) {
+      console.log('No quoted message found');
+      return reply('❌ Please reply to a viewonce message to retrieve it.');
     }
 
-    // Check if it's a viewonce media
-    const isViewOnce = quotedMsg.imageMessage?.viewOnce ||
-      quotedMsg.videoMessage?.viewOnce ||
-      quotedMsg.audioMessage?.viewOnce;
+    console.log('Quoted message keys:', Object.keys(quotedMessage));
 
-    if (!isViewOnce) {
-      return reply('⚠️ This message is not a viewonce media.');
+    // Check for any viewonce media
+    const hasViewOnce = quotedMessage.viewOnceMessageV2 ||
+                       (quotedMessage.imageMessage?.viewOnce) ||
+                       (quotedMessage.videoMessage?.viewOnce) ||
+                       (quotedMessage.audioMessage?.viewOnce);
+
+    if (!hasViewOnce) {
+      console.log('No viewonce media detected');
+      return reply('⚠️ This message is not a viewonce media. Please reply to a viewonce message.');
     }
 
-    // Determine media type and extract
     let mediaBuffer = null;
     let mediaType = '';
+    let mimeType = 'image/jpeg';
 
-    if (quotedMsg.imageMessage?.viewOnce) {
-      mediaBuffer = await conn.downloadMediaMessage(quotedMsg.imageMessage);
-      mediaType = 'image';
-    } else if (quotedMsg.videoMessage?.viewOnce) {
-      mediaBuffer = await conn.downloadMediaMessage(quotedMsg.videoMessage);
-      mediaType = 'video';
-    } else if (quotedMsg.audioMessage?.viewOnce) {
-      mediaBuffer = await conn.downloadMediaMessage(quotedMsg.audioMessage);
-      mediaType = 'audio';
+    // Extract media from viewOnceMessageV2
+    if (quotedMessage.viewOnceMessageV2) {
+      const innerMsg = quotedMessage.viewOnceMessageV2.message;
+      console.log('ViewOnceV2 inner message keys:', Object.keys(innerMsg || {}));
+
+      if (innerMsg?.imageMessage) {
+        mediaType = 'image';
+        mimeType = innerMsg.imageMessage.mimetype || 'image/jpeg';
+        try {
+          mediaBuffer = await conn.downloadMediaMessage(innerMsg.imageMessage);
+          console.log('Downloaded image from viewOnceV2, size:', mediaBuffer?.length);
+        } catch (e) {
+          console.error('Error downloading viewOnceV2 image:', e.message);
+        }
+      } else if (innerMsg?.videoMessage) {
+        mediaType = 'video';
+        mimeType = innerMsg.videoMessage.mimetype || 'video/mp4';
+        try {
+          mediaBuffer = await conn.downloadMediaMessage(innerMsg.videoMessage);
+          console.log('Downloaded video from viewOnceV2, size:', mediaBuffer?.length);
+        } catch (e) {
+          console.error('Error downloading viewOnceV2 video:', e.message);
+        }
+      } else if (innerMsg?.audioMessage) {
+        mediaType = 'audio';
+        mimeType = innerMsg.audioMessage.mimetype || 'audio/mpeg';
+        try {
+          mediaBuffer = await conn.downloadMediaMessage(innerMsg.audioMessage);
+          console.log('Downloaded audio from viewOnceV2, size:', mediaBuffer?.length);
+        } catch (e) {
+          console.error('Error downloading viewOnceV2 audio:', e.message);
+        }
+      }
     }
 
+    // Fallback to direct imageMessage/videoMessage/audioMessage
     if (!mediaBuffer) {
-      return reply('❌ Failed to retrieve media. Please try again.');
+      if (quotedMessage.imageMessage?.viewOnce) {
+        mediaType = 'image';
+        mimeType = quotedMessage.imageMessage.mimetype || 'image/jpeg';
+        try {
+          mediaBuffer = await conn.downloadMediaMessage(quotedMessage.imageMessage);
+          console.log('Downloaded image, size:', mediaBuffer?.length);
+        } catch (e) {
+          console.error('Error downloading image:', e.message);
+        }
+      } else if (quotedMessage.videoMessage?.viewOnce) {
+        mediaType = 'video';
+        mimeType = quotedMessage.videoMessage.mimetype || 'video/mp4';
+        try {
+          mediaBuffer = await conn.downloadMediaMessage(quotedMessage.videoMessage);
+          console.log('Downloaded video, size:', mediaBuffer?.length);
+        } catch (e) {
+          console.error('Error downloading video:', e.message);
+        }
+      } else if (quotedMessage.audioMessage?.viewOnce) {
+        mediaType = 'audio';
+        mimeType = quotedMessage.audioMessage.mimetype || 'audio/mpeg';
+        try {
+          mediaBuffer = await conn.downloadMediaMessage(quotedMessage.audioMessage);
+          console.log('Downloaded audio, size:', mediaBuffer?.length);
+        } catch (e) {
+          console.error('Error downloading audio:', e.message);
+        }
+      }
+    }
+
+    if (!mediaBuffer || mediaBuffer.length === 0) {
+      console.error('Failed to get media buffer');
+      return reply('❌ Failed to retrieve media. It may have expired or been deleted.');
     }
 
     // Send the retrieved media with caption
@@ -214,19 +290,22 @@ cmd({
     } else if (mediaType === 'video') {
       await conn.sendMessage(from, {
         video: mediaBuffer,
-        caption: caption
+        caption: caption,
+        mimetype: mimeType
       }, { quoted: mek });
     } else if (mediaType === 'audio') {
       await conn.sendMessage(from, {
         audio: mediaBuffer,
-        mimetype: 'audio/mpeg',
+        mimetype: mimeType,
         ptt: false
       }, { quoted: mek });
       await reply(caption);
     }
 
+    console.log('✅ Viewonce media retrieved and sent successfully');
+
   } catch (error) {
-    console.error('Error retrieving viewonce media:', error);
+    console.error('Error retrieving viewonce media:', error.message, error.stack);
     reply('❌ Failed to retrieve viewonce media. Error: ' + error.message);
   }
 });
