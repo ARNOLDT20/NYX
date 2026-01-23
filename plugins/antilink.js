@@ -16,7 +16,13 @@ cmd({
   try {
     const badWords = ["wtf", "mia", "xxx", "fuck", 'sex', "huththa", "pakaya", 'ponnaya', "hutto"];
 
-    if (!isGroup || isAdmins || !isBotAdmins) {
+    // Skip if not a group or bot is not admin
+    if (!isGroup || !isBotAdmins) {
+      return;
+    }
+
+    // Allow admins to send bad words without penalty
+    if (isAdmins) {
       return;
     }
 
@@ -70,7 +76,13 @@ cmd({
   reply
 }) => {
   try {
-    if (!isGroup || isAdmins || !isBotAdmins) {
+    // Skip if not a group or bot is not admin
+    if (!isGroup || !isBotAdmins) {
+      return;
+    }
+
+    // Allow admins to send links without penalty
+    if (isAdmins) {
       return;
     }
 

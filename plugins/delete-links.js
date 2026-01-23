@@ -36,7 +36,13 @@ cmd({
   isBotAdmins
 }) => {
   try {
-    if (!isGroup || isAdmins || !isBotAdmins) {
+    // Skip if not a group or bot is not admin
+    if (!isGroup || !isBotAdmins) {
+      return;
+    }
+
+    // Allow admins to send links without deletion
+    if (isAdmins) {
       return;
     }
 

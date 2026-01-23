@@ -498,17 +498,19 @@ async function connectToWA() {
     const groupName = isGroup && groupMetadata ? groupMetadata.subject : ''
     const participants = isGroup && groupMetadata ? groupMetadata.participants : []
     const groupAdmins = isGroup ? await getGroupAdmins(participants) : []
-    const isBotAdmins = isGroup ? (Array.isArray(groupAdmins) && (
-      groupAdmins.includes(botNumber2) ||
-      groupAdmins.includes(botJid) ||
-      groupAdmins.includes(botNumber) ||
-      groupAdmins.some(a => typeof a === 'string' && a.includes(botNumber))
-    )) : false
-    const isAdmins = isGroup ? (Array.isArray(groupAdmins) && (
-      groupAdmins.includes(sender) ||
-      groupAdmins.includes(senderNumber + '@s.whatsapp.net') ||
-      groupAdmins.some(a => typeof a === 'string' && a.includes(senderNumber))
-    )) : false
+    const isBotAdmins = isGroup ? (Array.isArray(groupAdmins) && groupAdmins.some(admin => {
+      const adminJid = typeof admin === 'string' ? admin : admin.id || ''
+      return adminJid.includes(botNumber) ||
+        adminJid === botJid ||
+        adminJid === botNumber2 ||
+        adminJid.startsWith(botNumber + '@')
+    })) : false
+    const isAdmins = isGroup ? (Array.isArray(groupAdmins) && groupAdmins.some(admin => {
+      const adminJid = typeof admin === 'string' ? admin : admin.id || ''
+      return adminJid.includes(senderNumber) ||
+        adminJid === sender ||
+        adminJid === (senderNumber + '@s.whatsapp.net')
+    })) : false
     const isReact = m.message.reactionMessage ? true : false
     const reply = (teks) => {
       conn.sendMessage(from, { text: teks }, { quoted: mek })
