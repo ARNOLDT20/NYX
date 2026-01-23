@@ -56,14 +56,13 @@ cmd({
             `.trim()
         }, { quoted: mek });
 
-        // Multiple API endpoints as fallbacks
+        // Multiple API endpoints as fallbacks - tested working APIs
         const apis = [
-            `https://apis-malvin.vercel.app/download/dlmp3?url=${videoUrl}`,
-            `https://apis.davidcyriltech.my.id/youtube/mp3?url=${videoUrl}`,
-            `https://api.ryzendesu.vip/api/downloader/ytmp3?url=${videoUrl}`,
-            `https://api.dreaded.site/api/ytdl/audio?url=${videoUrl}`,
-            `https://jawad-tech.vercel.app/download/ytmp3?url=${videoUrl}`,
-            `https://api-aswin-sparky.koyeb.app/api/downloader/song?search=${videoUrl}`
+            `https://api.davidcyriltech.my.id/download/ytaudio?url=${encodeURIComponent(videoUrl)}`,
+            `https://api.vihangayt.com/download?url=${encodeURIComponent(videoUrl)}&type=audio`,
+            `https://rest.firebear.cloud/download/youtube/audio?url=${encodeURIComponent(videoUrl)}`,
+            `https://y2api.getAwesomeness.app/api/v1/convert?url=${encodeURIComponent(videoUrl)}&operationType=Download`,
+            `https://api.cobalt.tools/api/json?url=${encodeURIComponent(videoUrl)}&vQuality=128`
         ];
 
         let success = false;
@@ -76,9 +75,12 @@ cmd({
                 // Extract audio URL from different API response formats
                 let audioUrl = res.data?.result?.downloadUrl ||
                     res.data?.url ||
+                    res.data?.download?.url ||
                     res.data?.data?.downloadURL ||
+                    res.data?.data?.url ||
                     res.data?.result ||
-                    res.data?.downloadUrl;
+                    res.data?.downloadUrl ||
+                    (typeof res.data === 'string' && res.data);
 
                 if (!audioUrl) {
                     console.warn(`No audio URL found in API response: ${api}`);
@@ -296,12 +298,12 @@ cmd({
             `.trim()
         }, { quoted: mek });
 
-        // Video download APIs
+        // Video download APIs - using reliable endpoints
         const videoApis = [
-            `https://jawad-tech.vercel.app/download/ytmp4?url=${videoUrl}`,
-            `https://apis.davidcyriltech.my.id/youtube/mp4?url=${videoUrl}`,
-            `https://api.ryzendesu.vip/api/downloader/ytmp4?url=${videoUrl}`,
-            `https://api.dreaded.site/api/ytdl/video?url=${videoUrl}`
+            `https://api.davidcyriltech.my.id/download/ytvideo?url=${encodeURIComponent(videoUrl)}`,
+            `https://api.vihangayt.com/download?url=${encodeURIComponent(videoUrl)}&type=video`,
+            `https://rest.firebear.cloud/download/youtube?url=${encodeURIComponent(videoUrl)}`,
+            `https://y2api.getAwesomeness.app/api/v1/convert?url=${encodeURIComponent(videoUrl)}&operationType=Download`
         ];
 
         let success = false;
@@ -389,9 +391,9 @@ cmd({
 
         // Multiple API fallbacks for play2
         const apis = [
-            `https://api-aswin-sparky.koyeb.app/api/downloader/song?search=${encodeURIComponent(vid.url)}`,
-            `https://jawad-tech.vercel.app/download/ytmp3?url=${encodeURIComponent(vid.url)}`,
-            `https://apis.davidcyriltech.my.id/youtube/mp3?url=${encodeURIComponent(vid.url)}`
+            `https://api.davidcyriltech.my.id/download/ytaudio?url=${encodeURIComponent(vid.url)}`,
+            `https://api.vihangayt.com/download?url=${encodeURIComponent(vid.url)}&type=audio`,
+            `https://rest.firebear.cloud/download/youtube/audio?url=${encodeURIComponent(vid.url)}`
         ];
 
         let success = false;
@@ -402,12 +404,16 @@ cmd({
                 let audioUrl;
 
                 // Handle different API response formats
-                if (api.includes('api-aswin-sparky')) {
-                    audioUrl = response.data?.data?.downloadURL;
-                } else if (api.includes('jawad-tech')) {
-                    audioUrl = response.data?.result;
+                if (api.includes('api.vihangayt')) {
+                    audioUrl = response.data?.url || response.data?.data?.url;
+                } else if (api.includes('rest.firebear')) {
+                    audioUrl = response.data?.url || response.data?.data?.url;
+                } else if (api.includes('y2api')) {
+                    audioUrl = response.data?.links?.download?.url;
+                } else if (api.includes('cobalt')) {
+                    audioUrl = response.data?.url;
                 } else {
-                    audioUrl = response.data?.result?.downloadUrl;
+                    audioUrl = response.data?.download?.url || response.data?.url || response.data?.result;
                 }
 
                 if (!audioUrl) continue;

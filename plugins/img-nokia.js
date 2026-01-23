@@ -53,7 +53,9 @@ cmd({
     form.append('reqtype', 'fileupload');
 
     const uploadResponse = await axios.post("https://catbox.moe/user/api.php", form, {
-      headers: form.getHeaders()
+      headers: form.getHeaders(),
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity
     });
 
     const imageUrl = uploadResponse.data;
