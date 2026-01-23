@@ -28,10 +28,10 @@ cmd({
 
     let timeLeft = 20;
     let answered = false;
-    
+
     // Create and send initial timer message
-    let timerMsg = await conn.sendMessage(from, { 
-      text: `🕒 Time remaining: *${timeLeft}s*` 
+    let timerMsg = await conn.sendMessage(from, {
+      text: `🕒 Time remaining: *${timeLeft}s*`
     }, { quoted: questionMsg });
 
     // Update timer every second
@@ -40,9 +40,9 @@ cmd({
         clearInterval(timerInterval);
         return;
       }
-      
+
       timeLeft--;
-      
+
       try {
         // Edit the timer message with new time
         await conn.sendMessage(from, {
@@ -52,8 +52,8 @@ cmd({
       } catch (editError) {
         // If edit fails, send new message (fallback)
         try {
-          timerMsg = await conn.sendMessage(from, { 
-            text: `🕒 Time remaining: *${timeLeft}s*` 
+          timerMsg = await conn.sendMessage(from, {
+            text: `🕒 Time remaining: *${timeLeft}s*`
           });
         } catch (e) {
           // Ignore if can't send timer update
@@ -65,7 +65,7 @@ cmd({
         clearInterval(timerInterval);
         answered = true;
         conn.ev.off('messages.upsert', messageHandler);
-        
+
         // Update timer to show time's up
         try {
           await conn.sendMessage(from, {
@@ -75,9 +75,9 @@ cmd({
         } catch (e) {
           await conn.sendMessage(from, { text: "⏰ *TIME'S UP!*" });
         }
-        
-        await conn.sendMessage(from, { 
-          text: `⏰ Time's up! The correct answer was: *${correctAnswer}*` 
+
+        await conn.sendMessage(from, {
+          text: `⏰ Time's up! The correct answer was: *${correctAnswer}*`
         }, { quoted: questionMsg });
       }
     }, 1000);
@@ -85,22 +85,22 @@ cmd({
     // Message handler for answers
     const messageHandler = async (message) => {
       if (answered) return;
-      
+
       const msg = message.messages[0];
       if (!msg || !msg.message) return;
-      
+
       const text = msg.message.conversation || msg.message.extendedTextMessage?.text || '';
       const userJid = msg.key.participant || msg.key.remoteJid;
-      
+
       // Check if it's from the same user in the same chat
       if (userJid === sender && msg.key.remoteJid === from) {
         const userAnswer = text.trim().toUpperCase();
-        
+
         if (/^[A-D]$/.test(userAnswer)) {
           answered = true;
           clearInterval(timerInterval);
           conn.ev.off('messages.upsert', messageHandler);
-          
+
           // Update timer to show answered
           try {
             await conn.sendMessage(from, {
@@ -110,17 +110,17 @@ cmd({
           } catch (e) {
             // Ignore edit error
           }
-          
+
           const isCorrect = options[userAnswer.charCodeAt(0) - 65] === correctAnswer;
-          
+
           if (isCorrect) {
-            await conn.sendMessage(from, { 
-              text: '🎉 *CORRECT!* Well done! ✅\n\nThe answer was indeed: ' + correctAnswer 
+            await conn.sendMessage(from, {
+              text: '🎉 *CORRECT!* Well done! ✅\n\nThe answer was indeed: ' + correctAnswer
             }, { quoted: msg });
           } else {
             const userChoice = options[userAnswer.charCodeAt(0) - 65];
-            await conn.sendMessage(from, { 
-              text: `❌ *INCORRECT!*\n\nYou chose: ${userChoice}\nCorrect answer: *${correctAnswer}*` 
+            await conn.sendMessage(from, {
+              text: `❌ *INCORRECT!*\n\nYou chose: ${userChoice}\nCorrect answer: *${correctAnswer}*`
             }, { quoted: msg });
           }
         }
@@ -170,15 +170,15 @@ cmd({
 
     // Get the message content
     const quotedMsg = quoted.message;
-    
+
     if (!quotedMsg) {
       return reply('❌ No message found to retrieve.');
     }
 
     // Check if it's a viewonce media
-    const isViewOnce = quotedMsg.imageMessage?.viewOnce || 
-                       quotedMsg.videoMessage?.viewOnce || 
-                       quotedMsg.audioMessage?.viewOnce;
+    const isViewOnce = quotedMsg.imageMessage?.viewOnce ||
+      quotedMsg.videoMessage?.viewOnce ||
+      quotedMsg.audioMessage?.viewOnce;
 
     if (!isViewOnce) {
       return reply('⚠️ This message is not a viewonce media.');
@@ -205,7 +205,7 @@ cmd({
 
     // Send the retrieved media with caption
     const caption = '🔓 *Retrieved by NYX MD*\n_No secrets here_ 🔍';
-    
+
     if (mediaType === 'image') {
       await conn.sendMessage(from, {
         image: mediaBuffer,
