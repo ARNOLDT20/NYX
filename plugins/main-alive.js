@@ -1,6 +1,6 @@
 const { cmd, commands } = require('../command');
 const os = require('os');
-const { runtime, getBuffer } = require('../lib/functions');
+const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson, jsonformat} = require('../lib/functions');
 const config = require('../config');
 
 cmd({
@@ -21,47 +21,59 @@ cmd({
             const platform = `${os.type()} ${os.release()} ${os.arch()}`;
             const cpu = os.cpus()[0].model;
 
-            const aliveText = `╔════════════════════════════╗
+            const aliveText = `╔═════════════════════════╗
 ║    ✨ *${config.BOT_NAME || 'NYX MD'}* ✨    ║
 ║   🤖 STATUS: ALIVE...🧚‍♂️   ║
-╚════════════════════════════╝
+╚═════════════════════════╝
 
-╭─────────────────────────────╮
-│ 📊 *SYSTEM INFORMATION*
-├─────────────────────────────┤
+╭
 │ 👑 Owner: ${config.OWNER_NAME || 'Owner'}
 │ 🔑 Prefix: ${config.PREFIX || '.'}
 │ 🏷️  Version: 3.0.0
 │ 📦 Commands: ${totalCmds}
-├─────────────────────────────┤
 │ ⏱️  Uptime: ${up}
 │ 💾 Memory: ${usedMB}MB / ${totalMB}MB
 │ 🖥️  Platform: ${platform}
 │ ⚙️  CPU: ${cpu.substring(0, 30)}...
 ├─────────────────────────────┤
-│ 🔗 Group: ${config.GROUP_LINK ? '✅ Active' : '❌ Not Set'}
-│ 📢 Channel: ${config.CHANNEL_LINK ? '✅ Active' : '❌ Not Set'}
-├─────────────────────────────┤
-│ 🟢 Status: *ONLINE & READY*
-╰─────────────────────────────╯
 
 *> Made with ❤️ by BLAZE TECH*`;
 
             // try to send an image (alive image) with the card
-            try {
-                const img = config.ALIVE_IMG || config.MENU_IMAGE_URL;
-                await conn.sendMessage(from, {
-                    image: { url: img },
-                    caption: aliveText,
-                    contextInfo: { mentionedJid: [sender] }
-                }, { quoted: mek });
-            } catch (err) {
-                // fallback to text only
-                await conn.sendMessage(from, { text: aliveText, contextInfo: { mentionedJid: [sender] } }, { quoted: mek });
+            let buttons = [
+            {
+                buttonId: ".owner",
+                buttonText: { displayText: "❭❭ 𝗢𝗪𝗡𝗘𝗥🧑‍💻" },
+                type: 1
+            },
+            {
+                buttonId: ".ping",
+                buttonText: { displayText: "❭❭ 𝗣𝗜𝗡𝗚📍" },
+                type: 1
             }
+        ];
 
-        } catch (e) {
-            console.error('Error in alive command:', e);
-            reply(`An error occurred: ${e.message}`);
-        }
-    });
+        // 2️⃣ Send image + status
+        await conn.sendMessage(from, {
+            buttons,
+            headerType: 1,
+            viewOnce: true,
+            image: { url: config.ALIVE_IMG },
+            caption: status,
+            contextInfo: {
+                mentionedJid: [sender],
+                forwardingScore: 1000,
+                isForwarded: true,
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: '@newsletter',
+                    newsletterName: 'NYX MD',
+                    serverMessageId: 143
+                }
+            }
+        }, { quoted: qMessage });
+
+    } catch (e) {
+        console.error("Alive Error:", e);
+        reply(`❌ An error occurred: ${e.message}`);
+    }
+});
