@@ -135,44 +135,30 @@ cmd({
         }
 
         if (!success) {
-            // Final fallback: try downloading directly with ytdl-core
-            try {
-                console.log('Attempting fallback with ytdl-core...');
-                const info = await ytdl.getInfo(videoUrl);
-                const audioFormat = ytdl.chooseFormat(info.formats, { quality: 'highestaudio' });
-                if (audioFormat && audioFormat.url) {
-                    const stream = ytdl.downloadFromInfo(info, { quality: 'highestaudio' });
-                } catch (err) {
-                    console.warn(`⚠️ API failed -`, err.message);
-                    continue;
-                }
-            }
-
-        if (!success) {
-                await conn.sendMessage(from, {
-                    react: { text: "❌", key: mek.key }
-                });
-                reply("🚫 *All download servers failed. Please try again later.*\nℹ️ Try again or check if the video is available.");
-            }
-
-        } catch (e) {
-            console.error("❌ Error in .play command:", e);
-
-            // Clean up temp file if it exists
-            try {
-                if (fs.existsSync(outputPath)) {
-                    fs.unlinkSync(outputPath);
-                }
-            } catch (cleanupErr) {
-                // Ignore cleanup errors
-            }
-
             await conn.sendMessage(from, {
                 react: { text: "❌", key: mek.key }
             });
-            reply("🚨 *Something went wrong!*\n" + e.message);
+            reply("🚫 *All download servers failed. Please try again later.*\nℹ️ Try again or check if the video is available.");
         }
-    });
+
+    } catch (e) {
+        console.error("❌ Error in .play command:", e);
+
+        // Clean up temp file if it exists
+        try {
+            if (fs.existsSync(outputPath)) {
+                fs.unlinkSync(outputPath);
+            }
+        } catch (cleanupErr) {
+            // Ignore cleanup errors
+        }
+
+        await conn.sendMessage(from, {
+            react: { text: "❌", key: mek.key }
+        });
+        reply("🚨 *Something went wrong!*\n" + e.message);
+    }
+});
 
 // Enhanced play4 command with multiple APIs
 cmd({
