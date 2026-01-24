@@ -8,20 +8,22 @@ cmd({
     alias: ['status', 'live'],
     desc: 'Check uptime and system status',
     category: 'main',
-        react: '🟢',
+    react: '🟢',
     filename: __filename
 },
-    async (conn, mek, m, { from, sender, reply }) => {
-        try {
-            const totalCmds = commands.length;
-            const up = runtime(process.uptime());
-            const mem = process.memoryUsage();
-            const usedMB = (mem.heapUsed / 1024 / 1024).toFixed(2);
-            const totalMB = (mem.heapTotal / 1024 / 1024).toFixed(2);
-            const platform = `${os.type()} ${os.release()} ${os.arch()}`;
-            const cpu = os.cpus()[0].model;
+async (conn, mek, m, { from, sender, reply }) => {
+    try {
+        const totalCmds = commands.length;
+        const up = runtime(process.uptime());
 
-            const status = `╔═════════════════════════╗
+        const mem = process.memoryUsage();
+        const usedMB = (mem.heapUsed / 1024 / 1024).toFixed(2);
+        const totalMB = (mem.heapTotal / 1024 / 1024).toFixed(2);
+
+        const platform = `${os.type()} ${os.release()} ${os.arch()}`;
+        const cpu = os.cpus()[0].model;
+
+        const status = `╔═════════════════════════╗
 ║    ✨ *${config.BOT_NAME || 'NYX MD'}* ✨    ║
 ║   🤖 STATUS: ALIVE...🧚‍♂️   ║
 ╚═════════════════════════╝
@@ -29,18 +31,17 @@ cmd({
 ╭
 │ 👑 Owner: ${config.OWNER_NAME || 'Owner'}
 │ 🔑 Prefix: ${config.PREFIX || '.'}
-│ 🏷️  Version: 3.0.0
+│ 🏷️ Version: 3.0.0
 │ 📦 Commands: ${totalCmds}
-│ ⏱️  Uptime: ${up}
+│ ⏱️ Uptime: ${up}
 │ 💾 Memory: ${usedMB}MB / ${totalMB}MB
-│ 🖥️  Platform: ${platform}
-│ ⚙️  CPU: ${cpu.substring(0, 30)}...
+│ 🖥️ Platform: ${platform}
+│ ⚙️ CPU: ${cpu.substring(0, 30)}...
 ├─────────────────────────────┤
 
 *> Made with ❤️ by BLAZE TECH*`;
 
-            // try to send an image (alive image) with the card
-            let buttons = [
+        const buttons = [
             {
                 buttonId: ".owner",
                 buttonText: { displayText: "❭❭ 𝗢𝗪𝗡𝗘𝗥🧑‍💻" },
@@ -53,27 +54,23 @@ cmd({
             }
         ];
 
-        // 2️⃣ Send image + status
-        await conn.sendMessage(from, {
-            buttons,
-            headerType: 1,
-            viewOnce: true,
-            image: { url: config.ALIVE_IMG },
-            caption: status,
-            contextInfo: {
-                mentionedJid: [sender],
-                forwardingScore: 1000,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: '@newsletter',
-                    newsletterName: 'NYX MD',
-                    serverMessageId: 143
+        await conn.sendMessage(
+            from,
+            {
+                image: { url: config.ALIVE_IMG },
+                caption: status,
+                buttons,
+                headerType: 1,
+                viewOnce: true,
+                contextInfo: {
+                    mentionedJid: [sender]
                 }
-            }
-        }, { quoted: qMessage });
+            },
+            { quoted: mek }
+        );
 
     } catch (e) {
         console.error("Alive Error:", e);
-        reply(`❌ An error occurred: ${e.message}`);
+        reply(`❌ Error: ${e.message}`);
     }
 });
