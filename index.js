@@ -479,27 +479,71 @@ async function connectToWA() {
         const channelLink = config.CHANNEL_LINK || '';
         const channelMatch = channelLink.match(/channel\/([0-9A-Za-z-_]+)/i);
         const channelId = channelMatch ? channelMatch[1] : null;
-        if (channelId && conn.newsletterMetadata) {
+        
+        if (channelId) {
           try {
-            const channelMeta = await conn.newsletterMetadata('invite', channelId);
-            const targetId = channelMeta?.id || channelId;
+            // Try to get channel metadata for verification
+            let targetId = channelId;
+            
+            if (typeof conn.newsletterMetadata === 'function') {
+              try {
+                const channelMeta = await conn.newsletterMetadata('invite', channelId);
+                if (channelMeta?.id) {
+                  targetId = channelMeta.id;
+                }
+              } catch (metaErr) {
+                console.warn('⚠️ Could not get channel metadata, using provided ID:', metaErr.message);
+                // Continue with original ID
+              }
+            }
 
             // Try a few possible follow/subscribe method names supported by different Baileys builds
+            let followed = false;
+            
             if (typeof conn.newsletterFollow === 'function') {
-              await conn.newsletterFollow(targetId);
-              console.log('✅ Followed channel via newsletterFollow');
-            } else if (typeof conn.newsletterSubscribe === 'function') {
-              await conn.newsletterSubscribe(targetId);
-              console.log('✅ Followed channel via newsletterSubscribe');
-            } else if (typeof conn.newsletterJoin === 'function') {
-              await conn.newsletterJoin(targetId);
-              console.log('✅ Followed channel via newsletterJoin');
-            } else if (typeof conn.newsletterAcceptInvite === 'function') {
-              await conn.newsletterAcceptInvite(targetId);
-              console.log('✅ Followed channel via newsletterAcceptInvite');
-            } else {
-              console.log('ℹ️ No newsletter follow method available on this Baileys build. Channel follow skipped.');
+              try {
+                await conn.newsletterFollow(targetId);
+                console.log('✅ Followed channel via newsletterFollow');
+                followed = true;
+              } catch (followErr) {
+                console.warn('⚠️ newsletterFollow failed:', followErr.message);
+              }
             }
+            
+            if (!followed && typeof conn.newsletterSubscribe === 'function') {
+              try {
+                await conn.newsletterSubscribe(targetId);
+                console.log('✅ Followed channel via newsletterSubscribe');
+                followed = true;
+              } catch (subErr) {
+                console.warn('⚠️ newsletterSubscribe failed:', subErr.message);
+              }
+            }
+            
+            if (!followed && typeof conn.newsletterJoin === 'function') {
+              try {
+                await conn.newsletterJoin(targetId);
+                console.log('✅ Followed channel via newsletterJoin');
+                followed = true;
+              } catch (joinErr) {
+                console.warn('⚠️ newsletterJoin failed:', joinErr.message);
+              }
+            }
+            
+            if (!followed && typeof conn.newsletterAcceptInvite === 'function') {
+              try {
+                await conn.newsletterAcceptInvite(targetId);
+                console.log('✅ Followed channel via newsletterAcceptInvite');
+                followed = true;
+              } catch (acceptErr) {
+                console.warn('⚠️ newsletterAcceptInvite failed:', acceptErr.message);
+              }
+            }
+            
+            if (!followed) {
+              console.log('ℹ️ No newsletter follow method available or all methods failed. Channel follow skipped.');
+            }
+            
           } catch (err) {
             console.error('❌ Failed to auto-follow channel:', err.message || err);
           }
