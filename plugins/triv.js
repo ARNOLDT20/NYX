@@ -168,12 +168,12 @@ cmd({
     console.log('Mek message keys:', mek.message ? Object.keys(mek.message) : 'No message');
 
     // Direct check: Is the user replying to any message?
-    const contextInfo = mek.message?.extendedTextMessage?.contextInfo || 
-                       mek.message?.conversation?.contextInfo;
-    
+    const contextInfo = mek.message?.extendedTextMessage?.contextInfo ||
+      mek.message?.conversation?.contextInfo;
+
     const hasReply = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage ||
-                     mek.message?.imageMessage?.contextInfo?.quotedMessage ||
-                     mek.message?.videoMessage?.contextInfo?.quotedMessage;
+      mek.message?.imageMessage?.contextInfo?.quotedMessage ||
+      mek.message?.videoMessage?.contextInfo?.quotedMessage;
 
     if (!hasReply) {
       console.log('No reply found in message');
@@ -182,8 +182,8 @@ cmd({
 
     // Get quoted message from context
     const quotedMessage = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage ||
-                         mek.message?.imageMessage?.contextInfo?.quotedMessage ||
-                         mek.message?.videoMessage?.contextInfo?.quotedMessage;
+      mek.message?.imageMessage?.contextInfo?.quotedMessage ||
+      mek.message?.videoMessage?.contextInfo?.quotedMessage;
 
     if (!quotedMessage) {
       console.log('No quoted message found');
@@ -194,9 +194,9 @@ cmd({
 
     // Check for any viewonce media
     const hasViewOnce = quotedMessage.viewOnceMessageV2 ||
-                       (quotedMessage.imageMessage?.viewOnce) ||
-                       (quotedMessage.videoMessage?.viewOnce) ||
-                       (quotedMessage.audioMessage?.viewOnce);
+      (quotedMessage.imageMessage?.viewOnce) ||
+      (quotedMessage.videoMessage?.viewOnce) ||
+      (quotedMessage.audioMessage?.viewOnce);
 
     if (!hasViewOnce) {
       console.log('No viewonce media detected');

@@ -56,98 +56,76 @@ cmd({
             `.trim()
         }, { quoted: mek });
 
-        // Multiple API endpoints as fallbacks - tested working APIs
+        // Multiple API endpoints as fallbacks - simpler and more reliable
         const apis = [
-            `https://api.davidcyriltech.my.id/download/ytaudio?url=${encodeURIComponent(videoUrl)}`,
-            `https://api.vihangayt.com/download?url=${encodeURIComponent(videoUrl)}&type=audio`,
-            `https://rest.firebear.cloud/download/youtube/audio?url=${encodeURIComponent(videoUrl)}`,
-            `https://y2api.getAwesomeness.app/api/v1/convert?url=${encodeURIComponent(videoUrl)}&operationType=Download`,
-            `https://api.cobalt.tools/api/json?url=${encodeURIComponent(videoUrl)}&vQuality=128`
+            {
+                url: `https://api.cobalt.tools/api/json`,
+                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                body: { url: videoUrl, vQuality: '128', aFormat: 'mp3' },
+                method: 'POST',
+                parseUrl: (data) => data?.url || data?.links?.download?.url
+            },
+            {
+                url: `https://yt-api.p.rapidapi.com/dl?url=${encodeURIComponent(videoUrl)}`,
+                headers: {
+                    'X-RapidAPI-Key': 'demo',
+                    'X-RapidAPI-Host': 'yt-api.p.rapidapi.com'
+                },
+                method: 'GET',
+                parseUrl: (data) => data?.result?.downloadUrl || data?.url
+            },
+            {
+                url: `https://api.vihangayt.com/download?url=${encodeURIComponent(videoUrl)}&type=audio`,
+                headers: { 'User-Agent': 'Mozilla/5.0' },
+                method: 'GET',
+                parseUrl: (data) => data?.url || data?.data?.url || data?.result
+            }
         ];
 
         let success = false;
 
-        for (const api of apis) {
+        for (const apiConfig of apis) {
             try {
-                console.log(`Trying API: ${api}`);
-                const res = await axios.get(api, { timeout: 30000 });
+                console.log(`Trying API: ${apiConfig.url}`);
 
-                // Extract audio URL from different API response formats
-                let audioUrl = res.data?.result?.downloadUrl ||
-                    res.data?.url ||
-                    res.data?.download?.url ||
-                    res.data?.data?.downloadURL ||
-                    res.data?.data?.url ||
-                    res.data?.result ||
-                    res.data?.downloadUrl ||
-                    (typeof res.data === 'string' && res.data);
+                let res;
+                if (apiConfig.method === 'POST') {
+                    res = await axios.post(apiConfig.url, apiConfig.body, {
+                        headers: apiConfig.headers,
+                        timeout: 30000
+                    });
+                } else {
+                    res = await axios.get(apiConfig.url, {
+                        headers: apiConfig.headers,
+                        timeout: 30000
+                    });
+                }
+
+                // Extract audio URL using the parser
+                let audioUrl = apiConfig.parseUrl(res.data);
 
                 if (!audioUrl) {
-                    console.warn(`No audio URL found in API response: ${api}`);
+                    console.warn(`No audio URL found in API response`);
+                    console.log('Response data:', JSON.stringify(res.data).substring(0, 200));
                     continue;
                 }
 
-                console.log(`Downloading from: ${audioUrl}`);
+                console.log(`Downloaded ${audioRes.data.length} bytes of audio`);
 
-                // Download and convert audio
-                const stream = await axios({
-                    url: audioUrl,
-                    method: "GET",
-                    responseType: "stream",
-                    timeout: 60000
-                });
-
-                if (stream.status !== 200) {
-                    console.warn(`Stream failed with status: ${stream.status}`);
-                    continue;
-                }
-
-                // Convert to MP3 using ffmpeg
-                await new Promise((resolve, reject) => {
-                    ffmpeg(stream.data)
-                        .audioCodec('libmp3lame')
-                        .audioBitrate(128)
-                        .format('mp3')
-                        .on('end', () => {
-                            console.log('Audio conversion completed');
-                            resolve();
-                        })
-                        .on('error', (err) => {
-                            console.error('FFmpeg error:', err);
-                            reject(err);
-                        })
-                        .save(outputPath);
-                });
-
-                // Verify file was created
-                if (!fs.existsSync(outputPath)) {
-                    throw new Error('Output file not created');
-                }
-
-                const fileStats = fs.statSync(outputPath);
-                if (fileStats.size === 0) {
-                    throw new Error('Output file is empty');
-                }
-
-                console.log(`File created successfully: ${outputPath} (${fileStats.size} bytes)`);
-
-                // Send audio file
+                // Send audio file directly - no conversion needed
                 await conn.sendMessage(from, {
-                    audio: fs.readFileSync(outputPath),
+                    audio: audioRes.data,
                     mimetype: 'audio/mpeg',
                     fileName: `${title}.mp3`,
                     ptt: false
                 }, { quoted: mek });
-
-                // Clean up
-                fs.unlinkSync(outputPath);
-                success = true;
 
                 // Send success reaction
                 await conn.sendMessage(from, {
                     react: { text: "✅", key: mek.key }
                 });
 
+                success = true;
                 break;
 
             } catch (err) {
@@ -164,89 +142,37 @@ cmd({
                 const audioFormat = ytdl.chooseFormat(info.formats, { quality: 'highestaudio' });
                 if (audioFormat && audioFormat.url) {
                     const stream = ytdl.downloadFromInfo(info, { quality: 'highestaudio' });
-
-                    await new Promise((resolve, reject) => {
-                        ffmpeg(stream)
-                            .audioCodec('libmp3lame')
-                            .audioBitrate(128)
-                            .format('mp3')
-                            .on('end', () => {
-                                resolve();
-                            })
-                            .on('error', (err) => {
-                                reject(err);
-                            })
-                            .save(outputPath);
-                    });
-
-                    if (fs.existsSync(outputPath)) {
-                        await conn.sendMessage(from, {
-                            audio: fs.readFileSync(outputPath),
-                            mimetype: 'audio/mpeg',
-                            fileName: `${title}.mp3`,
-                            ptt: false
-                        }, { quoted: mek });
-                        fs.unlinkSync(outputPath);
-                        success = true;
-                        await conn.sendMessage(from, { react: { text: "✅", key: mek.key } });
-                    }
-                }
-            } catch (ydlErr) {
-                console.warn('ytdl-core fallback failed:', ydlErr && ydlErr.message ? ydlErr.message : ydlErr);
-            }
-            // Try one final fallback - send audio directly without conversion
-            for (const api of apis) {
-                try {
-                    const res = await axios.get(api, { timeout: 30000 });
-                    let audioUrl = res.data?.result?.downloadUrl ||
-                        res.data?.url ||
-                        res.data?.data?.downloadURL ||
-                        res.data?.result;
-
-                    if (audioUrl) {
-                        await conn.sendMessage(from, {
-                            audio: { url: audioUrl },
-                            mimetype: "audio/mpeg",
-                            fileName: `${title}.mp3`
-                        }, { quoted: mek });
-
-                        await conn.sendMessage(from, {
-                            react: { text: "✅", key: mek.key }
-                        });
-                        success = true;
-                        break;
-                    }
-                } catch (finalErr) {
+                } catch (err) {
+                    console.warn(`⚠️ API failed -`, err.message);
                     continue;
                 }
             }
-        }
 
         if (!success) {
+                await conn.sendMessage(from, {
+                    react: { text: "❌", key: mek.key }
+                });
+                reply("🚫 *All download servers failed. Please try again later.*\nℹ️ Try again or check if the video is available.");
+            }
+
+        } catch (e) {
+            console.error("❌ Error in .play command:", e);
+
+            // Clean up temp file if it exists
+            try {
+                if (fs.existsSync(outputPath)) {
+                    fs.unlinkSync(outputPath);
+                }
+            } catch (cleanupErr) {
+                // Ignore cleanup errors
+            }
+
             await conn.sendMessage(from, {
                 react: { text: "❌", key: mek.key }
             });
-            reply("🚫 *All download servers failed. Please try again later.*");
+            reply("🚨 *Something went wrong!*\n" + e.message);
         }
-
-    } catch (e) {
-        console.error("❌ Error in .play command:", e);
-
-        // Clean up temp file if it exists
-        try {
-            if (fs.existsSync(outputPath)) {
-                fs.unlinkSync(outputPath);
-            }
-        } catch (cleanupErr) {
-            // Ignore cleanup errors
-        }
-
-        await conn.sendMessage(from, {
-            react: { text: "❌", key: mek.key }
-        });
-        reply("🚨 *Something went wrong!*\n" + e.message);
-    }
-});
+    });
 
 // Enhanced play4 command with multiple APIs
 cmd({
@@ -300,10 +226,10 @@ cmd({
 
         // Video download APIs - using reliable endpoints
         const videoApis = [
+            `https://api.yt-downloader.org/download?url=${encodeURIComponent(videoUrl)}&type=video`,
             `https://api.davidcyriltech.my.id/download/ytvideo?url=${encodeURIComponent(videoUrl)}`,
             `https://api.vihangayt.com/download?url=${encodeURIComponent(videoUrl)}&type=video`,
-            `https://rest.firebear.cloud/download/youtube?url=${encodeURIComponent(videoUrl)}`,
-            `https://y2api.getAwesomeness.app/api/v1/convert?url=${encodeURIComponent(videoUrl)}&operationType=Download`
+            `https://ytstream-download.p.rapidapi.com/info?url=${encodeURIComponent(videoUrl)}`
         ];
 
         let success = false;
@@ -391,40 +317,59 @@ cmd({
 
         // Multiple API fallbacks for play2
         const apis = [
-            `https://api.davidcyriltech.my.id/download/ytaudio?url=${encodeURIComponent(vid.url)}`,
-            `https://api.vihangayt.com/download?url=${encodeURIComponent(vid.url)}&type=audio`,
-            `https://rest.firebear.cloud/download/youtube/audio?url=${encodeURIComponent(vid.url)}`
+            {
+                url: `https://api.cobalt.tools/api/json`,
+                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                body: { url: vid.url, vQuality: '128', aFormat: 'mp3' },
+                method: 'POST',
+                parseUrl: (data) => data?.url || data?.links?.download?.url
+            },
+            {
+                url: `https://api.vihangayt.com/download?url=${encodeURIComponent(vid.url)}&type=audio`,
+                headers: { 'User-Agent': 'Mozilla/5.0' },
+                method: 'GET',
+                parseUrl: (data) => data?.url || data?.data?.url
+            }
         ];
 
         let success = false;
 
-        for (const api of apis) {
+        for (const apiConfig of apis) {
             try {
-                const response = await axios.get(api, { timeout: 30000 });
-                let audioUrl;
+                console.log(`Trying play2 API: ${apiConfig.url}`);
 
-                // Handle different API response formats
-                if (api.includes('api.vihangayt')) {
-                    audioUrl = response.data?.url || response.data?.data?.url;
-                } else if (api.includes('rest.firebear')) {
-                    audioUrl = response.data?.url || response.data?.data?.url;
-                } else if (api.includes('y2api')) {
-                    audioUrl = response.data?.links?.download?.url;
-                } else if (api.includes('cobalt')) {
-                    audioUrl = response.data?.url;
+                let response;
+                if (apiConfig.method === 'POST') {
+                    response = await axios.post(apiConfig.url, apiConfig.body, {
+                        headers: apiConfig.headers,
+                        timeout: 30000
+                    });
                 } else {
-                    audioUrl = response.data?.download?.url || response.data?.url || response.data?.result;
+                    response = await axios.get(apiConfig.url, {
+                        headers: apiConfig.headers,
+                        timeout: 30000
+                    });
                 }
 
-                if (!audioUrl) continue;
+                let audioUrl = apiConfig.parseUrl(response.data);
+                if (!audioUrl) {
+                    console.warn('No audio URL found in response');
+                    continue;
+                }
 
                 // Download audio
                 const audioRes = await axios({
                     url: audioUrl,
                     method: "GET",
                     responseType: "arraybuffer",
-                    timeout: 60000
+                    timeout: 60000,
+                    headers: { 'User-Agent': 'Mozilla/5.0' }
                 });
+
+                if (!audioRes.data || audioRes.data.length === 0) {
+                    console.warn('Downloaded empty audio');
+                    continue;
+                }
 
                 // Send audio
                 await conn.sendMessage(from, {
@@ -439,7 +384,7 @@ cmd({
                 break;
 
             } catch (err) {
-                console.warn(`Play2 API failed: ${api} -`, err.message);
+                console.warn(`Play2 API failed -`, err.message);
                 continue;
             }
         }

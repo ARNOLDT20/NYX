@@ -15,7 +15,7 @@ cmd({
 
     await reply("> *CREATING IMAGINE ...🔥*");
 
-    const apiUrl = `https://api.siputzx.my.id/api/ai/flux?prompt=${encodeURIComponent(q)}`;
+    const apiUrl = `https://api.popcat.xyz/imagine?prompt=${encodeURIComponent(q)}`;
 
     const response = await axios.get(apiUrl, { responseType: "arraybuffer" });
 
@@ -49,7 +49,7 @@ cmd({
 
     await reply("> *CREATING IMAGINE ...🔥*");
 
-    const apiUrl = `https://api.siputzx.my.id/api/ai/stable-diffusion?prompt=${encodeURIComponent(q)}`;
+    const apiUrl = `https://api.popcat.xyz/v2/imagine?prompt=${encodeURIComponent(q)}`;
 
     const response = await axios.get(apiUrl, { responseType: "arraybuffer" });
 
@@ -83,7 +83,7 @@ cmd({
 
     await reply("> *CREATING IMAGINE ...🔥*");
 
-    const apiUrl = `https://api.siputzx.my.id/api/ai/stabilityai?prompt=${encodeURIComponent(q)}`;
+    const apiUrl = `https://api.popcat.xyz/v2/generation?prompt=${encodeURIComponent(q)}`;
 
     const response = await axios.get(apiUrl, { responseType: "arraybuffer" });
 
