@@ -23,7 +23,7 @@
     "@mrnima/facebook-downloader": "1.0.0",
     "@mrnima/tiktok-downloader": "1.0.0",
     "@vitalets/google-translate-api": "^9.2.0",
-    "@whiskeysockets/baileys": "github:vijitharanawakage/QueenJusmy-Baileys",
+    "@whiskeysockets/baileys": "npm:baileys-pro@latest",
     "adm-zip": "^0.5.16",
     "api-dylux": "1.8.5",
     "axios": "^1.2.5",
