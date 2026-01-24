@@ -1,236 +1,190 @@
-﻿#  NYX MD - WhatsApp Bot
+NYX MD - WhatsApp Bot
+<div align="center"><img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=32&duration=2800&pause=1000&color=8A2BE2&center=true&vCenter=true&width=600&lines=%F0%9F%94%A5+NYX+WHATSAPP+BOT+%F0%9F%94%A5;100%2B+Advanced+Features;Fully+Customizable;Lightning+Fast+Responses" alt="NYX Bot Typing Animation" />
+The Ultimate Multi-Functional WhatsApp Automation Suite
 
-<div align="center">
-
-![NYX Typing Animation](assets/typing-animation.svg)
-
-** The Ultimate WhatsApp Bot with 100+ Advanced Commands **
-
-[![Node.js](https://img.shields.io/badge/Node.js->=20-brightgreen?style=for-the-badge&logo=node.js)](https://nodejs.org)
-[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
-[![GitHub](https://img.shields.io/badge/GitHub-NYX-black?style=for-the-badge&logo=github)](https://github.com/blazetech-glitch/NYX)
-[![Version](https://img.shields.io/badge/Version-3.0.0-green?style=for-the-badge)]()
+https://img.shields.io/badge/Node.js-%3E=20-339933?style=for-the-badge&logo=node.js&logoColor=white
+https://img.shields.io/badge/License-MIT-blue?style=for-the-badge
+https://img.shields.io/badge/Version-3.0.0-8A2BE2?style=for-the-badge
+https://img.shields.io/badge/Contributors-Welcome-success?style=for-the-badge
+https://img.shields.io/github/stars/blazetech-glitch/NYX?style=for-the-badge&color=yellow
 
 </div>
-
----
-
-##  Key Features
-
-<table>
-<tr>
-<td>
-
-###  Media & Download
--  YouTube Music/Video
--  Instagram Posts/Reels
--  TikTok Videos
--  Facebook Videos
--  Ringtone Downloads
-
-</td>
-<td>
-
-###  Admin Tools
--  Group Management
--  Member Control
--  Auto-Kick Bad Links
--  Welcome/Goodbye
--  Status Reactions
-
-</td>
-</tr>
-<tr>
-<td>
-
-###  Smart Features
--  AI Chat Integration
--  Auto Typing Indicator
--  Auto Recording Indicator
--  Message Auto-React
--  Status Auto-Seen
-
-</td>
-<td>
-
-###  Creative Tools
--  Sticker Converter
--  Image Editor
--  Fancy Text
--  Meme Generator
--  And 80+ more!
-
-</td>
-</tr>
-</table>
-
----
-
-##  Installation
-
-###  Local Setup
-
-`ash
+✨ Feature Highlights
+<div align="center"><table> <tr> <td align="center" width="25%">
+🎵 Media Master
+<div align="left"> • YouTube Music/Video<br> • Instagram Posts/Reels<br> • TikTok Videos<br> • Facebook Downloads<br> • Ringtone Creator<br> • Audio/Video Converter </div></td> <td align="center" width="25%">
+⚡ Smart AI
+<div align="left"> • GPT-4 Integration<br> • Auto Response System<br> • Contextual Conversations<br> • Multi-language Support<br> • Smart Command Detection </div></td> <td align="center" width="25%">
+🔧 Admin Power
+<div align="left"> • Advanced Group Management<br> • Auto-Moderation Tools<br> • Welcome/Goodbye System<br> • Anti-Spam Protection<br> • Custom Command Builder </div></td> <td align="center" width="25%">
+🎨 Creative Suite
+<div align="left"> • Sticker Factory<br> • Image Editor Pro<br> • Meme Generator<br> • Fancy Text Designer<br> • GIF Creator<br> • Quote Maker </div></td> </tr> </table></div>
+🚀 Quick Installation
+<div align="center">
+Choose Your Deployment Method
+<table> <tr> <td align="center">
+🖥️ Local Setup
+bash
 git clone https://github.com/blazetech-glitch/NYX.git
 cd NYX
 npm install
 node index.js
-`
+Scan QR code when prompted
 
-** First Run**: Scan QR code or provide SESSION_ID from .env
+</td> <td align="center">
+🐳 Docker Setup
+bash
+docker pull blazetech/nyx-bot
+docker run -e SESSION_ID="your_id" nyx-bot
+Pre-configured & optimized
 
-###  Docker
+</td> <td align="center">
+☁️ One-Click Deploy
+https://www.herokucdn.com/deploy/button.svg
+Zero configuration needed
 
-`ash
-docker build -t nyx-bot .
-docker run -e SESSION_ID="your_session_id" nyx-bot
-`
-
----
-
-##  Configuration
-
-| Variable | Value | Purpose |
-|:--------:|:-----:|:--------|
-| SESSION_ID | your_session_id | WhatsApp authentication (required) |
-| OWNER_NUMBER | 255627417402 | Primary owner |
-| PREFIX | . | Command trigger character |
-| MODE | public | Bot mode (public/private/groups) |
-| AUTO_TYPING | true | Show typing indicator |
-| ANTI_LINK | true | Block link sharing |
-
----
-
-##  🔐 Get Your Session ID
-
+</td> </tr> </table></div>
+⚙️ Configuration
 <div align="center">
+Essential Environment Variables
+Variable	Description	Required
+SESSION_ID	WhatsApp authentication token	✅ Yes
+OWNER_NUMBER	Primary admin contact	✅ Yes
+PREFIX	Command prefix (default: .)	❌ No
+MODE	Bot mode: public/private/groups	❌ No
+AUTO_TYPING	Enable typing indicators	❌ No
+</div>
+🔐 Authentication Setup
+<div align="center">
+Get Your Session ID in 3 Steps
+<a href="http://popkid-get-your-id-e1e23276b30a.herokuapp.com/pair" target="_blank"> <img src="https://img.shields.io/badge/🚀_Generate_Session_ID-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="Generate Session ID"/> </a>
 
-### Need a SESSION_ID to authenticate your bot?
 
-<a href="http://popkid-get-your-id-e1e23276b30a.herokuapp.com/pair" target="_blank">
-  <img alt="Get Session ID" src="https://img.shields.io/badge/✨_Get_Session_ID_✨-4a90e2?style=for-the-badge&logo=whatsapp&logoColor=white" />
-</a>
 
-### Steps:
-1. Click the badge above
-2. Scan the QR code with your phone
-3. Copy your SESSION_ID
-4. Add it to your `.env` file:
+1. Click the button above → 2. Scan QR code → 3. Copy SESSION_ID
 
-```env
-SESSION_ID=your_generated_session_id_here
-```
+env
+# .env Configuration
+SESSION_ID=your_generated_id_here
+OWNER_NUMBER=255627417402
+PREFIX=.
+MODE=public
+AUTO_TYPING=true
+ANTI_LINK=true
+</div>
+💡 Popular Commands
+<div align="center">
+yaml
+🎵 Media:
+  .play <song>      # Stream music
+  .video <query>    # Download video
+  .tiktok <url>     # TikTok download
+  .ig <url>         # Instagram download
 
-5. Start the bot: `node index.js`
+🛡️ Admin:
+  .group-info       # Group details
+  .antilink         # Toggle link protection
+  .welcome          # Custom greetings
+  .mode <type>      # Change bot mode
+
+🤖 AI & Fun:
+  .ai <question>    # Chat with AI
+  .meme             # Random memes
+  .quote            # Inspirational quotes
+  .fancy <text>     # Stylish text
+
+🎨 Creative:
+  .sticker          # Create stickers
+  .edit             # Image editor
+  .triggered        # Triggered meme
+  .logo <text>      # Logo generator
+*Total: 100+ commands available*
 
 </div>
-
----
-
-##  Popular Commands
-
-`
- Media Commands
-  .play <query>         Play music from YouTube
-  .video <query>        Download video
-  .song <name>          Download song
-  .tiktok <url>         Download TikTok video
-  .instagram <url>      Download Instagram post
-
- Admin Commands
-  .owner                Get bot info
-  .mode <type>          Change bot mode
-  .group-info           Group information
-  .antilink             Toggle anti-link
-  .welcome              Toggle welcome message
-
- Fun Commands
-  .meme                 Random meme
-  .joke                 Random joke
-  .ship <name1> <name2> Ship two people
-  .fancy <text>         Fancy text conversion
-`
-
----
-
-##  Deploy Anywhere
-
+🌐 Deployment Options
 <div align="center">
+Choose Your Platform
+<table> <tr> <td align="center">
+https://img.shields.io/badge/Heroku-430098?style=for-the-badge&logo=heroku&logoColor=white
+One-click deployment
 
-** Choose your platform and get started in minutes!**
+</td> <td align="center">
+https://img.shields.io/badge/Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white
+Git-based auto-deploy
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
-[![](assets/btn-railway.svg)](https://railway.app)
-[![](assets/btn-koyeb.svg)](https://koyeb.com)
-[![](assets/btn-cloudflare.svg)](https://workers.cloudflare.com)
-[![](assets/btn-render.svg)](https://render.com)
-[![](assets/btn-ubuntu.svg)](https://ubuntu.com)
+</td> <td align="center">
+https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=white
+Free tier available
 
-</div>
+</td> </tr> <tr> <td align="center">
+https://img.shields.io/badge/Koyeb-121212?style=for-the-badge&logo=koyeb&logoColor=white
+Global edge network
 
-| Platform | Description |
-|:--------:|:------------|
-| ** Heroku** | Click deploy button  Set env vars  Done  |
-| ** Railway** | Connect GitHub  Set vars  Auto deploy  |
-| ** Render** | Link repo  Configure  Deploy  |
-| ** Koyeb** | \koyeb app create --docker blazetech-glitch/NYX\ |
-| ** Cloudflare** | \wrangler init\  \wrangler publish\ |
-| ** Ubuntu VPS** | Clone  Install  \
-pm start\ |
+</td> <td align="center">
+https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=cloudflare&logoColor=white
+Serverless workers
 
----
+</td> <td align="center">
+https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white
+Self-hosted VPS
 
-##  Built With
+</td> </tr> </table></div>
+🏗️ Tech Stack
+<div align="center"><table> <tr> <td align="center">
+https://img.shields.io/badge/Node.js-20+-339933?style=flat-square&logo=node.js&logoColor=white
+Runtime Environment
 
+</td> <td align="center">
+https://img.shields.io/badge/Baileys-25D366?style=flat-square&logo=whatsapp&logoColor=white
+WhatsApp Web API
+
+</td> <td align="center">
+https://img.shields.io/badge/SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white
+Database
+
+</td> </tr> <tr> <td align="center">
+https://img.shields.io/badge/FFmpeg-007808?style=flat-square&logo=ffmpeg&logoColor=white
+Media Processing
+
+</td> <td align="center">
+https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white
+Containerization
+
+</td> <td align="center">
+https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=flat-square&logo=javascript&logoColor=black
+Core Language
+
+</td> </tr> </table></div>
+📞 Connect & Support
 <div align="center">
+Join Our Community
+<table> <tr> <td align="center">
+https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white
+Source Code
 
-![Node.js](https://img.shields.io/badge/Node.js_20+-339933?logo=node.js&logoColor=white&style=for-the-badge)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black&style=for-the-badge)
-![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white&style=for-the-badge)
-![FFmpeg](https://img.shields.io/badge/FFmpeg-007808?logo=ffmpeg&logoColor=white&style=for-the-badge)
-![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white&style=for-the-badge)
+</td> <td align="center">
+https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white
+Direct Support
 
-</div>
+</td> <td align="center">
+https://img.shields.io/badge/Official_Channel-25D366?style=for-the-badge&logo=whatsapp&logoColor=white
+Updates
 
-** Core Dependencies:**
--  **@whiskeysockets/baileys** - WhatsApp automation
--  **ytdl-core** - YouTube downloader
--  **fluent-ffmpeg** - Media processing
--  **SQLite3** - Database
+</td> </tr> <tr> <td align="center">
+https://img.shields.io/badge/User_Community-5865F2?style=for-the-badge&logo=discord&logoColor=white
+Help & Discussion
 
----
+</td> <td align="center">
+https://img.shields.io/badge/Full_Docs-8A2BE2?style=for-the-badge&logo=readthedocs&logoColor=white
+Detailed Guides
 
-##  Connect With Us
+</td> <td align="center">
+https://img.shields.io/badge/Report_Issues-FF6B6B?style=for-the-badge&logo=github&logoColor=white
+Bug Reports
 
-<div align="center">
+</td> </tr> </table>
+Lead Developer: BLAZE TECH
+Project Maintainer: NYX Development Team
 
-###  BLAZE TECH Team
 
-[![](assets/btn-github.svg)](https://github.com/blazetech-glitch)
-[![](assets/btn-whatsapp.svg)](https://wa.me/255627417402)
-[![](assets/btn-channel.svg)](https://whatsapp.com/channel/0029VbC49Bb2P59togOaEF2E)
-[![](assets/btn-community.svg)](https://chat.whatsapp.com/IrmNcI7Wn0C4bdLC70xVPJ)
-
-** Lead Developer**: [BLAZE TECH](https://wa.me/255627417402) 
-
-</div>
-
----
-
-##  Security & License
-
--  Keep \SESSION_ID\ private in \.env\
--  Never share credentials publicly
--  Enable \ANTI_LINK\ in group chats
--  Monitor bot logs regularly
-
-** License**: MIT - For educational purposes only  
-** Disclaimer**: Users responsible for WhatsApp Terms of Service compliance
-
----
-
-<div align="center">
-
-** Made with  by BLAZE TECH** | *NYX MD v3.0.0*
-
-</div>
+<div align="center"><img src="https://komarev.com/ghpvc/?username=blazetech-glitch-NYX&label=Repository+Views&color=8A2BE2&style=for-the-badge" alt="Repository views" /></div></div>
