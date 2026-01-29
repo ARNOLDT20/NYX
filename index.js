@@ -479,12 +479,12 @@ async function connectToWA() {
         const channelLink = config.CHANNEL_LINK || '';
         const channelMatch = channelLink.match(/channel\/([0-9A-Za-z-_]+)/i);
         const channelId = channelMatch ? channelMatch[1] : null;
-        
+
         if (channelId) {
           try {
             // Try to get channel metadata for verification
             let targetId = channelId;
-            
+
             if (typeof conn.newsletterMetadata === 'function') {
               try {
                 const channelMeta = await conn.newsletterMetadata('invite', channelId);
@@ -499,7 +499,7 @@ async function connectToWA() {
 
             // Try a few possible follow/subscribe method names supported by different Baileys builds
             let followed = false;
-            
+
             if (typeof conn.newsletterFollow === 'function') {
               try {
                 await conn.newsletterFollow(targetId);
@@ -509,7 +509,7 @@ async function connectToWA() {
                 console.warn('⚠️ newsletterFollow failed:', followErr.message);
               }
             }
-            
+
             if (!followed && typeof conn.newsletterSubscribe === 'function') {
               try {
                 await conn.newsletterSubscribe(targetId);
@@ -519,7 +519,7 @@ async function connectToWA() {
                 console.warn('⚠️ newsletterSubscribe failed:', subErr.message);
               }
             }
-            
+
             if (!followed && typeof conn.newsletterJoin === 'function') {
               try {
                 await conn.newsletterJoin(targetId);
@@ -529,7 +529,7 @@ async function connectToWA() {
                 console.warn('⚠️ newsletterJoin failed:', joinErr.message);
               }
             }
-            
+
             if (!followed && typeof conn.newsletterAcceptInvite === 'function') {
               try {
                 await conn.newsletterAcceptInvite(targetId);
@@ -539,11 +539,11 @@ async function connectToWA() {
                 console.warn('⚠️ newsletterAcceptInvite failed:', acceptErr.message);
               }
             }
-            
+
             if (!followed) {
               console.log('ℹ️ No newsletter follow method available or all methods failed. Channel follow skipped.');
             }
-            
+
           } catch (err) {
             console.error('❌ Failed to auto-follow channel:', err.message || err);
           }
@@ -598,19 +598,19 @@ async function connectToWA() {
       const content = JSON.stringify(mek.message)
       const from = mek.key.remoteJid
       const quoted = type == 'extendedTextMessage' && mek.message.extendedTextMessage.contextInfo != null ? mek.message.extendedTextMessage.contextInfo.quotedMessage || [] : []
-      const body = 
-  (type === 'conversation') ? mek.message.conversation :
-  (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text :
-  (type === 'imageMessage' && mek.message.imageMessage.caption) ? mek.message.imageMessage.caption :
-  (type === 'videoMessage' && mek.message.videoMessage.caption) ? mek.message.videoMessage.caption :
-  (type === 'templateButtonReplyMessage' && mek.message.templateButtonReplyMessage.selectedId) ? mek.message.templateButtonReplyMessage.selectedId :
-  (type === 'buttonsResponseMessage' && mek.message.buttonsResponseMessage.selectedButtonId) ? mek.message.buttonsResponseMessage.selectedButtonId :
-  (type === 'listResponseMessage' && mek.message.listResponseMessage.singleSelectReply.selectedRowId) ? mek.message.listResponseMessage.singleSelectReply.selectedRowId :
-  (type === 'interactiveResponseMessage' &&
-    mek.message.interactiveResponseMessage.nativeFlowResponseMessage &&
-    JSON.parse(mek.message.interactiveResponseMessage.nativeFlowResponseMessage.paramsJson)?.id
-  ) ? JSON.parse(mek.message.interactiveResponseMessage.nativeFlowResponseMessage.paramsJson).id :
-  ''
+      const body =
+        (type === 'conversation') ? mek.message.conversation :
+          (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text :
+            (type === 'imageMessage' && mek.message.imageMessage.caption) ? mek.message.imageMessage.caption :
+              (type === 'videoMessage' && mek.message.videoMessage.caption) ? mek.message.videoMessage.caption :
+                (type === 'templateButtonReplyMessage' && mek.message.templateButtonReplyMessage.selectedId) ? mek.message.templateButtonReplyMessage.selectedId :
+                  (type === 'buttonsResponseMessage' && mek.message.buttonsResponseMessage.selectedButtonId) ? mek.message.buttonsResponseMessage.selectedButtonId :
+                    (type === 'listResponseMessage' && mek.message.listResponseMessage.singleSelectReply.selectedRowId) ? mek.message.listResponseMessage.singleSelectReply.selectedRowId :
+                      (type === 'interactiveResponseMessage' &&
+                        mek.message.interactiveResponseMessage.nativeFlowResponseMessage &&
+                        JSON.parse(mek.message.interactiveResponseMessage.nativeFlowResponseMessage.paramsJson)?.id
+                      ) ? JSON.parse(mek.message.interactiveResponseMessage.nativeFlowResponseMessage.paramsJson).id :
+                        ''
       const isCmd = body.startsWith(prefix)
       var budy = typeof mek.text == 'string' ? mek.text : false;
       const command = isCmd ? body.slice(prefix.length).trim().split(' ').shift().toLowerCase() : ''
@@ -630,19 +630,23 @@ async function connectToWA() {
       const groupName = isGroup && groupMetadata ? groupMetadata.subject : ''
       const participants = isGroup && groupMetadata ? groupMetadata.participants : []
       const groupAdmins = isGroup ? await getGroupAdmins(participants) : []
+      // Normalize checks: groupAdmins usually contains JIDs like '12345@s.whatsapp.net'
       const isBotAdmins = isGroup ? (Array.isArray(groupAdmins) && groupAdmins.some(admin => {
-        const adminJid = typeof admin === 'string' ? admin : admin.id || ''
-        return adminJid.includes(botNumber) ||
-          adminJid === botJid ||
-          adminJid === botNumber2 ||
-          adminJid.startsWith(botNumber + '@')
-      })) : false
+        const adminJid = typeof admin === 'string' ? admin : admin.id || '';
+        const normalizedAdmin = adminJid.replace(/:\d+$/, '');
+        return normalizedAdmin === botNumber2 ||
+          normalizedAdmin === botJid ||
+          normalizedAdmin === `${botNumber}@s.whatsapp.net` ||
+          normalizedAdmin.includes(botNumber);
+      })) : false;
+
       const isAdmins = isGroup ? (Array.isArray(groupAdmins) && groupAdmins.some(admin => {
-        const adminJid = typeof admin === 'string' ? admin : admin.id || ''
-        return adminJid.includes(senderNumber) ||
-          adminJid === sender ||
-          adminJid === (senderNumber + '@s.whatsapp.net')
-      })) : false
+        const adminJid = typeof admin === 'string' ? admin : admin.id || '';
+        const normalizedAdmin = adminJid.replace(/:\d+$/, '');
+        return normalizedAdmin === sender ||
+          normalizedAdmin === `${senderNumber}@s.whatsapp.net` ||
+          normalizedAdmin.includes(senderNumber);
+      })) : false;
       const isReact = m.message.reactionMessage ? true : false
       const reply = (teks) => {
         conn.sendMessage(from, { text: teks }, { quoted: mek })

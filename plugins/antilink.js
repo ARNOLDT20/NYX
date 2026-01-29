@@ -40,28 +40,29 @@ cmd({
 });
 
 // Anti-Link System
+// Generic and specific link patterns (no global flag to avoid lastIndex issues)
 const linkPatterns = [
-  /https?:\/\/(?:chat\.whatsapp\.com|wa\.me)\/\S+/gi,
-  /^https?:\/\/(www\.)?whatsapp\.com\/channel\/([a-zA-Z0-9_-]+)$/,
-  /wa\.me\/\S+/gi,
-  /https?:\/\/(?:t\.me|telegram\.me)\/\S+/gi,
-  /https?:\/\/(?:www\.)?youtube\.com\/\S+/gi,
-  /https?:\/\/youtu\.be\/\S+/gi,
-  /https?:\/\/(?:www\.)?facebook\.com\/\S+/gi,
-  /https?:\/\/fb\.me\/\S+/gi,
-  /https?:\/\/(?:www\.)?instagram\.com\/\S+/gi,
-  /https?:\/\/(?:www\.)?twitter\.com\/\S+/gi,
-  /https?:\/\/(?:www\.)?tiktok\.com\/\S+/gi,
-  /https?:\/\/(?:www\.)?linkedin\.com\/\S+/gi,
-  /https?:\/\/(?:www\.)?snapchat\.com\/\S+/gi,
-  /https?:\/\/(?:www\.)?pinterest\.com\/\S+/gi,
-  /https?:\/\/(?:www\.)?reddit\.com\/\S+/gi,
-  /https?:\/\/ngl\/\S+/gi,
-  /https?:\/\/(?:www\.)?discord\.com\/\S+/gi,
-  /https?:\/\/(?:www\.)?twitch\.tv\/\S+/gi,
-  /https?:\/\/(?:www\.)?vimeo\.com\/\S+/gi,
-  /https?:\/\/(?:www\.)?dailymotion\.com\/\S+/gi,
-  /https?:\/\/(?:www\.)?medium\.com\/\S+/gi
+  /(?:https?:\/\/|www\.)\S+/i, // any http(s) or www link
+  /https?:\/\/(?:chat\.whatsapp\.com|wa\.me)\/\S+/i,
+  /^https?:\/\/(www\.)?whatsapp\.com\/channel\/([a-zA-Z0-9_-]+)$/i,
+  /https?:\/\/(?:t\.me|telegram\.me)\/\S+/i,
+  /https?:\/\/(?:www\.)?youtube\.com\/\S+/i,
+  /https?:\/\/youtu\.be\/\S+/i,
+  /https?:\/\/(?:www\.)?facebook\.com\/\S+/i,
+  /https?:\/\/fb\.me\/\S+/i,
+  /https?:\/\/(?:www\.)?instagram\.com\/\S+/i,
+  /https?:\/\/(?:www\.)?twitter\.com\/\S+/i,
+  /https?:\/\/(?:www\.)?tiktok\.com\/\S+/i,
+  /https?:\/\/(?:www\.)?linkedin\.com\/\S+/i,
+  /https?:\/\/(?:www\.)?snapchat\.com\/\S+/i,
+  /https?:\/\/(?:www\.)?pinterest\.com\/\S+/i,
+  /https?:\/\/(?:www\.)?reddit\.com\/\S+/i,
+  /https?:\/\/ngl\/\S+/i,
+  /https?:\/\/(?:www\.)?discord\.com\/\S+/i,
+  /https?:\/\/(?:www\.)?twitch\.tv\/\S+/i,
+  /https?:\/\/(?:www\.)?vimeo\.com\/\S+/i,
+  /https?:\/\/(?:www\.)?dailymotion\.com\/\S+/i,
+  /https?:\/\/(?:www\.)?medium\.com\/\S+/i
 ];
 
 cmd({

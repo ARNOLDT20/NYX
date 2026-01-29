@@ -43,31 +43,10 @@ module.exports.handleWelcome = async (conn, id, participants, groupMetadata) => 
                     continue;
                 }
 
-                let welcomeMsg = config.WELCOME_MESSAGE || `
-╔════════════════════════════════════════╗
-║     🎉 *WELCOME TO* ${groupName} 🎉     ║
-╚════════════════════════════════════════╝
+                let welcomeMsg = config.WELCOME_MESSAGE || `Welcome ${userName} to ${groupName}!
+You are member #${groupMetadata.participants.length}.
 
-┌─────────────────────────────────────┐
-│ 👤 *New Member:* ${userName}
-│ 📱 *Number:* +${memberNumber}
-│ 👥 *Total Members:* ${groupMetadata.participants.length}
-└─────────────────────────────────────┘
-
-✨ *We're excited to have you here!* ✨
-
-📌 *Please:*
-   • Introduce yourself
-   • Read the group description
-   • Follow all group rules
-   • Be respectful to everyone
-
-💬 Feel free to ask questions anytime!
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🤖 *Powered by NYX MD*
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-`;
+Please introduce yourself and follow the group rules.`;
 
                 // Replace placeholders if custom message is set
                 if (config.WELCOME_MESSAGE && typeof config.WELCOME_MESSAGE === 'string') {

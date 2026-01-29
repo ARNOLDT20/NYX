@@ -13,50 +13,62 @@ const path = require('path');
 
 // Persist config changes to `config.env` so toggles survive restarts
 function saveConfig(key, value) {
-    try {
-        const envPath = path.join(__dirname, '..', 'config.env');
-        let content = '';
-        if (fs.existsSync(envPath)) content = fs.readFileSync(envPath, 'utf8');
-        const lines = content.split(/\r?\n/).filter(Boolean);
-        const kv = `${key}=${value}`;
-        let found = false;
-        const out = lines.map(line => {
-            if (line.startsWith(key + '=')) {
-                found = true;
-                return kv;
+},
+async (conn, mek, m, { from, args, isCreator, isGroup, isAdmins, reply }) => {
+    if (isGroup) {
+        if (!isAdmins && !isCreator) return reply("*📛 Only a group admin or the owner can use this command!*);
+            } else {
+        if (!isCreator) return reply("*📛 Only the owner can use this command!*);
             }
-            return line;
-        });
-        if (!found) out.push(kv);
-        fs.writeFileSync(envPath, out.join('\n'), 'utf8');
-        // Also update process.env so other code can read it immediately
-        process.env[key] = value;
-        return true;
-    } catch (e) {
-        return false;
+
+    const status = args[0]?.toLowerCase();
+    if (status === "on") {
+        config.WELCOME = "true";
+        saveConfig('WELCOME', config.WELCOME);
+        return reply("✅ Welcome messages are now enabled.");
+    } else if (status === "off") {
+        config.WELCOME = "false";
+        saveConfig('WELCOME', config.WELCOME);
+        return reply("❌ Welcome messages are now disabled.");
+    } else {
+        return reply(`Example: .welcome on`);
     }
+});
+fs.writeFileSync(envPath, out.join('\n'), 'utf8');
+// Also update process.env so other code can read it immediately
+process.env[key] = value;
+return true;
+    } catch (e) {
+    return false;
+}
 }
 
-cmd({
-    pattern: "admin-events",
-    alias: ["adminevents"],
-    desc: "Enable or disable admin event notifications",
-    category: "settings",
-    filename: __filename
 },
-    async (conn, mek, m, { from, args, isCreator, reply }) => {
-        if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
-
-        const status = args[0]?.toLowerCase();
-        if (status === "on") {
-            config.ADMIN_EVENTS = "true";
-            return reply("✅ Admin event notifications are now enabled.");
-        } else if (status === "off") {
-            config.ADMIN_EVENTS = "false";
-            return reply("❌ Admin event notifications are now disabled.");
+async (conn, mek, m, { from, args, isCreator, isGroup, isAdmins, reply }) => {
+    if (isGroup) {
+        if (!isAdmins && !isCreator) return reply("*📛 Only a group admin or the owner can use this command!*);
         } else {
-            return reply(`Example: .admin-events on`);
+        if (!isCreator) return reply("*📛 Only the owner can use this command!*);
         }
+
+    const status = args[0]?.toLowerCase();
+    if (status === "on") {
+        config.GOODBYE = "true";
+        saveConfig('GOODBYE', config.GOODBYE);
+        return reply("✅ Goodbye messages are now enabled.");
+    } else if (status === "off") {
+        config.GOODBYE = "false";
+        saveConfig('GOODBYE', config.GOODBYE);
+        return reply("❌ Goodbye messages are now disabled.");
+    } else {
+        return reply(`Example: .goodbye on`);
+    }
+});
+config.ADMIN_EVENTS = "false";
+return reply("❌ Admin event notifications are now disabled.");
+        } else {
+    return reply(`Example: .admin-events on`);
+}
     });
 
 cmd({

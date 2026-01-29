@@ -43,25 +43,10 @@ module.exports.handleGoodbye = async (conn, id, participants, groupMetadata) => 
                     continue;
                 }
 
-                let goodbyeMsg = config.GOODBYE_MESSAGE || `
-╔════════════════════════════════════════╗
-║     👋 *GOODBYE* 👋                     ║
-╚════════════════════════════════════════╝
+                let goodbyeMsg = config.GOODBYE_MESSAGE || `Goodbye ${userName}.
+We now have ${groupMetadata.participants.length} members remaining.
 
-┌─────────────────────────────────────┐
-│ 👤 *Member Left:* ${userName}
-│ 📱 *Number:* +${memberNumber}
-│ 👥 *Remaining Members:* ${groupMetadata.participants.length}
-└─────────────────────────────────────┘
-
-😢 *We'll miss you!* 😢
-
-💬 Come back and visit us anytime!
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🤖 *Powered by NYX MD*
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-`;
+Hope to see you again!`;
 
                 // Replace placeholders if custom message is set
                 if (config.GOODBYE_MESSAGE && typeof config.GOODBYE_MESSAGE === 'string') {
