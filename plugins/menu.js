@@ -4,6 +4,8 @@ const { cmd, commands } = require('../command');
 const { runtime } = require('../lib/functions');
 const os = require('os');
 const { getPrefix } = require('../lib/prefix');
+const fs = require('fs');
+const path = require('path');
 
 // Fonction pour styliser les majuscules comme ʜɪ
 function toUpperStylized(str) {
@@ -145,10 +147,31 @@ cmd({
     for (let i = 0; i < menuChunks.length; i++) {
       if (i === 0) {
         // First page with image
+        const imageUrl = config.MENU_IMAGE_URL || 'https://files.catbox.moe/rw0yfd.png';
+
+        // Check if it's a local file or URL
+        let imageSource;
+        if (imageUrl.startsWith('./') || imageUrl.startsWith('/') || !imageUrl.startsWith('http')) {
+          // Local file - check if exists
+          const localPath = imageUrl.startsWith('./')
+            ? path.join(__dirname, '..', imageUrl.substring(2))
+            : imageUrl;
+
+          if (fs.existsSync(localPath)) {
+            imageSource = { url: 'data:image/jpeg;base64,' + fs.readFileSync(localPath).toString('base64') };
+          } else {
+            // Fallback to default
+            imageSource = { url: 'https://files.catbox.moe/rw0yfd.png' };
+          }
+        } else {
+          // URL
+          imageSource = { url: imageUrl };
+        }
+
         await conn.sendMessage(
           from,
           {
-            image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/rw0yfd.png' },
+            image: imageSource,
             caption: menuChunks[i],
             contextInfo: imageContextInfo
           },
