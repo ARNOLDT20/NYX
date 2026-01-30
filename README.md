@@ -62,7 +62,9 @@ Zero configuration needed
 
 </td> <td align="center">
 ☁️ One-Click Deploy
-https://www.herokucdn.com/deploy/button.svg
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
+[![Deploy to Railway](https://img.shields.io/badge/Deploy-Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)](https://railway.app/new/template?template=https://github.com/blazetech-glitch/NYX)
+[![Deploy to Render](https://img.shields.io/badge/Deploy-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://render.com/deploy?repo=https://github.com/blazetech-glitch/NYX)
 Zero configuration needed
 
 </td> </tr> </table></div>
