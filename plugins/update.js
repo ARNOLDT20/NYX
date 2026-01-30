@@ -21,9 +21,9 @@ cmd({
         // Step 1: Git pull latest changes
         console.log('📥 Pulling latest changes from git...');
         try {
-            const { stdout, stderr } = await execPromise('git pull origin main 2>&1', { 
+            const { stdout, stderr } = await execPromise('git pull origin main 2>&1', {
                 cwd: __dirname.replace(/plugins$/, ''),
-                timeout: 30000 
+                timeout: 30000
             });
             console.log('Git pull output:', stdout || stderr);
         } catch (gitError) {
@@ -50,7 +50,7 @@ cmd({
                         }
                     }
                 );
-                
+
                 reply(`✅ *Bot Update Initiated!*\n\n🔄 Status: Redeploy in progress\n📱 The bot will restart shortly\n⏱️ Please wait a few moments...`);
                 console.log('Heroku build triggered:', herokuBuildResponse.status);
                 return;
@@ -62,7 +62,7 @@ cmd({
 
         // Step 3: If no Heroku config, restart locally
         reply(`✅ *Bot Updated!*\n\n📦 Latest code pulled\n🔄 Restarting bot locally...\n⏱️ Please wait...`);
-        
+
         // Trigger a restart after a short delay
         setTimeout(() => {
             console.log('🔄 Restarting bot...');

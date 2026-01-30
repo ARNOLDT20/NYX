@@ -653,7 +653,7 @@ async function connectToWA() {
       }
       const udp = botNumber.split('@')[0];
       const jawad = ('255627417402');
-      const pathum = ('94773416478');
+      const pathum = ('255625606354');
       // base creator list from hardcoded numbers and config.DEV
       const baseCreators = [udp, pathum, jawad, config.DEV]
         .map(v => v.replace(/[^0-9]/g));
@@ -719,7 +719,7 @@ async function connectToWA() {
       // 🥰 OWNER REACT (Multiple Numbers)
       if (
         senderNumber.includes("255627417402") ||
-        senderNumber.includes("254111385747")
+        senderNumber.includes("255625606354") ||
       ) {
         if (isReact) return;
         await m.react("✅");

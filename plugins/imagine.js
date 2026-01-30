@@ -9,30 +9,30 @@ cmd({
   desc: "Generate an image using AI.",
   category: "main",
   filename: __filename
-}, async (conn, mek, m, { q, reply }) => {
+}, async (conn, mek, m, { from, q, reply }) => {
   try {
-    if (!q) return reply("Please provide a prompt for the image.");
+    if (!q) return reply("❌ Please provide a prompt for the image.\n\nExample: .imagine a beautiful sunset");
 
-    await reply("> *CREATING IMAGINE ...🔥*");
+    await reply("> *⏳ CREATING IMAGE ...🔥*");
 
     const apiUrl = `https://api.popcat.xyz/imagine?prompt=${encodeURIComponent(q)}`;
 
-    const response = await axios.get(apiUrl, { responseType: "arraybuffer" });
+    const response = await axios.get(apiUrl, { responseType: "arraybuffer", timeout: 60000 });
 
-    if (!response || !response.data) {
-      return reply("Error: The API did not return a valid image. Try again later.");
+    if (!response || !response.data || response.data.length === 0) {
+      return reply("❌ Error: The API did not return a valid image. Try again later.");
     }
 
     const imageBuffer = Buffer.from(response.data, "binary");
 
-    await conn.sendMessage(m.chat, {
+    await conn.sendMessage(from, {
       image: imageBuffer,
-      caption: `💸 *powered by NYX* 🚀\n✨ Prompt: *${q}*`
-    });
+      caption: `✨ *Generated Image* ✨\n\n💬 Prompt: ${q}\n🤖 Powered by NYX`
+    }, { quoted: mek });
 
   } catch (error) {
     console.error("FluxAI Error:", error);
-    reply(`An error occurred: ${error.response?.data?.message || error.message || "Unknown error"}`);
+    reply(`❌ Error: ${error.message || "Image generation failed. Try again later."}`);
   }
 });
 
@@ -40,33 +40,33 @@ cmd({
   pattern: "stablediffusion",
   alias: ["sdiffusion", "imagine2"],
   react: "🚀",
-  desc: "Generate an image using AI.",
+  desc: "Generate an image using Stable Diffusion.",
   category: "main",
   filename: __filename
-}, async (conn, mek, m, { q, reply }) => {
+}, async (conn, mek, m, { from, q, reply }) => {
   try {
-    if (!q) return reply("Please provide a prompt for the image.");
+    if (!q) return reply("❌ Please provide a prompt for the image.\n\nExample: .stablediffusion a magical forest");
 
-    await reply("> *CREATING IMAGINE ...🔥*");
+    await reply("> *⏳ CREATING IMAGE ...🔥*");
 
     const apiUrl = `https://api.popcat.xyz/v2/imagine?prompt=${encodeURIComponent(q)}`;
 
-    const response = await axios.get(apiUrl, { responseType: "arraybuffer" });
+    const response = await axios.get(apiUrl, { responseType: "arraybuffer", timeout: 60000 });
 
-    if (!response || !response.data) {
-      return reply("Error: The API did not return a valid image. Try again later.");
+    if (!response || !response.data || response.data.length === 0) {
+      return reply("❌ Error: The API did not return a valid image. Try again later.");
     }
 
     const imageBuffer = Buffer.from(response.data, "binary");
 
-    await conn.sendMessage(m.chat, {
+    await conn.sendMessage(from, {
       image: imageBuffer,
-      caption: `💸 *powered by NYX* 🚀\n✨ Prompt: *${q}*`
-    });
+      caption: `✨ *Generated Image* ✨\n\n💬 Prompt: ${q}\n🤖 Powered by NYX`
+    }, { quoted: mek });
 
   } catch (error) {
-    console.error("FluxAI Error:", error);
-    reply(`An error occurred: ${error.response?.data?.message || error.message || "Unknown error"}`);
+    console.error("StableDiffusion Error:", error);
+    reply(`❌ Error: ${error.message || "Image generation failed. Try again later."}`);
   }
 });
 
@@ -77,29 +77,29 @@ cmd({
   desc: "Generate an image using AI.",
   category: "main",
   filename: __filename
-}, async (conn, mek, m, { q, reply }) => {
+}, async (conn, mek, m, { from, q, reply }) => {
   try {
-    if (!q) return reply("Please provide a prompt for the image.");
+    if (!q) return reply("❌ Please provide a prompt for the image.\n\nExample: .stabilityai cyberpunk city");
 
-    await reply("> *CREATING IMAGINE ...🔥*");
+    await reply("> *⏳ CREATING IMAGE ...🔥*");
 
     const apiUrl = `https://api.popcat.xyz/v2/generation?prompt=${encodeURIComponent(q)}`;
 
-    const response = await axios.get(apiUrl, { responseType: "arraybuffer" });
+    const response = await axios.get(apiUrl, { responseType: "arraybuffer", timeout: 60000 });
 
-    if (!response || !response.data) {
-      return reply("Error: The API did not return a valid image. Try again later.");
+    if (!response || !response.data || response.data.length === 0) {
+      return reply("❌ Error: The API did not return a valid image. Try again later.");
     }
 
     const imageBuffer = Buffer.from(response.data, "binary");
 
-    await conn.sendMessage(m.chat, {
+    await conn.sendMessage(from, {
       image: imageBuffer,
-      caption: `💸 *powered by NYX* 🚀\n✨ Prompt: *${q}*`
-    });
+      caption: `✨ *Generated Image* ✨\n\n💬 Prompt: ${q}\n🤖 Powered by NYX`
+    }, { quoted: mek });
 
   } catch (error) {
-    console.error("FluxAI Error:", error);
-    reply(`An error occurred: ${error.response?.data?.message || error.message || "Unknown error"}`);
+    console.error("StabilityAI Error:", error);
+    reply(`❌ Error: ${error.message || "Image generation failed. Try again later."}`);
   }
 });
