@@ -1,3 +1,157 @@
+# NYX MD - WhatsApp Bot
+
+<div align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=32&duration=2800&pause=1000&color=8A2BE2&center=true&vCenter=true&width=600&lines=%F0%9F%94%A5+NYX+WHATSAPP+BOT+%F0%9F%94%A5;100%2B+Advanced+Features;Fully+Customizable;Lightning+Fast+Responses" alt="NYX Bot Typing Animation" />
+</div>
+> The Ultimate Multi-Functional WhatsApp Automation Suite
+[![Node.js](https://img.shields.io/badge/Node.js-%3E=20-339933?style=for-the-badge&logo=node.js&logoColor=white)]()
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)]()
+[![Version](https://img.shields.io/badge/Version-3.0.0-8A2BE2?style=for-the-badge)]()
+[![Contributors](https://img.shields.io/badge/Contributors-Welcome-success?style=for-the-badge)]()
+[![GitHub Stars](https://img.shields.io/github/stars/blazetech-glitch/NYX?style=for-the-badge&color=yellow)](https://github.com/blazetech-glitch/NYX)
+
+---
+## Feature Highlights
+
+- Media master: YouTube / TikTok / Instagram downloads, converters
+- Smart AI: GPT integration, contextual chat
+- Admin tools: welcome/goodbye, anti-link, group management
+- Creative: sticker maker, image editor, logo generator
+
+## Quick Installation
+Choose your deployment method:
+
+- Local
+
+```bash
+git clone https://github.com/blazetech-glitch/NYX.git
+cd NYX
+npm install
+node index.js
+```
+
+- Docker
+
+```bash
+docker pull blazetech/nyx-bot
+docker run -e SESSION_ID="your_id" blazetech/nyx-bot
+```
+
+- One-Click Deploy
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
+[![Deploy to Railway](https://img.shields.io/badge/Deploy-Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)](https://railway.app/new/template?template=https://github.com/blazetech-glitch/NYX)
+[![Deploy to Render](https://img.shields.io/badge/Deploy-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://dashboard.render.com/deploy?repo=https://github.com/blazetech-glitch/NYX)
+[![Deploy to Koyeb](https://img.shields.io/badge/Deploy-Koyeb-121212?style=for-the-badge&logo=koyeb&logoColor=white)](https://app.koyeb.com/deploy?repository=https://github.com/blazetech-glitch/NYX)
+
+---
+## Configuration
+
+Create a `.env` or `config.env` with the following values:
+
+```env
+SESSION_ID=your_generated_id_here
+OWNER_NUMBER=255627417402
+PREFIX=.
+MODE=public
+AUTO_TYPING=true
+ANTI_LINK=true
+```
+
+## Authentication
+
+Get a Session ID (pairing service):
+
+[![Generate Session ID](https://img.shields.io/badge/Generate_Session_ID-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](http://popkid-get-your-id-e1e23276b30a.herokuapp.com/pair)
+
+Steps:
+1. Click the button above
+2. Scan the QR code
+3. Copy SESSION_ID into `.env`
+
+---
+## Popular Commands (examples)
+
+```text
+.play <song>
+.video <query>
+.tiktok <url>
+.ig <url>
+.group-info
+.antilink
+.welcome
+.ai <question>
+.sticker
+.logo <text>
+```
+
+---
+## Deployment Options
+
+Deploy instantly with one-click buttons that open each platform's deploy flow for this rep# NYX — WhatsApp Bot
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
+
+Quick deploy: click the button above to deploy the repository template to Heroku.
+
+Minimal required config vars (set these in Heroku dashboard -> Deploy -> Deploy using Heroku Button -> Configure app):
+
+- `SESSION_ID` — required (your session identifier)
+- `OWNER_NUMBER` — 255627417402
+- `OWNER_NUMBER2` — 255754206718
+- `BOT_NAME` — NYX MD
+- `MENU_IMAGE_URL` — https://files.catbox.moe/rw0yfd.png
+- `NEWSLETTER_JID` — 120363424512102809@newsletter
+
+Optional vars you may want to configure: `PREFIX`, `DESCRIPTION`, `ALIVE_IMG`, `MENU_AUDIO_URL`, etc.
+
+Run locally:
+
+```bash
+git clone https://github.com/blazetech-glitch/NYX
+cd NYX
+npm install
+node index.js
+```
+
+Notes:
+- This repo is configured to use `index.js` as the process entrypoint (see `Procfile`).
+- I did not change any tokens or secrets. Keep those private.
+
+If you want, I can also create a small Heroku deploy checklist or automate a Heroku pipeline for this repo.
+ository.
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
+[![Deploy to Railway](https://img.shields.io/badge/Deploy-Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)](https://railway.app/new/template?template=https://github.com/blazetech-glitch/NYX)
+[![Deploy to Render](https://img.shields.io/badge/Deploy-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://dashboard.render.com/deploy?repo=https://github.com/blazetech-glitch/NYX)
+[![Deploy to Koyeb](https://img.shields.io/badge/Deploy-Koyeb-121212?style=for-the-badge&logo=koyeb&logoColor=white)](https://app.koyeb.com/deploy?repository=https://github.com/blazetech-glitch/NYX)
+
+Quick access to deployment files & directories:
+
+[![Dockerfile](https://img.shields.io/badge/Dockerfile-Open-blue?style=for-the-badge&logo=docker&logoColor=white)](Dockerfile)
+[![Procfile](https://img.shields.io/badge/Procfile-Open-purple?style=for-the-badge)](Procfile)
+[![Heroku Config](https://img.shields.io/badge/heroku.yml-Open-430098?style=for-the-badge&logo=heroku&logoColor=white)](heroku.yml)
+[![Koyeb Config](https://img.shields.io/badge/koyeb.yaml-Open-121212?style=for-the-badge&logo=koyeb&logoColor=white)](koyeb.yaml)
+[![Plugins](https://img.shields.io/badge/Plugins-folder-6f42c1?style=for-the-badge)](plugins/)
+[![Assets](https://img.shields.io/badge/Assets-folder-2b8a3e?style=for-the-badge)](assets/)
+[![Data](https://img.shields.io/badge/Data-folder-ff7043?style=for-the-badge)](data/)
+
+---
+## Tech Stack
+
+[![Node.js](https://img.shields.io/badge/Node.js-20+-339933?style=flat-square&logo=node.js&logoColor=white)]()
+[![Baileys](https://img.shields.io/badge/Baileys-25D366?style=flat-square&logo=whatsapp&logoColor=white)]()
+[![FFmpeg](https://img.shields.io/badge/FFmpeg-007808?style=flat-square&logo=ffmpeg&logoColor=white)]()
+
+---
+## Connect & Support
+
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/blazetech-glitch/NYX)
+[![WhatsApp](https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)]()
+[![Discord](https://img.shields.io/badge/User_Community-5865F2?style=for-the-badge&logo=discord&logoColor=white)]()
+
+Lead Developer: BLAZE TECH
+
 NYX MD - WhatsApp Bot
 <div align="center"><img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=32&duration=2800&pause=1000&color=8A2BE2&center=true&vCenter=true&width=600&lines=%F0%9F%94%A5+NYX+WHATSAPP+BOT+%F0%9F%94%A5;100%2B+Advanced+Features;Fully+Customizable;Lightning+Fast+Responses" alt="NYX Bot Typing Animation" />
 The Ultimate Multi-Functional WhatsApp Automation Suite
@@ -55,14 +209,14 @@ Pre-configured & optimized
 
 </td> <td align="center">
 Pre-configured & optimized
-[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
 Zero configuration needed
 
 </td> </tr> </table></div>
 
 </td> <td align="center">
 ☁️ One-Click Deploy
-[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
 [![Deploy to Railway](https://img.shields.io/badge/Deploy-Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)](https://railway.app/new/template?template=https://github.com/blazetech-glitch/NYX)
 [![Deploy to Render](https://img.shields.io/badge/Deploy-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://render.com/deploy?repo=https://github.com/blazetech-glitch/NYX)
 Zero configuration needed
@@ -124,7 +278,7 @@ Get Your Session ID in 3 Steps
 <a href="http://popkid-get-your-id-e1e23276b30a.herokuapp.com/pair" target="_blank"> <img src="https://img.shields.io/badge/🚀_Generate_Session_ID-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="Generate Session ID"/> </a>
 
 
-[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
 [![Deploy to Railway](https://img.shields.io/badge/Deploy-Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)](https://railway.app/new/template?template=https://github.com/blazetech-glitch/NYX)
 [![Deploy to Render](https://img.shields.io/badge/Deploy-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://render.com/deploy?repo=https://github.com/blazetech-glitch/NYX)
 [![Deploy to Koyeb](https://img.shields.io/badge/Deploy-Koyeb-121212?style=for-the-badge&logo=koyeb&logoColor=white)](https://app.koyeb.com/deploy?repository=https://github.com/blazetech-glitch/NYX)
@@ -236,11 +390,11 @@ yaml
 </div>
 🌐 Deployment Options
 <div align="center">
-Deploy instantly with one-click buttons or open deployment files in the repo.
+Deploy instantly with one-click buttons that open each platform's deploy flow for this repository.
 <br/><br/>
-[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
 [![Deploy to Railway](https://img.shields.io/badge/Deploy-Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)](https://railway.app/new/template?template=https://github.com/blazetech-glitch/NYX)
-[![Deploy to Render](https://img.shields.io/badge/Deploy-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://render.com/deploy?repo=https://github.com/blazetech-glitch/NYX)
+[![Deploy to Render](https://img.shields.io/badge/Deploy-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://dashboard.render.com/deploy?repo=https://github.com/blazetech-glitch/NYX)
 [![Deploy to Koyeb](https://img.shields.io/badge/Deploy-Koyeb-121212?style=for-the-badge&logo=koyeb&logoColor=white)](https://app.koyeb.com/deploy?repository=https://github.com/blazetech-glitch/NYX)
 <br/><br/>
 Quick access to deployment files & directories — click any badge to open it in the repo.
@@ -253,7 +407,7 @@ Quick access to deployment files & directories — click any badge to open it in
 [![Assets](https://img.shields.io/badge/Assets-folder-2b8a3e?style=for-the-badge)](assets/)
 [![Data](https://img.shields.io/badge/Data-folder-ff7043?style=for-the-badge)](data/)
 <br/>
-<sub>Tip: Click the Heroku button to deploy directly using this repository as the template.</sub>
+<sub>Tip: Click any button to start a deploy flow on that platform for this repository.</sub>
 </div>
 🏗️ Tech Stack
 <div align="center"><table> <tr> <td align="center">
