@@ -77,25 +77,57 @@ cmd({
       if (cmd.category && !cmd.dontAdd && cmd.pattern) {
         const normalizedCategory = normalize(cmd.category);
         categories[normalizedCategory] = categories[normalizedCategory] || [];
-        categories[normalizedCategory].push(cmd.pattern.split('|')[0]);
+        categories[normalizedCategory].push({
+          pattern: cmd.pattern.split('|')[0],
+          desc: cmd.desc || 'No description'
+        });
       }
     }
 
-    // 🌈 COLORFUL CATEGORY STYLE WITH BUTTONS
+    // 🌈 COLORFUL CATEGORY STYLE WITH DESCRIPTIONS AND PAGINATION
+    let menuChunks = [];
+    let currentMenu = menu;
+    let charCount = menu.length;
+    const maxChars = 4090; // WhatsApp limit is around 4096
+
     for (const cat of Object.keys(categories).sort()) {
       const emoji = emojiByCategory[cat] || '✨';
-      menu += `\n\n╭─────────────────────────────────╮
-│ ${emoji} *${toUpperStylized(cat).toUpperCase()} MENU*
-├─────────────────────────────────┤`;
-      for (const cmd of categories[cat].sort()) {
-        menu += `\n│ ▸ ${prefix}${cmd}`;
+      const categorySection = `\n\n╭─ ${emoji} *${toUpperStylized(cat).toUpperCase()}*\n`;
+
+      let categoryContent = '';
+      for (const cmd of categories[cat].sort((a, b) => a.pattern.localeCompare(b.pattern))) {
+        const cmdLine = `│ ▸ ${prefix}${cmd.pattern.padEnd(12)} — ${cmd.desc}\n`;
+        categoryContent += cmdLine;
       }
-      menu += `\n╰─────────────────────────────────╯`;
+      categoryContent += '╰───────────────────────────────────╯';
+
+      const fullSection = categorySection + categoryContent;
+
+      // Check if adding this section exceeds limit
+      if (charCount + fullSection.length > maxChars) {
+        // Save current chunk and start new one
+        currentMenu += `\n\n╔════════════════════════════════╗\n║ 📄 See next page for more...  ║\n╚════════════════════════════════╝`;
+        menuChunks.push(currentMenu);
+        currentMenu = `╔════════════════════════════════╗\n║   📖 *MENU - PAGE ${menuChunks.length + 1}* 📖   ║\n╚════════════════════════════════╝${fullSection}`;
+        charCount = currentMenu.length;
+      } else {
+        currentMenu += fullSection;
+        charCount += fullSection.length;
+      }
     }
 
-    menu += `\n\n╔════════════════════════════════╗
+    // Add footer to last menu chunk
+    currentMenu += `\n\n╔════════════════════════════════╗
 ║   🌟 ${config.DESCRIPTION || toUpperStylized('Explore the power of NYX MD')} 🌟   ║
-╚════════════════════════════════╝\n\n*📱 Need help?*\n🔗 Group: ${config.GROUP_LINK ? '[Join](' + config.GROUP_LINK + ')' : 'Not Set'}\n📢 Channel: ${config.CHANNEL_LINK ? '[Follow](' + config.CHANNEL_LINK + ')' : 'Not Set'}\n\n*Made with ❤️ by BLAZE TECH* | *v3.0.0*`;
+╚════════════════════════════════╝
+
+*📱 Need help?*
+🔗 Group: ${config.GROUP_LINK ? config.GROUP_LINK : 'Not Set'}
+📢 Channel: ${config.CHANNEL_LINK ? config.CHANNEL_LINK : 'Not Set'}
+
+*Made with ❤️ by BLAZE TECH* | *v3.0.0*`;
+
+    menuChunks.push(currentMenu);
 
     // Context info
     const imageContextInfo = {
@@ -109,16 +141,33 @@ cmd({
       }
     };
 
-    // Send menu
-    await conn.sendMessage(
-      from,
-      {
-        image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/rw0yfd.png' },
-        caption: menu,
-        contextInfo: imageContextInfo
-      },
-      { quoted: mek }
-    );
+    // Send all menu chunks with image on first page only
+    for (let i = 0; i < menuChunks.length; i++) {
+      if (i === 0) {
+        // First page with image
+        await conn.sendMessage(
+          from,
+          {
+            image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/rw0yfd.png' },
+            caption: menuChunks[i],
+            contextInfo: imageContextInfo
+          },
+          { quoted: mek }
+        );
+      } else {
+        // Subsequent pages as text
+        await conn.sendMessage(
+          from,
+          { text: menuChunks[i], contextInfo: imageContextInfo },
+          { quoted: mek }
+        );
+      }
+
+      // Delay between messages to avoid rate limiting
+      if (i < menuChunks.length - 1) {
+        await new Promise(r => setTimeout(r, 500));
+      }
+    }
 
     // Optional audio
     if (config.MENU_AUDIO_URL) {
