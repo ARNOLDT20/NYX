@@ -28,36 +28,48 @@ cmd({
 
 *Made with ❤️ by ${config.OWNER_NAME || 'BLAZE TEAM'}*`;
 
-    // Send image with caption
-    await conn.sendMessage(m.chat, {
-      image: { url: config.MENU_IMAGE_URL || "https://files.catbox.moe/rw0yfd.png" },
-      caption: mentionText,
-      contextInfo: {
-        mentionedJid: [m.sender],
-        forwardingScore: 999,
-        isForwarded: true,
-        externalAdReply: {
-          showAdAttribution: true,
-          title: config.BOT_NAME || 'NYX MD',
-          body: '🤖 Your AI Assistant',
-          thumbnailUrl: config.MENU_IMAGE_URL || "https://files.catbox.moe/rw0yfd.png",
-          sourceUrl: config.CHANNEL_LINK || '',
-          mediaType: 1,
-          renderLargerThumbnail: false
+    try {
+      // Send image with caption
+      await conn.sendMessage(m.chat, {
+        image: { url: config.MENU_IMAGE_URL || "https://files.catbox.moe/rw0yfd.png" },
+        caption: mentionText,
+        contextInfo: {
+          mentionedJid: [m.sender],
+          forwardingScore: 999,
+          isForwarded: true,
+          externalAdReply: {
+            showAdAttribution: true,
+            title: config.BOT_NAME || 'NYX MD',
+            body: '🤖 Your AI Assistant',
+            thumbnailUrl: config.MENU_IMAGE_URL || "https://files.catbox.moe/rw0yfd.png",
+            sourceUrl: config.CHANNEL_LINK || '',
+            mediaType: 1,
+            renderLargerThumbnail: false
+          }
         }
-      }
-    }, { quoted: m });
+      }, { quoted: m });
 
-    // Send audio file
-    await conn.sendMessage(m.chat, {
-      audio: { url: "https://files.catbox.moe/lu3f94.mp3" },
-      mimetype: 'audio/mpeg',
-      ptt: false,
-      fileName: `${config.BOT_NAME || 'NYX'}-notification.mp3`
-    }, { quoted: m });
+      // Add delay before sending audio
+      await new Promise(r => setTimeout(r, 1000));
+
+      // Send audio file
+      await conn.sendMessage(m.chat, {
+        audio: { url: "https://files.catbox.moe/lu3f94.mp3" },
+        mimetype: 'audio/mpeg',
+        ptt: false,
+        fileName: `${config.BOT_NAME || 'NYX'}-notification.mp3`
+      }, { quoted: m });
+
+    } catch (sendError) {
+      console.error('Error sending mention reply:', sendError.message);
+      // Fallback: send text only
+      await conn.sendMessage(m.chat, {
+        text: `👋 *${config.BOT_NAME || 'NYX MD'} is here!*\n\n🎯 I'm listening and ready to help.\nUse *.menu* for commands!`
+      }, { quoted: m });
+    }
 
   } catch (e) {
-    console.error('Mention reply error:', e);
+    console.error('Mention reply error:', e.message);
   }
 });
 
