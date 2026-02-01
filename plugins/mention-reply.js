@@ -11,12 +11,53 @@ cmd({
     const botNumber = conn.user.id.split(":")[0] + '@s.whatsapp.net';
     if (!mentioned.includes(botNumber)) return;
 
+    // Beautiful formatted message
+    const mentionText = `╔════════════════════════════════╗
+║        👋 *MENTION RECEIVED* 👋        ║
+╚════════════════════════════════╝
+
+✨ **${config.BOT_NAME || 'NYX MD'}** is here! 
+
+🎯 I'm listening and ready to help you.
+
+╭─────────────────────────────────╮
+│ 💬 How can I assist you today?
+│ ⚡ Use .menu for commands
+│ 🔗 ${config.GROUP_LINK ? config.GROUP_LINK : 'Join our community'}
+╰─────────────────────────────────╯
+
+*Made with ❤️ by ${config.OWNER_NAME || 'BLAZE TEAM'}*`;
+
+    // Send image with caption
     await conn.sendMessage(m.chat, {
-      text: "Yoh am listening 👂 How can I assist? 😊"
+      image: { url: config.MENU_IMAGE_URL || "https://files.catbox.moe/rw0yfd.png" },
+      caption: mentionText,
+      contextInfo: {
+        mentionedJid: [m.sender],
+        forwardingScore: 999,
+        isForwarded: true,
+        externalAdReply: {
+          showAdAttribution: true,
+          title: config.BOT_NAME || 'NYX MD',
+          body: '🤖 Your AI Assistant',
+          thumbnailUrl: config.MENU_IMAGE_URL || "https://files.catbox.moe/rw0yfd.png",
+          sourceUrl: config.CHANNEL_LINK || '',
+          mediaType: 1,
+          renderLargerThumbnail: false
+        }
+      }
+    }, { quoted: m });
+
+    // Send audio file
+    await conn.sendMessage(m.chat, {
+      audio: { url: "https://files.catbox.moe/lu3f94.mp3" },
+      mimetype: 'audio/mpeg',
+      ptt: false,
+      fileName: `${config.BOT_NAME || 'NYX'}-notification.mp3`
     }, { quoted: m });
 
   } catch (e) {
-    console.error(e);
+    console.error('Mention reply error:', e);
   }
 });
 
