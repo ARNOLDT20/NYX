@@ -16,7 +16,7 @@ cmd({
 
     const mentioned = m.mentionedJid || [];
     const botNumber = conn.user.id.split(":")[0] + '@s.whatsapp.net';
-    
+
     // Check if bot is mentioned
     if (!mentioned.includes(botNumber)) return;
 

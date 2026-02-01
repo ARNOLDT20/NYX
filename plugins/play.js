@@ -33,8 +33,9 @@ cmd({
     category: "download",
     react: "🎵",
     filename: __filename
-}, async (conn, mek, m, { from, quoted, sender, reply, arg }) => {
+}, async (conn, mek, m, { from, quoted, sender, reply, args, q }) => {
     try {
+        const arg = args || (q ? String(q).trim().split(/\s+/) : []);
         if (!arg[0]) {
             return reply("Please provide a song name or YouTube URL.\nExample: .play Imagine Dragons Believer");
         }
@@ -173,8 +174,9 @@ cmd({
     category: "download",
     react: "🎥",
     filename: __filename
-}, async (conn, mek, m, { from, quoted, sender, reply, arg }) => {
+}, async (conn, mek, m, { from, quoted, sender, reply, args, q }) => {
     try {
+        const arg = args || (q ? String(q).trim().split(/\s+/) : []);
         if (!arg[0]) {
             return reply("Please provide a video name or YouTube URL.\nExample: .video Lara Croft");
         }
@@ -289,8 +291,9 @@ cmd({
     category: "download",
     react: "🔍",
     filename: __filename
-}, async (conn, mek, m, { from, quoted, sender, reply, arg }) => {
+}, async (conn, mek, m, { from, quoted, sender, reply, args, q }) => {
     try {
+        const arg = args || (q ? String(q).trim().split(/\s+/) : []);
         if (!arg[0]) {
             return reply("Please provide a search query.\nExample: .ytsearch Imagine Dragons");
         }

@@ -1,5 +1,7 @@
 const { cmd } = require('../command');
 const config = require("../config");
+const fs = require('fs').promises;
+const path = require('path');
 
 // Anti-Bad Words System
 cmd({
@@ -78,25 +80,75 @@ cmd({
 }) => {
   try {
     // Skip if not a group or bot is not admin
-    if (!isGroup || !isBotAdmins) {
-      return;
-    }
+    if (!isGroup || !isBotAdmins) return;
 
     // Allow admins to send links without penalty
-    if (isAdmins) {
-      return;
+    if (isAdmins) return;
+
+    const containsLink = linkPatterns.some(pattern => pattern.test(body || ''));
+
+    if (!(containsLink && config.ANTI_LINK === 'true')) return;
+
+    // Delete the offending message
+    try {
+      await conn.sendMessage(from, { delete: m.key }, { quoted: m });
+    } catch (e) {
+      // ignore delete errors
     }
 
-    const containsLink = linkPatterns.some(pattern => pattern.test(body));
+    // Warn tracking persisted to store/antilink_warns.json
+    const warnsFile = path.join(process.cwd(), 'store', 'antilink_warns.json');
 
-    if (containsLink && config.ANTI_LINK === 'true') {
-      await conn.sendMessage(from, { 'delete': m.key }, { 'quoted': m });
-      await conn.sendMessage(from, {
-        'text': `⚠️ Links are not allowed in this group.\n@${sender.split('@')[0]} has been removed. 🚫`,
-        'mentions': [sender]
-      }, { 'quoted': m });
+    const readWarns = async () => {
+      try {
+        const data = await fs.readFile(warnsFile, 'utf8');
+        return JSON.parse(data || '{}');
+      } catch (e) {
+        return {};
+      }
+    };
 
-      await conn.groupParticipantsUpdate(from, [sender], "remove");
+    const writeWarns = async (obj) => {
+      await fs.mkdir(path.dirname(warnsFile), { recursive: true });
+      await fs.writeFile(warnsFile, JSON.stringify(obj, null, 2), 'utf8');
+    };
+
+    const warns = await readWarns();
+    // structure: { [groupId]: { [userId]: count } }
+    if (!warns[from]) warns[from] = {};
+    const current = warns[from][sender] ? Number(warns[from][sender]) : 0;
+    const updated = current + 1;
+    warns[from][sender] = updated;
+    await writeWarns(warns);
+
+    const maxWarns = 5;
+    if (updated >= maxWarns) {
+      // reset user's warns
+      delete warns[from][sender];
+      await writeWarns(warns);
+
+      // notify and remove
+      try {
+        await conn.sendMessage(from, {
+          text: `🚫 @${sender.split('@')[0]} has reached ${maxWarns} warnings and will be removed from the group.`,
+          mentions: [sender]
+        }, { quoted: m });
+        await conn.groupParticipantsUpdate(from, [sender], 'remove');
+      } catch (err) {
+        console.error('Failed to remove user after warns:', err);
+        reply('Could not remove the user, make sure the bot has admin rights.');
+      }
+    } else {
+      // send warn message
+      try {
+        await conn.sendMessage(from, {
+          text: `⚠️ @${sender.split('@')[0]} Warning ${updated}/${maxWarns} — Posting links is not allowed. After ${maxWarns} warnings you will be removed.`,
+          mentions: [sender]
+        }, { quoted: m });
+      } catch (err) {
+        // fallback to reply
+        reply(`Warning ${updated}/${maxWarns} — Posting links is not allowed.`);
+      }
     }
   } catch (error) {
     console.error(error);
