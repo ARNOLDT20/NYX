@@ -8,12 +8,12 @@ const ffmpeg = require('fluent-ffmpeg');
 const ytdl = require('ytdl-core');
 
 cmd({
-    pattern: "play",
-    alias: ["ytplay", "ytmp3", "song", "audio", "yta"],
+    pattern: "playx",
+    alias: ["ytplay"],
     react: "🎵",
-    desc: "Download YouTube audio with multiple API fallbacks",
+    desc: "Download YouTube audio with multiple API fallbacks (legacy)",
     category: "download",
-    use: '.play <song name or YouTube URL>',
+    use: '.playx <song name or YouTube URL>',
     filename: __filename
 }, async (conn, mek, m, { from, reply, q }) => {
     try {
@@ -110,6 +110,20 @@ cmd({
                     continue;
                 }
 
+                // Download the audio file
+                const audioRes = await axios({
+                    url: audioUrl,
+                    method: "GET",
+                    responseType: "arraybuffer",
+                    timeout: 60000,
+                    headers: { 'User-Agent': 'Mozilla/5.0' }
+                });
+
+                if (!audioRes.data || audioRes.data.length === 0) {
+                    console.warn(`No audio data downloaded`);
+                    continue;
+                }
+
                 console.log(`Downloaded ${audioRes.data.length} bytes of audio`);
 
                 // Send audio file directly - no conversion needed
@@ -162,12 +176,12 @@ cmd({
 
 // Enhanced play4 command with multiple APIs
 cmd({
-    pattern: "video",
-    alias: ["ytmp4", "ytvideo", "yta4"],
+    pattern: "videox",
+    alias: ["ytmp4x"],
     react: "🎬",
-    desc: "Download YouTube video with multiple API fallbacks",
+    desc: "Download YouTube video with multiple API fallbacks (legacy)",
     category: "download",
-    use: '.play4 <video name or YouTube URL>',
+    use: '.videox <video name or YouTube URL>',
     filename: __filename
 }, async (conn, mek, m, { from, reply, q }) => {
     try {
@@ -267,16 +281,16 @@ cmd({
 
 // Keep the original play2 command but enhance it
 cmd({
-    pattern: "play2",
-    alias: ["yta2", "song2"],
+    pattern: "oldplay",
+    alias: ["legacyplay"],
     react: "🎵",
-    desc: "Download high quality YouTube audio",
+    desc: "Download high quality YouTube audio (legacy)",
     category: "media",
     use: "<song name>",
     filename: __filename
 }, async (conn, mek, m, { from, q, reply }) => {
     try {
-        if (!q) return reply("Please provide a song name\nExample: .play2 Tum Hi Ho");
+        if (!q) return reply("Please provide a song name\nExample: .oldplay Tum Hi Ho");
 
         // Step 1: Search YouTube
         await conn.sendMessage(from, { text: "🔍 Searching for your song..." }, { quoted: mek });

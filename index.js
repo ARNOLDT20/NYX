@@ -765,9 +765,12 @@ async function connectToWA() {
 
       const events = require('./command')
       const cmdName = isCmd ? body.slice(1).trim().split(" ")[0].toLowerCase() : false;
+      let executedCmd = false;
+
       if (isCmd) {
         const cmd = events.commands.find((cmd) => cmd.pattern === (cmdName)) || events.commands.find((cmd) => cmd.alias && cmd.alias.includes(cmdName))
         if (cmd) {
+          executedCmd = true;
           if (cmd.react) conn.sendMessage(from, { react: { text: cmd.react, key: mek.key } })
 
           try {
@@ -777,19 +780,26 @@ async function connectToWA() {
           }
         }
       }
+
+      // Only run .map() for non-pattern commands (on: body, text, image, sticker)
       events.commands.map(async (command) => {
-        if (body && command.on === "body") {
+        // Skip if this command has a pattern and was already executed
+        if (command.pattern && executedCmd) return;
+
+        if (body && command.on === "body" && !command.pattern) {
           command.function(conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply })
-        } else if (mek.q && command.on === "text") {
+        } else if (mek.q && command.on === "text" && !command.pattern) {
           command.function(conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply })
         } else if (
           (command.on === "image" || command.on === "photo") &&
-          mek.type === "imageMessage"
+          mek.type === "imageMessage" &&
+          !command.pattern
         ) {
           command.function(conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply })
         } else if (
           command.on === "sticker" &&
-          mek.type === "stickerMessage"
+          mek.type === "stickerMessage" &&
+          !command.pattern
         ) {
           command.function(conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply })
         }

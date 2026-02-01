@@ -89,9 +89,8 @@ cmd({
     // 🌈 COLORFUL CATEGORY STYLE WITH DESCRIPTIONS AND PAGINATION
     let menuChunks = [];
     let currentMenu = menu;
-    let charCount = menu.length;
-    const maxChars = 4090; // WhatsApp limit is around 4096
 
+    // Build menu with all categories on one page
     for (const cat of Object.keys(categories).sort()) {
       const emoji = emojiByCategory[cat] || '✨';
       const categorySection = `\n\n╭─ ${emoji} *${toUpperStylized(cat).toUpperCase()}*\n`;
@@ -103,22 +102,10 @@ cmd({
       }
       categoryContent += '╰───────────────────────────────────╯';
 
-      const fullSection = categorySection + categoryContent;
-
-      // Check if adding this section exceeds limit
-      if (charCount + fullSection.length > maxChars) {
-        // Save current chunk and start new one
-        currentMenu += `\n\n╔════════════════════════════════╗\n║ 📄 See next page for more...  ║\n╚════════════════════════════════╝`;
-        menuChunks.push(currentMenu);
-        currentMenu = `╔════════════════════════════════╗\n║   📖 *MENU - PAGE ${menuChunks.length + 1}* 📖   ║\n╚════════════════════════════════╝${fullSection}`;
-        charCount = currentMenu.length;
-      } else {
-        currentMenu += fullSection;
-        charCount += fullSection.length;
-      }
+      currentMenu += categorySection + categoryContent;
     }
 
-    // Add footer to last menu chunk
+    // Add footer
     currentMenu += `\n\n╔════════════════════════════════╗
 ║   🌟 ${config.DESCRIPTION || toUpperStylized('Explore the power of NYX MD')} 🌟   ║
 ╚════════════════════════════════╝
