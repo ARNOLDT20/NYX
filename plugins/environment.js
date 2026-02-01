@@ -13,64 +13,50 @@ const path = require('path');
 
 // Persist config changes to `config.env` so toggles survive restarts
 function saveConfig(key, value) {
-},
-async (conn, mek, m, { from, args, isCreator, isGroup, isAdmins, reply }) => {
-    if (isGroup) {
-        if (!isAdmins && !isCreator) return reply("*📛 Only a group admin or the owner can use this command!*);
-            } else {
-        if (!isCreator) return reply("*📛 Only the owner can use this command!*);
-            }
-
-    const status = args[0]?.toLowerCase();
-    if (status === "on") {
-        config.WELCOME = "true";
-        saveConfig('WELCOME', config.WELCOME);
-        return reply("✅ Welcome messages are now enabled.");
-    } else if (status === "off") {
-        config.WELCOME = "false";
-        saveConfig('WELCOME', config.WELCOME);
-        return reply("❌ Welcome messages are now disabled.");
-    } else {
-        return reply(`Example: .welcome on`);
-    }
-});
-fs.writeFileSync(envPath, out.join('\n'), 'utf8');
-// Also update process.env so other code can read it immediately
-process.env[key] = value;
-return true;
-    } catch (e) {
-    return false;
-}
-}
-
-},
-async (conn, mek, m, { from, args, isCreator, isGroup, isAdmins, reply }) => {
-    if (isGroup) {
-        if (!isAdmins && !isCreator) return reply("*📛 Only a group admin or the owner can use this command!*);
-        } else {
-        if (!isCreator) return reply("*📛 Only the owner can use this command!*);
+    try {
+        const envPath = path.join(process.cwd(), 'config.env');
+        let out = [];
+        if (fs.existsSync(envPath)) {
+            out = fs.readFileSync(envPath, 'utf8').split(/\r?\n/);
         }
+        const prefixLine = key + '=';
+        const idx = out.findIndex(l => l.startsWith(prefixLine));
+        const val = String(value);
+        if (idx > -1) out[idx] = `${key}=${val}`;
+                // Usage: .auto-recording on|off     (in group: toggles for this group by admin)
+                //        .auto-recording all on|off (sets global default)
+                const target = args[0]?.toLowerCase();
+                const status = (args[1] || args[0])?.toLowerCase();
+                if (!["on", "off"].includes(status)) return reply("*📝 Usage:  .auto-recording on|off  OR  .auto-recording all on|off*");
 
-    const status = args[0]?.toLowerCase();
-    if (status === "on") {
-        config.GOODBYE = "true";
-        saveConfig('GOODBYE', config.GOODBYE);
-        return reply("✅ Goodbye messages are now enabled.");
-    } else if (status === "off") {
-        config.GOODBYE = "false";
-        saveConfig('GOODBYE', config.GOODBYE);
-        return reply("❌ Goodbye messages are now disabled.");
-    } else {
-        return reply(`Example: .goodbye on`);
-    }
-});
-config.ADMIN_EVENTS = "false";
-return reply("❌ Admin event notifications are now disabled.");
-        } else {
-    return reply(`Example: .admin-events on`);
-}
-    });
+                const settings = readAutoSettings();
 
+                if (target === 'all') {
+                    settings.global = settings.global || {};
+                    settings.global.recording = status === 'on' ? 'true' : 'false';
+                    writeAutoSettings(settings);
+                    config.AUTO_RECORDING = settings.global.recording;
+                    saveConfig('AUTO_RECORDING', config.AUTO_RECORDING);
+                    return reply(`✅ Auto-recording global default set to *${status.toUpperCase()}*`);
+                }
+
+                const isGroup = m.isGroup || false;
+                const isAdmins = m.isGroup ? (m.isAdmins || false) : false;
+                if (isGroup) {
+                    if (!isAdmins && !isCreator) return reply("*📛 Only a group admin or the owner can use this command!*");
+                    settings.recording = settings.recording || {};
+                    settings.recording[from] = status === 'on' ? 'true' : 'false';
+                    writeAutoSettings(settings);
+                    return reply(`✅ Auto-recording for this chat set to *${status.toUpperCase()}*`);
+                }
+
+                if (!isCreator) return reply("*❌ Only the owner can set global auto-recording from private chat. Use: .auto-recording all on/off*");
+                settings.global = settings.global || {};
+                settings.global.recording = status === 'on' ? 'true' : 'false';
+                writeAutoSettings(settings);
+                config.AUTO_RECORDING = settings.global.recording;
+                saveConfig('AUTO_RECORDING', config.AUTO_RECORDING);
+                return reply(`✅ Auto-recording global default set to *${status.toUpperCase()}*`);
 cmd({
     pattern: "welcome",
     alias: ["welcomeset"],
@@ -164,31 +150,49 @@ cmd({
 
 cmd({
     pattern: "auto-typing",
+    alias: ["autotyping", "autotype"],
     description: "Enable or disable auto-typing feature.",
     category: "settings",
     filename: __filename
 },
     async (conn, mek, m, { from, args, isCreator, reply }) => {
-        if (!isCreator) return reply("*❌ Only the owner can use this command!*");
+        // Usage: .auto-typing on|off     (in group: toggles for this group by admin)
+        //        .auto-typing all on|off (sets global default)
+        const target = args[0]?.toLowerCase();
+        const status = (args[1] || args[0])?.toLowerCase();
+        if (!["on", "off"].includes(status)) return reply("*📝 Usage:  .auto-typing on|off  OR  .auto-typing all on|off*");
 
-        const status = args[0]?.toLowerCase();
-        if (!["on", "off"].includes(status)) {
-            return reply("*📝 Usage:  .auto-typing on|off*");
+        const settings = readAutoSettings();
+
+        // If 'all' specified, set global
+        if (target === 'all') {
+            settings.global = settings.global || {};
+            settings.global.typing = status === 'on' ? 'true' : 'false';
+            writeAutoSettings(settings);
+            config.AUTO_TYPING = settings.global.typing;
+            saveConfig('AUTO_TYPING', config.AUTO_TYPING);
+            return reply(`✅ Auto-typing global default set to *${status.toUpperCase()}*`);
         }
 
-        config.AUTO_TYPING = status === "on" ? "true" : "false";
+        // Otherwise set per-chat (must be admin in groups)
+        const isGroup = m.isGroup || false;
+        const isAdmins = m.isGroup ? (m.isAdmins || false) : false;
+        if (isGroup) {
+            if (!isAdmins && !isCreator) return reply("*📛 Only a group admin or the owner can use this command!*");
+            settings.typing = settings.typing || {};
+            settings.typing[from] = status === 'on' ? 'true' : 'false';
+            writeAutoSettings(settings);
+            return reply(`✅ Auto-typing for this chat set to *${status.toUpperCase()}*`);
+        }
+
+        // Not group: only owner can set global via 'all' — but allow owner here to set global
+        if (!isCreator) return reply("*❌ Only the owner can set global auto-typing from private chat. Use: .auto-typing all on/off*");
+        settings.global = settings.global || {};
+        settings.global.typing = status === 'on' ? 'true' : 'false';
+        writeAutoSettings(settings);
+        config.AUTO_TYPING = settings.global.typing;
         saveConfig('AUTO_TYPING', config.AUTO_TYPING);
-
-        const statusIcon = status === "on" ? "✅" : "❌";
-        const toggleMsg = `╔════════════════════════════╗
-║   ⌨️  *AUTO-TYPING* ⌨️   ║
-╚════════════════════════════╝
-
-${statusIcon} Status: *${status.toUpperCase()}*
-${status === "on" ? "🟢 Bot will type during operations" : "🔴 Typing disabled"}
-Saved to config.env ✓`;
-
-        return reply(toggleMsg);
+        return reply(`✅ Auto-typing global default set to *${status.toUpperCase()}*`);
     });
 
 //mention reply 
@@ -248,37 +252,46 @@ cmd({
 //--------------------------------------------
 cmd({
     pattern: "auto-recording",
-    alias: ["autorecoding"],
+    alias: ["autorecoding", "autorecord", "autorec"],
     description: "Enable or disable auto-recording feature.",
     category: "settings",
     filename: __filename
 },
     async (conn, mek, m, { from, args, isCreator, reply }) => {
-        if (!isCreator) return reply("*❌ Only the owner can use this command!*");
+        // Usage: .auto-recording on|off     (in group: toggles for this group by admin)
+        //        .auto-recording all on|off (sets global default)
+        const target = args[0]?.toLowerCase();
+        const status = (args[1] || args[0])?.toLowerCase();
+        if (!["on", "off"].includes(status)) return reply("*📝 Usage:  .auto-recording on|off  OR  .auto-recording all on|off*");
 
-        const status = args[0]?.toLowerCase();
-        if (!["on", "off"].includes(status)) {
-            return reply("*📝 Usage:  .auto-recording on|off*");
+        const settings = readAutoSettings();
+
+        if (target === 'all') {
+            settings.global = settings.global || {};
+            settings.global.recording = status === 'on' ? 'true' : 'false';
+            writeAutoSettings(settings);
+            config.AUTO_RECORDING = settings.global.recording;
+            saveConfig('AUTO_RECORDING', config.AUTO_RECORDING);
+            return reply(`✅ Auto-recording global default set to *${status.toUpperCase()}*`);
         }
 
-        config.AUTO_RECORDING = status === "on" ? "true" : "false";
+        const isGroup = m.isGroup || false;
+        const isAdmins = m.isGroup ? (m.isAdmins || false) : false;
+        if (isGroup) {
+            if (!isAdmins && !isCreator) return reply("*📛 Only a group admin or the owner can use this command!*");
+            settings.recording = settings.recording || {};
+            settings.recording[from] = status === 'on' ? 'true' : 'false';
+            writeAutoSettings(settings);
+            return reply(`✅ Auto-recording for this chat set to *${status.toUpperCase()}*`);
+        }
+
+        if (!isCreator) return reply("*❌ Only the owner can set global auto-recording from private chat. Use: .auto-recording all on/off*");
+        settings.global = settings.global || {};
+        settings.global.recording = status === 'on' ? 'true' : 'false';
+        writeAutoSettings(settings);
+        config.AUTO_RECORDING = settings.global.recording;
         saveConfig('AUTO_RECORDING', config.AUTO_RECORDING);
-
-        const statusIcon = status === "on" ? "✅" : "❌";
-        const recordMsg = `╔════════════════════════════╗
-║   🎙️  *AUTO-RECORDING* 🎙️   ║
-╚════════════════════════════╝
-
-${statusIcon} Status: *${status.toUpperCase()}*
-${status === "on" ? "🔴 Bot is recording..." : "⚫ Recording stopped"}
-Saved to config.env ✓`;
-
-        if (status === "on") {
-            try { await conn.sendPresenceUpdate("recording", from); } catch (e) { }
-        } else {
-            try { await conn.sendPresenceUpdate("available", from); } catch (e) { }
-        }
-        return reply(recordMsg);
+        return reply(`✅ Auto-recording global default set to *${status.toUpperCase()}*`);
     });
 //--------------------------------------------
 // AUTO_VIEW_STATUS COMMANDS
