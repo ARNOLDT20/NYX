@@ -1,15 +1,34 @@
 const config = require('../config');
 const { cmd } = require('../command');
 
+// Track recent mentions to prevent duplicates
+const recentMentions = new Set();
+
 cmd({
   on: "body"
-}, async (conn, m, { isGroup }) => {
+}, async (conn, m, { isGroup, isBot }) => {
   try {
+    // Skip if not enabled or not a group
     if (config.MENTION_REPLY !== 'true' || !isGroup) return;
+
+    // SKIP BOT'S OWN MESSAGES
+    if (isBot || m.fromMe) return;
 
     const mentioned = m.mentionedJid || [];
     const botNumber = conn.user.id.split(":")[0] + '@s.whatsapp.net';
+    
+    // Check if bot is mentioned
     if (!mentioned.includes(botNumber)) return;
+
+    // Prevent duplicate mentions within 2 seconds
+    const mentionKey = `${m.chat}_${m.sender}`;
+    if (recentMentions.has(mentionKey)) {
+      return;
+    }
+
+    // Add to recent mentions
+    recentMentions.add(mentionKey);
+    setTimeout(() => recentMentions.delete(mentionKey), 2000);
 
     // Beautiful formatted message
     const mentionText = `╔════════════════════════════════╗
