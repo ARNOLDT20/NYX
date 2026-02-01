@@ -72,31 +72,91 @@ cmd({
             }
         }
 
-        // Download audio using API
+        // Download audio using multiple API fallbacks
         await reply("⬇️ Downloading audio... This may take a moment...");
 
-        try {
-            const downloadResponse = await axios.get(`https://apiskeith.vercel.app/download/audio?url=${encodeURIComponent(videoUrl)}`, { timeout: 30000 });
-            const downloadUrl = downloadResponse.data?.result;
-
-            if (!downloadUrl) {
-                throw new Error("Failed to get download URL from API.");
+        const audioApis = [
+            {
+                method: 'get',
+                url: `https://apiskeith.vercel.app/download/audio?url=${encodeURIComponent(videoUrl)}`,
+                parse: (d) => d?.result || d?.url || d?.data || null
+            },
+            {
+                method: 'post',
+                url: `https://api.cobalt.tools/api/json`,
+                body: { url: videoUrl, vQuality: '128', aFormat: 'mp3' },
+                parse: (d) => d?.url || d?.links?.download?.url || null
+            },
+            {
+                method: 'get',
+                url: `https://api.vihangayt.com/download?url=${encodeURIComponent(videoUrl)}&type=audio`,
+                parse: (d) => d?.result || d?.url || d?.data?.url || null
             }
+        ];
 
-            const fileName = `${videoTitle}.mp3`.replace(/[^\w\s.-]/gi, '');
-            const contextInfo = getContextInfo(videoTitle, sender, videoThumbnail);
+        let resolved = false;
+        let lastError = null;
 
-            // Send audio stream
-            await conn.sendMessage(from, {
-                audio: { url: downloadUrl },
-                mimetype: "audio/mpeg",
-                fileName: fileName,
-                contextInfo: contextInfo
-            }, { quoted: mek });
+        for (const api of audioApis) {
+            try {
+                let res;
+                if (api.method === 'post') {
+                    res = await axios.post(api.url, api.body, { headers: { 'Content-Type': 'application/json' }, timeout: 30000 });
+                } else {
+                    res = await axios.get(api.url, { timeout: 30000 });
+                }
 
-        } catch (downloadError) {
-            console.error('Download error:', downloadError);
-            return reply(`Download failed: ${downloadError.message}`);
+                const downloadUrl = api.parse(res.data);
+                if (!downloadUrl) {
+                    lastError = new Error('No download URL in API response');
+                    continue;
+                }
+
+                const fileName = `${videoTitle}.mp3`.replace(/[^\w\s.-]/gi, '');
+                const contextInfo = getContextInfo(videoTitle, sender, videoThumbnail);
+
+                // Try sending by URL first
+                try {
+                    await conn.sendMessage(from, {
+                        audio: { url: downloadUrl },
+                        mimetype: 'audio/mpeg',
+                        fileName: fileName,
+                        contextInfo
+                    }, { quoted: mek });
+
+                    resolved = true;
+                    break;
+                } catch (sendErr) {
+                    // fallback to downloading the bytes and sending buffer
+                    try {
+                        const audioRes = await axios.get(downloadUrl, { responseType: 'arraybuffer', timeout: 60000 });
+                        if (audioRes.data && audioRes.data.byteLength > 1000) {
+                            await conn.sendMessage(from, {
+                                audio: audioRes.data,
+                                mimetype: 'audio/mpeg',
+                                fileName: fileName,
+                                contextInfo
+                            }, { quoted: mek });
+                            resolved = true;
+                            break;
+                        } else {
+                            lastError = new Error('Downloaded empty audio');
+                        }
+                    } catch (bufErr) {
+                        lastError = bufErr;
+                        continue;
+                    }
+                }
+
+            } catch (err) {
+                lastError = err;
+                continue;
+            }
+        }
+
+        if (!resolved) {
+            console.error('Audio download failed for all APIs:', lastError);
+            return reply(`Download failed: ${lastError?.message || 'No available API worked'}`);
         }
 
     } catch (error) {
@@ -152,31 +212,67 @@ cmd({
             }
         }
 
-        // Download video
+        // Download video using multiple API fallbacks
         await reply("⬇️ Downloading video... This may take a moment...");
 
-        try {
-            const downloadResponse = await axios.get(`https://apiskeith.vercel.app/download/video?url=${encodeURIComponent(videoUrl)}`, { timeout: 30000 });
-            const downloadUrl = downloadResponse.data?.result;
+        const videoApis = [
+            `https://apiskeith.vercel.app/download/video?url=${encodeURIComponent(videoUrl)}`,
+            `https://api.vihangayt.com/download?url=${encodeURIComponent(videoUrl)}&type=video`,
+            `https://api.yt-downloader.org/download?url=${encodeURIComponent(videoUrl)}&type=video`
+        ];
 
-            if (!downloadUrl) {
-                throw new Error("Failed to get download URL from API.");
+        let vResolved = false;
+        let vLastErr = null;
+
+        for (const apiUrl of videoApis) {
+            try {
+                const res = await axios.get(apiUrl, { timeout: 30000 });
+                const downloadUrl = res.data?.result || res.data?.downloadUrl || res.data?.url || res.data?.videoUrl || null;
+                if (!downloadUrl) {
+                    vLastErr = new Error('No download URL in API response');
+                    continue;
+                }
+
+                const fileName = `${videoTitle}.mp4`.replace(/[^\w\s.-]/gi, '');
+                const contextInfo = getContextInfo(videoTitle, sender, videoThumbnail);
+
+                try {
+                    await conn.sendMessage(from, {
+                        video: { url: downloadUrl },
+                        mimetype: 'video/mp4',
+                        caption: `🎥 *${videoTitle}*`,
+                        contextInfo
+                    }, { quoted: mek });
+
+                    vResolved = true;
+                    break;
+                } catch (sendErr) {
+                    // try to send as document (fallback)
+                    try {
+                        await conn.sendMessage(from, {
+                            document: { url: downloadUrl },
+                            mimetype: 'video/mp4',
+                            fileName,
+                            caption: `📁 *${videoTitle}* (Document)`,
+                            contextInfo
+                        }, { quoted: mek });
+                        vResolved = true;
+                        break;
+                    } catch (docErr) {
+                        vLastErr = docErr;
+                        continue;
+                    }
+                }
+
+            } catch (err) {
+                vLastErr = err;
+                continue;
             }
+        }
 
-            const fileName = `${videoTitle}.mp4`.replace(/[^\w\s.-]/gi, '');
-            const contextInfo = getContextInfo(videoTitle, sender, videoThumbnail);
-
-            // Send video stream
-            await conn.sendMessage(from, {
-                video: { url: downloadUrl },
-                mimetype: "video/mp4",
-                caption: `🎥 *${videoTitle}*`,
-                contextInfo: contextInfo
-            }, { quoted: mek });
-
-        } catch (downloadError) {
-            console.error('Download error:', downloadError);
-            return reply(`Download failed: ${downloadError.message}`);
+        if (!vResolved) {
+            console.error('Video download failed for all APIs:', vLastErr);
+            return reply(`Download failed: ${vLastErr?.message || 'No available API worked'}`);
         }
 
     } catch (error) {
