@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const config = require('../config')
-const {cmd , commands} = require('../command')
+const { cmd, commands } = require('../command')
 
 const AUTO_SETTINGS_FILE = path.join(process.cwd(), 'store', 'auto_settings.json');
 const readAutoSettings = () => {
@@ -17,18 +17,18 @@ const readAutoSettings = () => {
 //auto recording
 cmd({
   on: "body"
-},    
-async (conn, mek, m, { from, body, isOwner }) => {       
-  try {
-    const settings = readAutoSettings();
-    const jid = from;
-    const per = settings.recording && settings.recording[jid];
-    const global = settings.global && settings.global.recording;
-    const enabled = per ? per === 'true' : (global ? global === 'true' : config.AUTO_RECORDING === 'true');
-    if (enabled) {
-      try { await conn.sendPresenceUpdate('recording', from); } catch (e) { }
+},
+  async (conn, mek, m, { from, body, isOwner }) => {
+    try {
+      const settings = readAutoSettings();
+      const jid = from;
+      const per = settings.recording && settings.recording[jid];
+      const global = settings.global && settings.global.recording;
+      const enabled = per ? per === 'true' : (global ? global === 'true' : config.AUTO_RECORDING === 'true');
+      if (enabled) {
+        try { await conn.sendPresenceUpdate('recording', from); } catch (e) { }
+      }
+    } catch (e) {
+      console.error('auto-recording error:', e);
     }
-  } catch (e) {
-    console.error('auto-recording error:', e);
-  }
-});
+  });
