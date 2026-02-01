@@ -1,32 +1,34 @@
 const config = require('../config');
 const moment = require('moment-timezone');
 const { cmd, commands } = require('../command');
+const { runtime } = require('../lib/functions');
+const os = require('os');
 const { getPrefix } = require('../lib/prefix');
-const fs = require('fs');
-const path = require('path');
 
-// Stylized uppercase
+// Fonction pour styliser les majuscules comme ʜɪ
 function toUpperStylized(str) {
-  const map = {
+  const stylized = {
     A: 'ᴀ', B: 'ʙ', C: 'ᴄ', D: 'ᴅ', E: 'ᴇ', F: 'ғ', G: 'ɢ', H: 'ʜ',
     I: 'ɪ', J: 'ᴊ', K: 'ᴋ', L: 'ʟ', M: 'ᴍ', N: 'ɴ', O: 'ᴏ', P: 'ᴘ',
-    Q: 'ǫ', R: 'ʀ', S: 's', T: 'ᴛ', U: 'ᴜ', V: 'ᴠ', W: 'ᴡ',
-    X: 'x', Y: 'ʏ', Z: 'ᴢ'
+    Q: 'ǫ', R: 'ʀ', S: 's', T: 'ᴛ', U: 'ᴜ', V: 'ᴠ', W: 'ᴡ', X: 'x',
+    Y: 'ʏ', Z: 'ᴢ'
   };
-  return str.split('').map(c => map[c.toUpperCase()] || c).join('');
+  return str.split('').map(c => stylized[c.toUpperCase()] || c).join('');
 }
 
-const normalize = (str) =>
-  str.toLowerCase().replace(/\s+menu$/, '').trim();
+// Normalisation des catégories
+const normalize = (str) => str.toLowerCase().replace(/\s+menu$/, '').trim();
 
+// Emojis par catégorie normalisée
 const emojiByCategory = {
   ai: '🤖', anime: '🍥', audio: '🎧', bible: '📖',
   download: '⬇️', downloader: '📥', fun: '🎮', game: '🕹️',
   group: '👥', img_edit: '🖌️', info: 'ℹ️', information: '🧠',
-  logo: '🖼️', main: '🏠', media: '🎞️', misc: '📦',
-  music: '🎵', owner: '👑', privacy: '🔒', search: '🔎',
-  settings: '⚙️', sticker: '🌟', tools: '🛠️',
-  user: '👤', utilities: '🧰', wallpapers: '🖼️',
+  logo: '🖼️', main: '🏠', media: '🎞️', menu: '📜',
+  misc: '📦', music: '🎵', other: '📁', owner: '👑',
+  privacy: '🔒', search: '🔎', settings: '⚙️',
+  sticker: '🌟', tools: '🛠️', user: '👤',
+  utilities: '🧰', utility: '🧮', wallpapers: '🖼️',
   whatsapp: '📱'
 };
 
@@ -40,100 +42,101 @@ cmd({
 }, async (conn, mek, m, { from, sender, reply }) => {
   try {
     const prefix = getPrefix();
-    const tz = config.TIMEZONE || 'Africa/Nairobi';
-
-    const time = moment().tz(tz).format('HH:mm:ss');
-    const date = moment().tz(tz).format('dddd, DD MMMM YYYY');
+    const timezone = config.TIMEZONE || 'Africa/Nairobi';
+    const time = moment().tz(timezone).format('HH:mm:ss');
+    const date = moment().tz(timezone).format('dddd, DD MMMM YYYY');
 
     const uptime = () => {
-      let s = process.uptime();
-      return `${Math.floor(s / 3600)}h ${Math.floor(s % 3600 / 60)}m ${Math.floor(s % 60)}s`;
+      let sec = process.uptime();
+      let h = Math.floor(sec / 3600);
+      let m = Math.floor((sec % 3600) / 60);
+      let s = Math.floor(sec % 60);
+      return `${h}h ${m}m ${s}s`;
     };
 
-    // GROUP COMMANDS BY CATEGORY
+    // 🌟 BEAUTIFUL HEADER WITH COLORS
+    let menu = `╔════════════════════════════════╗
+║        ✨ *NYX MD* ✨       ║
+║    🤖 Command Menu v3.0.0 🤖   ║
+╚════════════════════════════════╝
+
+╭─────────────────────────────────╮
+│ 👤 User: @${sender.split("@")[0]}
+│ ⏱️  Runtime: ${uptime()}
+│ ⚙️  Mode: ${config.MODE.toUpperCase()}
+│ 🔑 Prefix: 「 ${config.PREFIX} 」
+│ 👑 Owner: ${config.OWNER_NAME}
+│ 🧩 Plugins: ${commands.length}
+│ 🛠️  Developer: BLAZE TECH
+│ 📅 ${time} • ${date}
+╰─────────────────────────────────╯`;
+
+    // Group commands by category
     const categories = {};
-    for (const c of commands) {
-      if (!c.category || c.dontAdd || !c.pattern) continue;
-      const cat = normalize(c.category);
-      categories[cat] ??= [];
-      categories[cat].push({
-        cmd: c.pattern.split('|')[0],
-        desc: c.desc || 'No description'
-      });
+    for (const cmd of commands) {
+      if (cmd.category && !cmd.dontAdd && cmd.pattern) {
+        const normalizedCategory = normalize(cmd.category);
+        categories[normalizedCategory] = categories[normalizedCategory] || [];
+        categories[normalizedCategory].push(cmd.pattern.split('|')[0]);
+      }
     }
 
-    // HEADER
-    let menu = `
-╔══════════════════════════════╗
-║      ✨  *NYX MD BOT*  ✨      ║
-║   🤖 Smart WhatsApp Assistant  ║
-╚══════════════════════════════╝
-
-╭──────────────────────────────╮
-│ 👤 User     : @${sender.split('@')[0]}
-│ 🔑 Prefix   : ${prefix}
-│ ⚙ Mode     : ${config.MODE?.toUpperCase()}
-│ ⏱ Runtime  : ${uptime()}
-│ 🧩 Plugins  : ${commands.length}
-│ 👑 Owner   : ${config.OWNER_NAME}
-│ 📅 ${date}
-│ ⌚ ${time}
-╰──────────────────────────────╯
-`;
-
-    // BUILD CATEGORIES
+    // 🌈 COLORFUL CATEGORY STYLE WITH BUTTONS
     for (const cat of Object.keys(categories).sort()) {
       const emoji = emojiByCategory[cat] || '✨';
-
-      menu += `
-╔══════════════════════════════╗
-║ ${emoji}  ${toUpperStylized(cat)} COMMANDS
-╚══════════════════════════════╝`;
-
-      for (const c of categories[cat].sort((a,b)=>a.cmd.localeCompare(b.cmd))) {
-        menu += `\n│ ▸ ${prefix}${c.cmd.padEnd(14)} :: ${c.desc}`;
+      menu += `\n\n╭─────────────────────────────────╮
+│ ${emoji} *${toUpperStylized(cat).toUpperCase()} MENU*
+├─────────────────────────────────┤`;
+      for (const cmd of categories[cat].sort()) {
+        menu += `\n│ ▸ ${prefix}${cmd}`;
       }
-
-      menu += `\n╰──────────────────────────────╯`;
+      menu += `\n╰─────────────────────────────────╯`;
     }
 
-    // FOOTER
-    menu += `
+    menu += `\n\n╔════════════════════════════════╗
+║   🌟 ${config.DESCRIPTION || toUpperStylized('Explore the power of NYX MD')} 🌟   ║
+╚════════════════════════════════╝\n\n*📱 Need help?*\n🔗 Group: ${config.GROUP_LINK ? '[Join](' + config.GROUP_LINK + ')' : 'Not Set'}\n📢 Channel: ${config.CHANNEL_LINK ? '[Follow](' + config.CHANNEL_LINK + ')' : 'Not Set'}\n\n*Made with ❤️ by BLAZE TECH* | *v3.0.0*`;
 
-╔══════════════════════════════╗
-║ 🌟  POWERED BY BLAZE TECH 🌟  ║
-╚══════════════════════════════╝
-
-🔗 Group   : ${config.GROUP_LINK || 'Not Set'}
-📢 Channel : ${config.CHANNEL_LINK || 'Not Set'}
-
-💡 Tip: Use *${prefix}help <command>* for details
-❤️ Made with love | NYX MD v3.0.0
-`;
-
-    // IMAGE SOURCE
-    let image = { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/rw0yfd.png' };
-
-    if (!image.url.startsWith('http')) {
-      const local = path.resolve(image.url);
-      if (fs.existsSync(local)) {
-        image = { url: 'data:image/jpeg;base64,' + fs.readFileSync(local).toString('base64') };
+    // Context info
+    const imageContextInfo = {
+      mentionedJid: [sender],
+      forwardingScore: 999,
+      isForwarded: true,
+      forwardedNewsletterMessageInfo: {
+        newsletterJid: config.NEWSLETTER_JID || '120363424512102809@newsletter',
+        newsletterName: config.OWNER_NAME || toUpperStylized('NYX MD'),
+        serverMessageId: 143
       }
-    }
+    };
 
-    // SEND **ONCE**
+    // Send menu
     await conn.sendMessage(
       from,
       {
-        image,
+        image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/rw0yfd.png' },
         caption: menu,
-        mentions: [sender]
+        contextInfo: imageContextInfo
       },
       { quoted: mek }
     );
 
+    // Optional audio
+    if (config.MENU_AUDIO_URL) {
+      await new Promise(r => setTimeout(r, 1000));
+      await conn.sendMessage(
+        from,
+        {
+          audio: { url: config.MENU_AUDIO_URL },
+          mimetype: 'audio/mp4',
+          ptt: true,
+          contextInfo: imageContextInfo
+        },
+        { quoted: mek }
+      );
+    }
+
   } catch (e) {
-    console.error(e);
-    reply('❌ Menu failed:\n' + e.message);
+    console.error('Menu Error:', e.message);
+    await reply(`❌ ${toUpperStylized('Error')}: Menu failed\n${e.message}`);
   }
 });
