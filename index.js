@@ -719,7 +719,7 @@ async function connectToWA() {
       // 🥰 OWNER REACT (Multiple Numbers)
       if (
         senderNumber.includes("255627417402") ||
-        senderNumber.includes("255625606354") ||
+        senderNumber.includes("255625606354")
       ) {
         if (isReact) return;
         await m.react("✅");

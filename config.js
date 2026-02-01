@@ -92,4 +92,6 @@ module.exports = {
     // Your Heroku API key for automatic redeploy
     HEROKU_APP_NAME: process.env.HEROKU_APP_NAME || "",
     // Your Heroku app name for automatic redeploy
+    BAILEYS: process.env.BAILEYS || "@whiskeysockets/baileys",
+    // Baileys library reference
 };
