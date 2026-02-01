@@ -50,6 +50,18 @@ cmd({
       return `${Math.floor(s / 3600)}h ${Math.floor(s % 3600 / 60)}m ${Math.floor(s % 60)}s`;
     };
 
+    // GROUP COMMANDS BY CATEGORY
+    const categories = {};
+    for (const c of commands) {
+      if (!c.category || c.dontAdd || !c.pattern) continue;
+      const cat = normalize(c.category);
+      categories[cat] ??= [];
+      categories[cat].push({
+        cmd: c.pattern.split('|')[0],
+        desc: c.desc || 'No description'
+      });
+    }
+
     // HEADER
     let menu = `
 ╔══════════════════════════════╗
