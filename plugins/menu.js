@@ -51,53 +51,53 @@ cmd({
     };
 
     // HEADER
-    let menu = `╔══════════════════════════════╗
-║        ✨ *NYX MD* ✨        ║
-║    🤖 Command Menu v3.0.0 🤖 ║
+    let menu = `
+╔══════════════════════════════╗
+║      ✨  *NYX MD BOT*  ✨      ║
+║   🤖 Smart WhatsApp Assistant  ║
 ╚══════════════════════════════╝
 
 ╭──────────────────────────────╮
-│ 👤 User: @${sender.split('@')[0]}
-│ ⏱ Runtime: ${uptime()}
-│ ⚙ Mode: ${config.MODE?.toUpperCase()}
-│ 🔑 Prefix: ${config.PREFIX}
-│ 👑 Owner: ${config.OWNER_NAME}
-│ 🧩 Plugins: ${commands.length}
-│ 📅 ${time} • ${date}
-╰──────────────────────────────╯`;
+│ 👤 User     : @${sender.split('@')[0]}
+│ 🔑 Prefix   : ${prefix}
+│ ⚙ Mode     : ${config.MODE?.toUpperCase()}
+│ ⏱ Runtime  : ${uptime()}
+│ 🧩 Plugins  : ${commands.length}
+│ 👑 Owner   : ${config.OWNER_NAME}
+│ 📅 ${date}
+│ ⌚ ${time}
+╰──────────────────────────────╯
+`;
 
-    // GROUP COMMANDS
-    const categories = {};
-    for (const c of commands) {
-      if (!c.category || c.dontAdd || !c.pattern) continue;
-      const cat = normalize(c.category);
-      categories[cat] ??= [];
-      categories[cat].push({
-        cmd: c.pattern.split('|')[0],
-        desc: c.desc || 'No description'
-      });
-    }
-
-    // BUILD MENU (SINGLE PAGE)
+    // BUILD CATEGORIES
     for (const cat of Object.keys(categories).sort()) {
       const emoji = emojiByCategory[cat] || '✨';
 
-      menu += `\n\n╭─ ${emoji} *${toUpperStylized(cat)}*\n`;
-      for (const c of categories[cat].sort((a, b) => a.cmd.localeCompare(b.cmd))) {
-        menu += `│ ▸ ${prefix}${c.cmd} — ${c.desc}\n`;
+      menu += `
+╔══════════════════════════════╗
+║ ${emoji}  ${toUpperStylized(cat)} COMMANDS
+╚══════════════════════════════╝`;
+
+      for (const c of categories[cat].sort((a,b)=>a.cmd.localeCompare(b.cmd))) {
+        menu += `\n│ ▸ ${prefix}${c.cmd.padEnd(14)} :: ${c.desc}`;
       }
-      menu += `╰──────────────────────────────╯`;
+
+      menu += `\n╰──────────────────────────────╯`;
     }
 
     // FOOTER
-    menu += `\n\n╔══════════════════════════════╗
-║ 🌟 ${config.DESCRIPTION || 'Explore the power of NYX MD'} 🌟 ║
+    menu += `
+
+╔══════════════════════════════╗
+║ 🌟  POWERED BY BLAZE TECH 🌟  ║
 ╚══════════════════════════════╝
 
-🔗 Group: ${config.GROUP_LINK || 'Not set'}
-📢 Channel: ${config.CHANNEL_LINK || 'Not set'}
+🔗 Group   : ${config.GROUP_LINK || 'Not Set'}
+📢 Channel : ${config.CHANNEL_LINK || 'Not Set'}
 
-*Made with ❤️ by BLAZE TECH*`;
+💡 Tip: Use *${prefix}help <command>* for details
+❤️ Made with love | NYX MD v3.0.0
+`;
 
     // IMAGE SOURCE
     let image = { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/rw0yfd.png' };
