@@ -81,7 +81,7 @@ Please introduce yourself and follow the group rules.`;
 cmd({
     pattern: "setwelcome",
     desc: "Set a custom welcome message",
-    category: "settings",
+    category: "other",
     filename: __filename
 }, async (conn, mek, m, { from, args, q, isAdmins, isGroup, reply }) => {
     if (!isGroup) return reply("❌ This command can only be used in groups!");

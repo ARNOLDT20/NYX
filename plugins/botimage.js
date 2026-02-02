@@ -35,7 +35,7 @@ cmd({
     pattern: "botimage",
     alias: ["setmenuimage", "menuimage"],
     desc: "Set the menu image by replying to an image or providing an image URL",
-    category: "settings",
+    category: "other",
     react: "🖼️",
     filename: __filename
 }, async (conn, mek, m, { from, args, quoted, isCreator, isGroup, isAdmins, reply, sender }) => {
@@ -121,7 +121,7 @@ cmd({
     pattern: "setimage",
     alias: ["changeimage", "updateimage", "image"],
     desc: "Quick image URL setter (just paste URL)",
-    category: "settings",
+    category: "other",
     react: "🖼️",
     filename: __filename
 }, async (conn, mek, m, { from, args, quoted, isCreator, isGroup, isAdmins, reply, sender }) => {

@@ -5,7 +5,7 @@ cmd({
     pattern: "tiktok2",
     alias: ["tt", "ttdl", "tiktokdl"],
     desc: "Download TikTok video or audio",
-    category: "downloader",
+    category: "download",
     react: "🎵",
     filename: __filename
 },

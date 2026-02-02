@@ -285,7 +285,7 @@ cmd({
     alias: ["legacyplay"],
     react: "🎵",
     desc: "Download high quality YouTube audio (legacy)",
-    category: "media",
+    category: "download",
     use: "<song name>",
     filename: __filename
 }, async (conn, mek, m, { from, q, reply }) => {

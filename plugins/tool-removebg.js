@@ -10,7 +10,7 @@ cmd({
   alias: ["rmbg", "nobg", "transparentbg"],
   react: '🖼️',
   desc: "Remove background from an image",
-  category: "utility",
+  category: "other",
   use: ".removebg [reply to image]",
   filename: __filename
 }, async (client, message, { reply, quoted }) => {

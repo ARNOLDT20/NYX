@@ -10,7 +10,7 @@ cmd({
   alias: ["enhance", "hd", "upscale"],
   react: '✨',
   desc: "Enhance photo quality using AI",
-  category: "utility",
+  category: "other",
   use: ".remini [reply to image]",
   filename: __filename
 }, async (client, message, { reply, quoted }) => {

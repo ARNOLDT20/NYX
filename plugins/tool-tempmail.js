@@ -5,7 +5,7 @@ cmd({
     pattern: "tempmail",
     alias: ["genmail"],
     desc: "Generate a new temporary email address",
-    category: "utility",
+    category: "other",
     react: "📧",
     filename: __filename
 },
@@ -73,7 +73,7 @@ cmd({
     pattern: "checkmail",
     alias: ["inbox", "tmail", "mailinbox"],
     desc: "Check your temporary email inbox",
-    category: "utility",
+    category: "other",
     react: "📬",
     filename: __filename
 },

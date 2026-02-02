@@ -158,7 +158,7 @@ cmd({
   pattern: 'etrive',
   alias: ['viewonce', 'v1', 'disappear', 'secret'],
   desc: 'Retrieve viewonce (disappearing) media with caption',
-  category: 'media',
+  category: 'download',
   use: '.etrive (reply to viewonce message)',
   filename: __filename,
 }, async (conn, mek, msg, { from, sender, reply, quoted }) => {

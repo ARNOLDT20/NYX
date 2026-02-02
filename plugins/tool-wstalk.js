@@ -5,7 +5,7 @@ cmd({
     pattern: "wstalk",
     alias: ["channelstalk", "chinfo"],
     desc: "Get WhatsApp channel information",
-    category: "utility",
+    category: "other",
     react: "🔍",
     filename: __filename
 },
