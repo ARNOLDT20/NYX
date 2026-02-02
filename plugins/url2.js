@@ -1,8 +1,7 @@
-const { cmd } = require('../command');
-const { sms } = require('../lib/smsg');
-const { getBuffer } = require('../lib/functions');
-const FormData = require('form-data');
-const axios = require('axios');
+const { cmd, commands } = require('../command');
+const os = require('os');
+const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson, jsonformat } = require('../lib/functions');
+const config = require('../config');
 
 cmd({
     pattern: 'url2',
