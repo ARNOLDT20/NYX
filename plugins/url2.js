@@ -2,6 +2,9 @@ const { cmd, commands } = require('../command');
 const os = require('os');
 const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson, jsonformat } = require('../lib/functions');
 const config = require('../config');
+const { cmd } = require('../command');
+const axios = require('axios');
+const FormData = require('form-data');
 
 cmd({
     pattern: 'url2',
@@ -12,42 +15,41 @@ cmd({
     filename: __filename
 }, async (conn, mek, m, { from, sender, reply }) => {
     try {
+        // Determine actual message containing media
         let mediaMessage = m.quoted ? m.quoted : m;
-        let messageContent = mediaMessage.message || {};
-        let mediaType = Object.keys(messageContent)[0];
 
-        if (!['imageMessage', 'videoMessage', 'audioMessage', 'documentMessage', 'stickerMessage'].includes(mediaType)) {
+        if (!mediaMessage.message)
             return reply('❌ Please send or reply to a media file to upload.');
-        }
 
-        // Download media
-        let buffer = await conn.downloadMediaMessage(mediaMessage);
+        // Detect media type
+        let messageType = Object.keys(mediaMessage.message)[0];
+        const supportedTypes = ['imageMessage', 'videoMessage', 'audioMessage', 'documentMessage', 'stickerMessage'];
+
+        if (!supportedTypes.includes(messageType))
+            return reply('❌ Please send or reply to a media file to upload.');
+
+        // Download media buffer
+        const buffer = await conn.downloadMediaMessage(mediaMessage).catch(() => null);
         if (!buffer) return reply('❌ Failed to download media.');
 
-        // Prepare FormData
-        let form = new FormData();
+        // Prepare Catbox upload
+        const form = new FormData();
         form.append('reqtype', 'fileupload');
         form.append('userhash', '');
         form.append('fileToUpload', buffer, { filename: 'file' });
 
         // Upload to Catbox
-        const { data } = await axios.post('https://catbox.moe/user/api.php', form, { headers: form.getHeaders() });
+        const { data } = await axios.post('https://catbox.moe/user/api.php', form, {
+            headers: form.getHeaders()
+        });
 
-        const buttons = [{
-            buttonId: 'copyurl',
-            buttonText: { displayText: '📋 Copy URL' },
-            type: 1
-        }];
-
+        // Send result
         await conn.sendMessage(from, {
-            text: `✅ Uploaded Successfully!\n\n${data}`,
-            buttons,
-            headerType: 1,
-            contextInfo: { mentionedJid: [sender] }
+            text: `✅ Uploaded Successfully!\n\n${data}`
         }, { quoted: m });
 
-    } catch (e) {
-        console.error('URL2 Error:', e);
-        await reply(`❌ Error: ${e.message}`);
+    } catch (err) {
+        console.error('URL2 Error:', err);
+        await reply(`❌ Error: ${err.message}`);
     }
 });
