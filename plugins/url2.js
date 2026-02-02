@@ -1,7 +1,3 @@
-const { cmd, commands } = require('../command');
-const os = require('os');
-const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson, jsonformat } = require('../lib/functions');
-const config = require('../config');
 const { cmd } = require('../command');
 const axios = require('axios');
 const FormData = require('form-data');
