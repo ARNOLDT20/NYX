@@ -12,7 +12,9 @@ cmd({
     async (conn, mek, m, { from, q, reply }) => {
         try {
             if (!q) return reply("📝 Please provide a TikTok video URL.");
-            if (!/^https?:\/\/(www\.)?tiktok\.com\/.+$/.test(q)) return reply("❌ Invalid TikTok link.");
+            const urlText = (typeof q === 'string') ? q.trim() : (q && q.url) ? q.url : '';
+            // Accept tiktok.com with optional subdomains (vm., vt., m., www., etc.) and short links
+            if (!/^(https?:\/\/)?(?:[a-z0-9-]+\.)?tiktok\.com\/.+/i.test(urlText) && !/^(https?:\/\/)?vt\.tiktok\.com\/.+/i.test(urlText)) return reply("❌ Invalid TikTok link.");
 
             reply("⏳ Fetching TikTok video, please wait...");
 

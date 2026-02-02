@@ -18,14 +18,14 @@ cmd({
     // Check if quoted message exists and has media
     const quotedMsg = quoted || message;
     const mimeType = (quotedMsg.msg || quotedMsg).mimetype || '';
-    
+
     if (!mimeType || !mimeType.startsWith('image/')) {
       return reply("Please reply to an image file (JPEG/PNG)");
     }
 
     // Download the media
     const mediaBuffer = await quotedMsg.download();
-    
+
     // Get file extension based on mime type
     let extension = '';
     if (mimeType.includes('image/jpeg')) extension = '.jpg';
@@ -56,7 +56,7 @@ cmd({
 
     // Enhance image using new API
     const apiUrl = `https://api.kimkiro.my.id/tool/upscale?url=${encodeURIComponent(imageUrl)}`;
-    const response = await axios.get(apiUrl, { 
+    const response = await axios.get(apiUrl, {
       responseType: 'arraybuffer',
       timeout: 60000 // 1 minute timeout
     });
