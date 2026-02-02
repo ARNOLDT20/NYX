@@ -51,8 +51,8 @@ cmd({
                     buttonId: ".ping",
                     buttonText: { displayText: "❭❭ 𝗣𝗜𝗡𝗚📍" },
                     type: 1
-                }
-            {
+                },
+                {
                     buttonId: ".menu",
                     buttonText: { displayText: "❭❭ MENU 📂" },
                     type: 1
