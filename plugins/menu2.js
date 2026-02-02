@@ -1,14 +1,12 @@
 const { cmd, commands } = require('../command');
-const os = require('os');
-const { runtime } = require('../lib/functions');
-const config = require('../config');
 const { getPrefix } = require('../lib/prefix');
+const config = require('../config');
 const moment = require('moment-timezone');
 
 cmd({
     pattern: 'menu2',
     alias: ['menu2'],
-    desc: 'Show all bot commands',
+    desc: 'Show all bot commands (full list menu)',
     category: 'menu',
     react: '👌',
     filename: __filename
@@ -19,70 +17,50 @@ cmd({
         const time = moment().tz(timezone).format('HH:mm:ss');
         const date = moment().tz(timezone).format('dddd, DD MMMM YYYY');
 
-        // Uptime calculation
-        const up = runtime(process.uptime());
+        // Build the list of menu categories dynamically
+        const categoryMap = {
+            main: 'Main Menu',
+            download: 'Download Menu',
+            movie: 'Movie Menu',
+            convert: 'Convert Menu',
+            group: 'Group Menu',
+            ai: 'AI Menu',
+            fun: 'Fun Menu',
+            anime: 'Anime Menu',
+            reactions: 'Reaction Menu',
+            owner: 'Owner Menu',
+            other: 'Other Menu',
+            search: 'Search Menu'
+        };
 
-        // Memory usage
-        const mem = process.memoryUsage();
-        const usedMB = (mem.heapUsed / 1024 / 1024).toFixed(2);
-        const totalMB = (mem.heapTotal / 1024 / 1024).toFixed(2);
+        const rows = Object.keys(categoryMap).map(cat => ({
+            title: categoryMap[cat],
+            rowId: `${prefix}${cat}menu`,
+            description: `Open ${categoryMap[cat]}`
+        }));
 
-        const platform = `${os.type()} ${os.release()} ${os.arch()}`;
-        const cpu = os.cpus()[0].model;
+        // Menu text / caption
+        const menuText = `*👋 Hello, welcome to NYX-XD ❄️*\n\nSelect a menu below:`;
 
-        // Build menu text
-        const menuText = `
-╔═════════════════════════╗
-║     ✨ *NYX-XD MENU* ✨      ║
-║   🤖 Bot Command Menu v3.0   ║
-╚═════════════════════════╝
-
-╭─────────────────────────╮
-│ 👤 User: @${sender.split("@")[0]}
-│ ⏱️ Runtime: ${up}
-│ 🏷️ Prefix: ${prefix}
-│ 🛠️ Developer: Blaze Tech
-│ 🖥️ Platform: ${platform}
-│ 💾 Memory: ${usedMB}MB / ${totalMB}MB
-│ ⏱️ Time: ${time} • ${date}
-╰─────────────────────────╯
-
-*❐ NYX-XD MENU LIST ☣*
-> Created by STARBOY
-`;
-
-        // Buttons for menu categories
-        const buttons = [
-            { buttonId: `${prefix}mainmenu`, buttonText: { displayText: "Main Menu" }, type: 1 },
-            { buttonId: `${prefix}dlmenu`, buttonText: { displayText: "Download Menu" }, type: 1 },
-            { buttonId: `${prefix}moviemenu`, buttonText: { displayText: "Movie Menu" }, type: 1 },
-            { buttonId: `${prefix}convertmenu`, buttonText: { displayText: "Convert Menu" }, type: 1 },
-            { buttonId: `${prefix}groupmenu`, buttonText: { displayText: "Group Menu" }, type: 1 },
-            { buttonId: `${prefix}aimenu`, buttonText: { displayText: "AI Menu" }, type: 1 }
-        ];
-
-        // Send the menu message
-        await conn.sendMessage(
-            from,
-            {
-                image: { url: "https://files.catbox.moe/rw0yfd.png" },
-                caption: menuText,
-                footer: "🌟 NYX-XD Bot | Blaze Tech 🌟",
-                buttons,
-                headerType: 1,
-                contextInfo: {
-                    mentionedJid: [sender],
-                    forwardingScore: 999,
-                    isForwarded: true,
-                    forwardedNewsletterMessageInfo: {
-                        newsletterJid: '120363424512102809@newsletter',
-                        newsletterName: 'Blaze Tech',
-                        serverMessageId: 143
-                    }
+        // Build list message
+        const listMessage = {
+            text: menuText,
+            footer: "🌟 NYX-XD Bot | Blaze Tech 🌟",
+            buttonText: "Open Menu",
+            sections: [
+                {
+                    title: "NYX-XD Bot Menus",
+                    rows: rows
                 }
-            },
-            { quoted: mek }
-        );
+            ],
+            headerType: 1,
+            contextInfo: { mentionedJid: [sender] },
+            // Optional: add image header
+            image: { url: "https://files.catbox.moe/rw0yfd.png" }
+        };
+
+        // Send list menu
+        await conn.sendMessage(from, listMessage, { quoted: mek });
 
     } catch (e) {
         console.error('Menu2 Error:', e);
