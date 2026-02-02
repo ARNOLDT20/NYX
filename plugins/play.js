@@ -72,10 +72,11 @@ cmd({
             try {
                 await reply("🔍 Searching...");
                 const results = await ytsearch(query);
-                const video = results?.results?.[0];
-                if (!video?.url) return reply("❌ No videos found");
-                const urlMatch = video.url.match(/([a-zA-Z0-9_-]{11})/);
-                videoId = urlMatch ? urlMatch[0] : null;
+                const list = results && Array.isArray(results.results) ? results.results : (Array.isArray(results) ? results : []);
+                const video = list && list.length ? list[0] : null;
+                if (!video || !video.url) return reply("❌ No videos found");
+                const urlMatch = (typeof video.url === 'string') ? video.url.match(/([a-zA-Z0-9_-]{11})/) : null;
+                videoId = urlMatch && urlMatch[0] ? urlMatch[0] : null;
                 if (!videoId) return reply("❌ Could not extract video ID");
                 videoTitle = video.title || query;
             } catch (e) {
@@ -171,10 +172,11 @@ cmd({
             try {
                 await reply("🔍 Searching...");
                 const results = await ytsearch(query);
-                const video = results?.results?.[0];
-                if (!video?.url) return reply("❌ No videos found");
-                const urlMatch = video.url.match(/([a-zA-Z0-9_-]{11})/);
-                videoId = urlMatch ? urlMatch[0] : null;
+                const list = results && Array.isArray(results.results) ? results.results : (Array.isArray(results) ? results : []);
+                const video = list && list.length ? list[0] : null;
+                if (!video || !video.url) return reply("❌ No videos found");
+                const urlMatch = (typeof video.url === 'string') ? video.url.match(/([a-zA-Z0-9_-]{11})/) : null;
+                videoId = urlMatch && urlMatch[0] ? urlMatch[0] : null;
                 if (!videoId) return reply("❌ Could not extract video ID");
                 videoTitle = video.title || query;
             } catch (e) {
@@ -256,7 +258,7 @@ cmd({
 
         try {
             const results = await ytsearch(query);
-            const videos = results?.results;
+            const videos = results && Array.isArray(results.results) ? results.results : (Array.isArray(results) ? results : []);
 
             if (!Array.isArray(videos) || videos.length === 0) {
                 return reply("❌ No videos found");
