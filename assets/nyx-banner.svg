@@ -1,34 +1,102 @@
-<svg width="1200" height="220" viewBox="0 0 1200 220" xmlns="http://www.w3.org/2000/svg">
+<svg width="1200" height="280" viewBox="0 0 1200 280" xmlns="http://www.w3.org/2000/svg">
 
   <defs>
+    <!-- Background -->
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0d0d18"/>
-      <stop offset="50%" stop-color="#14142b"/>
-      <stop offset="100%" stop-color="#0d0d18"/>
+      <stop offset="0%" stop-color="#0b0b16"/>
+      <stop offset="50%" stop-color="#151530"/>
+      <stop offset="100%" stop-color="#0b0b16"/>
     </linearGradient>
 
-    <linearGradient id="textGrad" x1="0" x2="1">
+    <!-- NYX gradient -->
+    <linearGradient id="nyxGrad" x1="0" x2="1">
       <stop offset="0%" stop-color="#8A2BE2"/>
       <stop offset="50%" stop-color="#00FFFF"/>
       <stop offset="100%" stop-color="#8A2BE2"/>
     </linearGradient>
+
+    <!-- Blaze flame gradient -->
+    <linearGradient id="flameGrad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ff00ff"/>
+      <stop offset="50%" stop-color="#8A2BE2"/>
+      <stop offset="100%" stop-color="#00FFFF"/>
+    </linearGradient>
+
+    <!-- Glow -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
 
-  <rect width="1200" height="220" fill="url(#bg)" rx="25"/>
+  <!-- Background -->
+  <rect width="1200" height="280" rx="25" fill="url(#bg)" />
 
-  <text x="50%" y="48%" text-anchor="middle"
-        font-size="72"
+  <!-- Decorative lines -->
+  <g stroke="#8A2BE2" stroke-width="2" opacity="0.25">
+    <line x1="0" y1="45" x2="1200" y2="45"/>
+    <line x1="0" y1="235" x2="1200" y2="235"/>
+  </g>
+
+  <!-- ================= -->
+  <!-- Blaze Tech Logo  -->
+  <!-- ================= -->
+
+  <!-- Flame shape -->
+  <path d="M140 170
+           C110 135, 150 95, 135 65
+           C180 95, 195 120, 185 150
+           C210 145, 215 175, 175 195
+           C145 210, 120 195, 140 170 Z"
+        fill="url(#flameGrad)"
+        filter="url(#glow)"/>
+
+  <!-- Blaze text -->
+  <text x="140" y="230"
+        text-anchor="middle"
+        font-size="18"
         font-family="Verdana"
+        fill="#00FFFF">
+    BLAZE TECH
+  </text>
+
+  <!-- ================= -->
+  <!-- Main Title        -->
+  <!-- ================= -->
+
+  <text x="50%" y="44%"
+        text-anchor="middle"
+        font-size="82"
+        font-family="Verdana, Arial, sans-serif"
         font-weight="bold"
-        fill="url(#textGrad)">
+        fill="url(#nyxGrad)"
+        filter="url(#glow)">
     NYX MD
   </text>
 
-  <text x="50%" y="72%"
+  <text x="50%" y="62%"
         text-anchor="middle"
         font-size="26"
-        fill="#cfcfff">
+        fill="#d6d6ff">
     ⚡ Next-Gen WhatsApp Automation Bot ⚡
+  </text>
+
+  <!-- Developer + Owner -->
+  <text x="50%" y="78%"
+        text-anchor="middle"
+        font-size="20"
+        fill="#00FFFF">
+    👨‍💻 Developer: BLAZE TECH
+  </text>
+
+  <text x="50%" y="90%"
+        text-anchor="middle"
+        font-size="20"
+        fill="#8A2BE2">
+    👑 Owner: T20_STARBOY
   </text>
 
 </svg>
