@@ -12,15 +12,16 @@ cmd({
     filename: __filename
 }, async (conn, mek, m, { from, sender, reply }) => {
     try {
-        // Determine media
         let mediaMessage = m.quoted ? m.quoted : m;
-        let mediaType = mediaMessage.mtype;
+        let messageContent = mediaMessage.message || {};
+        let mediaType = Object.keys(messageContent)[0];
+
         if (!['imageMessage', 'videoMessage', 'audioMessage', 'documentMessage', 'stickerMessage'].includes(mediaType)) {
             return reply('❌ Please send or reply to a media file to upload.');
         }
 
         // Download media
-        let buffer = await mediaMessage.download();
+        let buffer = await conn.downloadMediaMessage(mediaMessage);
         if (!buffer) return reply('❌ Failed to download media.');
 
         // Prepare FormData
@@ -32,14 +33,11 @@ cmd({
         // Upload to Catbox
         const { data } = await axios.post('https://catbox.moe/user/api.php', form, { headers: form.getHeaders() });
 
-        // Send result with copy button
-        const buttons = [
-            {
-                buttonId: 'copyurl',
-                buttonText: { displayText: '📋 Copy URL' },
-                type: 1
-            }
-        ];
+        const buttons = [{
+            buttonId: 'copyurl',
+            buttonText: { displayText: '📋 Copy URL' },
+            type: 1
+        }];
 
         await conn.sendMessage(from, {
             text: `✅ Uploaded Successfully!\n\n${data}`,
