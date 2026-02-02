@@ -1,6 +1,7 @@
-const { cmd } = require('../lib/command')
-const os = require('os')
-const { runtime } = require('../lib/functions')
+const { cmd, commands } = require('../command');
+const os = require('os');
+const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson, jsonformat } = require('../lib/functions');
+const config = require('../config');
 
 cmd({
     pattern: "alive2",
