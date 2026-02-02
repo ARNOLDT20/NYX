@@ -1,17 +1,34 @@
-const { cmd } = require('../command');
 const config = require('../config');
+const moment = require('moment-timezone');
+const { cmd, commands } = require('../command');
+const { runtime } = require('../lib/functions');
+const os = require('os');
 const { getPrefix } = require('../lib/prefix');
 
 cmd({
-    pattern: "menu2",
-    react: "📂",
-    desc: "Check bot Commands.",
-    category: "main",
+    pattern: 'menu2',
+    alias: ['menu2'],
+    desc: 'Show all bot commands',
+    category: 'menu',
+    react: '👌',
     filename: __filename
-}, async (conn, mek, m, { reply, prefix }) => {
+}, async (conn, mek, m, { from, sender, reply }) => {
     try {
+        const prefix = getPrefix();
+        const timezone = config.TIMEZONE || 'Africa/Nairobi';
+        const time = moment().tz(timezone).format('HH:mm:ss');
+        const date = moment().tz(timezone).format('dddd, DD MMMM YYYY');
 
-        let teksnya = `
+        const uptime = () => {
+            let sec = process.uptime();
+            let h = Math.floor(sec / 3600);
+            let m = Math.floor((sec % 3600) / 60);
+            let s = Math.floor(sec % 60);
+            return `${h}h ${m}m ${s}s`;
+        };
+
+        // 🌟 BEAUTIFUL HEADER WITH COLORS
+        let menu = `
 *👋Hello welcome NYX-XD❄️* 
 ╭──────────────●●►
 | *🛠️  Version:* ${require("../package.json").version}
