@@ -6,6 +6,7 @@ const path = require('path');
 
 cmd({
   pattern: "owner",
+  alias: ['dev', '0wnercontact'],
   desc: "Get owner number",
   category: "main",
   react: "😇",

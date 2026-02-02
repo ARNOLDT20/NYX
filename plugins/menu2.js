@@ -38,7 +38,7 @@ _Select a menu below 👇_
             // ✅ NORMAL BUTTONS (NOT type 4)
             const buttons = [
 
-                { buttonId: `${prefix}mainmenu`, buttonText: { displayText: "🏠 MAIN MENU" }, type: 1 },
+                { buttonId: `${prefix}menu`, buttonText: { displayText: "🏠 MAIN MENU" }, type: 1 },
                 { buttonId: `${prefix}dlmenu`, buttonText: { displayText: "⬇️ DOWNLOAD" }, type: 1 },
                 { buttonId: `${prefix}groupmenu`, buttonText: { displayText: "👥 GROUP" }, type: 1 },
 
@@ -46,7 +46,7 @@ _Select a menu below 👇_
                 { buttonId: `${prefix}searchmenu`, buttonText: { displayText: "🔍 SEARCH" }, type: 1 },
                 { buttonId: `${prefix}funmenu`, buttonText: { displayText: "🎮 FUN" }, type: 1 },
 
-                { buttonId: `${prefix}ownermenu`, buttonText: { displayText: "👑 OWNER" }, type: 1 },
+                { buttonId: `${prefix}owner`, buttonText: { displayText: "👑 OWNER" }, type: 1 },
                 { buttonId: `${prefix}othermenu`, buttonText: { displayText: "📦 OTHER" }, type: 1 },
                 { buttonId: `${prefix}menu`, buttonText: { displayText: "📜 FULL MENU" }, type: 1 }
             ];
