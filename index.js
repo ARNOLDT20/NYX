@@ -184,7 +184,7 @@ const promptSessionID = () => {
         }
       }
 
-      const sessdata = config.SESSION_ID.replace("QJUSMY=", '');
+      const sessdata = config.SESSION_ID.replace("POPKID;;;", '');
       const filer = File.fromURL(`https://mega.nz/file/${sessdata}`);
 
       filer.download((err, data) => {
