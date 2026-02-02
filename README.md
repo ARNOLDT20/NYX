@@ -1,16 +1,17 @@
 # NYX MD - WhatsApp Bot
 
 <div align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=32&duration=2800&pause=1000&color=8A2BE2&center=true&vCenter=true&width=600&lines=%F0%9F%94%A5+NYX+WHATSAPP+BOT+%F0%9F%94%A5;100%2B+Advanced+Features;Fully+Customizable;Lightning+Fast+Responses" alt="NYX Bot Typing Animation" />
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=32&duration=2800&pause=1000&color=8A2BE2&center=true&vCenter=true&width=600&lines=%F0%9F%94%A5+NYX+WHATSAPP+BOT+%F0%9F%94%A5;100%2B+Advanced+Features;Fully+Customizable;Lightning+Fast+Responses" />
 </div>
+
 > The Ultimate Multi-Functional WhatsApp Automation Suite
-[![Node.js](https://img.shields.io/badge/Node.js-%3E=20-339933?style=for-the-badge&logo=node.js&logoColor=white)]()
-[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)]()
-[![Version](https://img.shields.io/badge/Version-3.0.0-8A2BE2?style=for-the-badge)]()
-[![Contributors](https://img.shields.io/badge/Contributors-Welcome-success?style=for-the-badge)]()
+
+[![Node.js](https://img.shields.io/badge/Node.js-%3E=20-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+[![Version](https://img.shields.io/badge/Version-3.0.0-8A2BE2?style=for-the-badge)](https://github.com/blazetech-glitch/NYX/releases)
+[![Contributors](https://img.shields.io/badge/Contributors-Welcome-success?style=for-the-badge)](https://github.com/blazetech-glitch/NYX/graphs/contributors)
 [![GitHub Stars](https://img.shields.io/github/stars/blazetech-glitch/NYX?style=for-the-badge&color=yellow)](https://github.com/blazetech-glitch/NYX)
 
----
 ## Feature Highlights
 
 - Media master: YouTube / TikTok / Instagram downloads, converters
@@ -18,58 +19,14 @@
 - Admin tools: welcome/goodbye, anti-link, group management
 - Creative: sticker maker, image editor, logo generator
 
-## Quick Installation
-Choose your deployment method:
-
-- Local
-
-```bash
-git clone https://github.com/blazetech-glitch/NYX.git
-cd NYX
-npm install
-node index.js
-```
-
-- Docker
-
-```bash
-docker pull blazetech/nyx-bot
-docker run -e SESSION_ID="your_id" blazetech/nyx-bot
-```
-
-- One-Click Deploy
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
-[![Deploy to Railway](https://img.shields.io/badge/Deploy-Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)](https://railway.app/new/template?template=https://github.com/blazetech-glitch/NYX)
-[![Deploy to Render](https://img.shields.io/badge/Deploy-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://dashboard.render.com/deploy?repo=https://github.com/blazetech-glitch/NYX)
-[![Deploy to Koyeb](https://img.shields.io/badge/Deploy-Koyeb-121212?style=for-the-badge&logo=koyeb&logoColor=white)](https://app.koyeb.com/deploy?repository=https://github.com/blazetech-glitch/NYX)
-
----
-## Configuration
-
-Create a `.env` or `config.env` with the following values:
-
-```env
-SESSION_ID=your_generated_id_here
-OWNER_NUMBER=255627417402
-PREFIX=.
-MODE=public
-AUTO_TYPING=true
-ANTI_LINK=true
-```
 
 ## Authentication
 
 Get a Session ID (pairing service):
 
-[![Generate Session ID](https://img.shields.io/badge/Generate_Session_ID-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](http://popkid-get-your-id-e1e23276b30a.herokuapp.com/pair)
+[![Generate Session ID](https://img.shields.io/badge/Generate_Session_ID-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](http:/https://queen-jusmy-pair.onrender.com/)
 
-Steps:
-1. Click the button above
-2. Scan the QR code
-3. Copy SESSION_ID into `.env`
 
----
 ## Popular Commands (examples)
 
 ```text
@@ -87,39 +44,6 @@ Steps:
 
 ---
 ## Deployment Options
-
-Deploy instantly with one-click buttons that open each platform's deploy flow for this rep# NYX — WhatsApp Bot
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
-
-Quick deploy: click the button above to deploy the repository template to Heroku.
-
-Minimal required config vars (set these in Heroku dashboard -> Deploy -> Deploy using Heroku Button -> Configure app):
-
-- `SESSION_ID` — required (your session identifier)
-- `OWNER_NUMBER` — 255627417402
-- `OWNER_NUMBER2` — 255754206718
-- `BOT_NAME` — NYX MD
-- `MENU_IMAGE_URL` — https://files.catbox.moe/rw0yfd.png
-- `NEWSLETTER_JID` — 120363424512102809@newsletter
-
-Optional vars you may want to configure: `PREFIX`, `DESCRIPTION`, `ALIVE_IMG`, `MENU_AUDIO_URL`, etc.
-
-Run locally:
-
-```bash
-git clone https://github.com/blazetech-glitch/NYX
-cd NYX
-npm install
-node index.js
-```
-
-Notes:
-- This repo is configured to use `index.js` as the process entrypoint (see `Procfile`).
-- I did not change any tokens or secrets. Keep those private.
-
-If you want, I can also create a small Heroku deploy checklist or automate a Heroku pipeline for this repo.
-ository.
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
 [![Deploy to Railway](https://img.shields.io/badge/Deploy-Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)](https://railway.app/new/template?template=https://github.com/blazetech-glitch/NYX)
@@ -275,7 +199,7 @@ ANTI_LINK=true
 ```
 </div>
 Get Your Session ID in 3 Steps
-<a href="http://popkid-get-your-id-e1e23276b30a.herokuapp.com/pair" target="_blank"> <img src="https://img.shields.io/badge/🚀_Generate_Session_ID-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="Generate Session ID"/> </a>
+<a href="http://queen-jusmy-pair.onrender.com" target="_blank"> <img src="https://img.shields.io/badge/🚀_Generate_Session_ID-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="Generate Session ID"/> </a>
 
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
@@ -296,145 +220,6 @@ Quick access to deployment files & directories — click any badge to open it in
 <sub>Tip: Click the Heroku button to deploy directly using this repository as the template.</sub>
 </div>
 
-1. Click the button above → 2. Scan QR code → 3. Copy SESSION_ID
-https://img.shields.io/badge/Node.js-20+-339933?style=flat-square&logo=node.js&logoColor=white
-Runtime Environment
-
-</td> <td align="center">
-https://img.shields.io/badge/Baileys-25D366?style=flat-square&logo=whatsapp&logoColor=white
-WhatsApp Web API
-
-</td> <td align="center">
-https://img.shields.io/badge/SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white
-Database
-
-</td> </tr> <tr> <td align="center">
-https://img.shields.io/badge/FFmpeg-007808?style=flat-square&logo=ffmpeg&logoColor=white
-Media Processing
-
-</td> <td align="center">
-https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white
-Containerization
-
-</td> <td align="center">
-https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=flat-square&logo=javascript&logoColor=black
-Core Language
-
-</td> </tr> </table></div>
-
-env
-# .env Configuration
-SESSION_ID=your_generated_id_here
-https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white
-Source Code
-
-</td> <td align="center">
-https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white
-Direct Support
-
-</td> <td align="center">
-https://img.shields.io/badge/Official_Channel-25D366?style=for-the-badge&logo=whatsapp&logoColor=white
-Updates
-
-</td> </tr> <tr> <td align="center">
-https://img.shields.io/badge/User_Community-5865F2?style=for-the-badge&logo=discord&logoColor=white
-Help & Discussion
-
-</td> <td align="center">
-https://img.shields.io/badge/Full_Docs-8A2BE2?style=for-the-badge&logo=readthedocs&logoColor=white
-Detailed Guides
-
-</td> <td align="center">
-https://img.shields.io/badge/Report_Issues-FF6B6B?style=for-the-badge&logo=github&logoColor=white
-Bug Reports
-
-</td> </tr> </table>
-OWNER_NUMBER=255627417402
-PREFIX=.
-
-
-<div align="center"><img src="https://komarev.com/ghpvc/?username=blazetech-glitch-NYX&label=Repository+Views&color=8A2BE2&style=for-the-badge" alt="Repository views" /></div></div>
-
-MODE=public
-AUTO_TYPING=true
-ANTI_LINK=true
-</div>
-💡 Popular Commands
-<div align="center">
-yaml
-🎵 Media:
-  .play <song>      # Stream music
-  .video <query>    # Download video
-  .tiktok <url>     # TikTok download
-  .ig <url>         # Instagram download
-
-🛡️ Admin:
-  .group-info       # Group details
-  .antilink         # Toggle link protection
-  .welcome          # Custom greetings
-  .mode <type>      # Change bot mode
-
-🤖 AI & Fun:
-  .ai <question>    # Chat with AI
-  .meme             # Random memes
-  .quote            # Inspirational quotes
-  .fancy <text>     # Stylish text
-
-🎨 Creative:
-  .sticker          # Create stickers
-  .edit             # Image editor
-  .triggered        # Triggered meme
-  .logo <text>      # Logo generator
-*Total: 100+ commands available*
-
-</div>
-🌐 Deployment Options
-<div align="center">
-Deploy instantly with one-click buttons that open each platform's deploy flow for this repository.
-<br/><br/>
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
-[![Deploy to Railway](https://img.shields.io/badge/Deploy-Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)](https://railway.app/new/template?template=https://github.com/blazetech-glitch/NYX)
-[![Deploy to Render](https://img.shields.io/badge/Deploy-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://dashboard.render.com/deploy?repo=https://github.com/blazetech-glitch/NYX)
-[![Deploy to Koyeb](https://img.shields.io/badge/Deploy-Koyeb-121212?style=for-the-badge&logo=koyeb&logoColor=white)](https://app.koyeb.com/deploy?repository=https://github.com/blazetech-glitch/NYX)
-<br/><br/>
-Quick access to deployment files & directories — click any badge to open it in the repo.
-<br/><br/>
-[![Dockerfile](https://img.shields.io/badge/Dockerfile-Open-blue?style=for-the-badge&logo=docker&logoColor=white)](Dockerfile)
-[![Procfile](https://img.shields.io/badge/Procfile-Open-purple?style=for-the-badge)](Procfile)
-[![Heroku Config](https://img.shields.io/badge/heroku.yml-Open-430098?style=for-the-badge&logo=heroku&logoColor=white)](heroku.yml)
-[![Koyeb Config](https://img.shields.io/badge/koyeb.yaml-Open-121212?style=for-the-badge&logo=koyeb&logoColor=white)](koyeb.yaml)
-[![Plugins](https://img.shields.io/badge/Plugins-folder-6f42c1?style=for-the-badge)](plugins/)
-[![Assets](https://img.shields.io/badge/Assets-folder-2b8a3e?style=for-the-badge)](assets/)
-[![Data](https://img.shields.io/badge/Data-folder-ff7043?style=for-the-badge)](data/)
-<br/>
-<sub>Tip: Click any button to start a deploy flow on that platform for this repository.</sub>
-</div>
-🏗️ Tech Stack
-<div align="center"><table> <tr> <td align="center">
-https://img.shields.io/badge/Node.js-20+-339933?style=flat-square&logo=node.js&logoColor=white
-Runtime Environment
-
-</td> <td align="center">
-https://img.shields.io/badge/Baileys-25D366?style=flat-square&logo=whatsapp&logoColor=white
-WhatsApp Web API
-
-</td> <td align="center">
-https://img.shields.io/badge/SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white
-Database
-
-</td> </tr> <tr> <td align="center">
-https://img.shields.io/badge/FFmpeg-007808?style=flat-square&logo=ffmpeg&logoColor=white
-Media Processing
-
-</td> <td align="center">
-https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white
-Containerization
-
-</td> <td align="center">
-https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=flat-square&logo=javascript&logoColor=black
-Core Language
-
-</td> </tr> </table></div>
 📞 Connect & Support
 <div align="center">
 Join Our Community
