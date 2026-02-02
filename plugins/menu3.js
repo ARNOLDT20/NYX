@@ -28,7 +28,7 @@ cmd({
             fun: 'Fun Menu',
             anime: 'Anime Menu',
             reactions: 'Reaction Menu',
-            owner: 'Owner Menu',
+            owner: 'Owner',
             other: 'Other Menu',
             search: 'Search Menu'
         };
