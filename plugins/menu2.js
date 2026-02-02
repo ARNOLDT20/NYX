@@ -1,9 +1,9 @@
-const config = require('../config');
-const moment = require('moment-timezone');
 const { cmd, commands } = require('../command');
-const { runtime } = require('../lib/functions');
 const os = require('os');
+const { runtime } = require('../lib/functions');
+const config = require('../config');
 const { getPrefix } = require('../lib/prefix');
+const moment = require('moment-timezone');
 
 cmd({
     pattern: 'menu2',
@@ -19,48 +19,57 @@ cmd({
         const time = moment().tz(timezone).format('HH:mm:ss');
         const date = moment().tz(timezone).format('dddd, DD MMMM YYYY');
 
-        const uptimeText = () => {
-            let sec = process.uptime();
-            let h = Math.floor(sec / 3600);
-            let m = Math.floor((sec % 3600) / 60);
-            let s = Math.floor(sec % 60);
-            return `${h}h ${m}m ${s}s`;
-        };
+        // Uptime calculation
+        const up = runtime(process.uptime());
+
+        // Memory usage
+        const mem = process.memoryUsage();
+        const usedMB = (mem.heapUsed / 1024 / 1024).toFixed(2);
+        const totalMB = (mem.heapTotal / 1024 / 1024).toFixed(2);
+
+        const platform = `${os.type()} ${os.release()} ${os.arch()}`;
+        const cpu = os.cpus()[0].model;
 
         // Build menu text
-        let menuText = `
-*👋 Hello, welcome to NYX-XD ❄️*
+        const menuText = `
+╔═════════════════════════╗
+║     ✨ *NYX-XD MENU* ✨      ║
+║   🤖 Bot Command Menu v3.0   ║
+╚═════════════════════════╝
 
-╭──────────────●●►
-│ 🛠️ Version: ${require("../package.json").version}
-│ 📟 RAM usage: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${Math.round(os.totalmem() / 1024 / 1024)}MB
-│ ⏱️ Runtime: ${runtime(process.uptime())}
-│ 👨‍💻 Owner: STARBOY
-╰──────────────●●►
+╭─────────────────────────╮
+│ 👤 User: @${sender.split("@")[0]}
+│ ⏱️ Runtime: ${up}
+│ 🏷️ Prefix: ${prefix}
+│ 🛠️ Developer: Blaze Tech
+│ 🖥️ Platform: ${platform}
+│ 💾 Memory: ${usedMB}MB / ${totalMB}MB
+│ ⏱️ Time: ${time} • ${date}
+╰─────────────────────────╯
 
 *❐ NYX-XD MENU LIST ☣*
-> ᴄʀᴇᴀᴛᴇᴅ ʙʏ STARBOY
+> Created by STARBOY
 `;
 
-        // Use the catbox.moe image
-        let imageUrl = "https://files.catbox.moe/rw0yfd.png";
-
-        // Define buttons
-        let buttons = [
+        // Buttons for menu categories
+        const buttons = [
             { buttonId: `${prefix}mainmenu`, buttonText: { displayText: "Main Menu" }, type: 1 },
             { buttonId: `${prefix}dlmenu`, buttonText: { displayText: "Download Menu" }, type: 1 },
             { buttonId: `${prefix}moviemenu`, buttonText: { displayText: "Movie Menu" }, type: 1 },
             { buttonId: `${prefix}convertmenu`, buttonText: { displayText: "Convert Menu" }, type: 1 },
+            { buttonId: `${prefix}groupmenu`, buttonText: { displayText: "Group Menu" }, type: 1 },
+            { buttonId: `${prefix}aimenu`, buttonText: { displayText: "AI Menu" }, type: 1 }
         ];
 
+        // Send the menu message
         await conn.sendMessage(
             from,
             {
-                image: { url: imageUrl },
+                image: { url: "https://files.catbox.moe/rw0yfd.png" },
                 caption: menuText,
                 footer: "🌟 NYX-XD Bot | Blaze Tech 🌟",
-                buttons: buttons,
-                headerType: 4, // 4 = image + buttons
+                buttons,
+                headerType: 1,
                 contextInfo: {
                     mentionedJid: [sender],
                     forwardingScore: 999,
