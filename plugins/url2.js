@@ -10,7 +10,7 @@ cmd({
     category: 'download',
     react: '📤',
     filename: __filename
-}, async (conn, mek, m, { from, sender, reply, q }) => {
+}, async (conn, mek, m, { from, sender, reply, q, args, quoted }) => {
     try {
         // Allow either: an URL provided as argument/text OR a media message (direct or quoted)
         const urlRegex = /(https?:\/\/[^\s]+)/i;
@@ -43,26 +43,50 @@ cmd({
             }
         } else {
             // No URL: expect a media message (either quoted or direct)
-            let mediaMessage = m.quoted ? m.quoted : m;
-            if (!mediaMessage || !mediaMessage.message)
-                return reply('❌ Please send or reply to a media file to upload, or provide a direct URL.');
-
-            // Detect media type
-            let messageType = Object.keys(mediaMessage.message)[0];
             const supportedTypes = ['imageMessage', 'videoMessage', 'audioMessage', 'documentMessage', 'stickerMessage'];
 
-            if (!supportedTypes.includes(messageType))
-                return reply('❌ Unsupported message type. Send or reply to an image, video, audio, document or sticker, or provide a URL.');
-
-            // Download media buffer
-            buffer = await conn.downloadMediaMessage(mediaMessage).catch(() => null);
-            if (!buffer) return reply('❌ Failed to download media.');
-            // Try to get filename for documents/stickers
-            try {
-                if (mediaMessage.message.documentMessage && mediaMessage.message.documentMessage.fileName) {
-                    filename = mediaMessage.message.documentMessage.fileName;
+            // Helper to attempt download from several possible shapes
+            const tryDownload = async (obj) => {
+                try {
+                    return await conn.downloadMediaMessage(obj);
+                } catch (e) {
+                    return null;
                 }
-            } catch (e) { /* ignore */ }
+            };
+
+            // First, prefer `quoted` wrapper if present
+            if (quoted) {
+                // If quoted has mtype (normalized by serializer)
+                if (quoted.mtype && supportedTypes.includes(quoted.mtype)) {
+                    buffer = await tryDownload(quoted);
+                    if (buffer && quoted.msg?.documentMessage?.fileName) filename = quoted.msg.documentMessage.fileName;
+                } else {
+                    // Try raw inner message shapes
+                    const innerKey = quoted.msg ? Object.keys(quoted.msg)[0] : (quoted.message ? Object.keys(quoted.message)[0] : null);
+                    if (innerKey && supportedTypes.includes(innerKey)) {
+                        const inner = quoted.msg ? quoted.msg : quoted.message;
+                        buffer = await tryDownload(inner[innerKey]);
+                        if (buffer && inner[innerKey]?.fileName) filename = inner[innerKey].fileName;
+                    }
+                }
+            }
+
+            // If still not found, try the current message `m` wrapper
+            if (!buffer) {
+                if (m.mtype && supportedTypes.includes(m.mtype)) {
+                    buffer = await tryDownload(m);
+                    if (buffer && m.msg?.documentMessage?.fileName) filename = m.msg.documentMessage.fileName;
+                } else {
+                    const innerKey2 = m.msg ? Object.keys(m.msg)[0] : (m.message ? Object.keys(m.message)[0] : null);
+                    if (innerKey2 && supportedTypes.includes(innerKey2)) {
+                        const inner2 = m.msg ? m.msg : m.message;
+                        buffer = await tryDownload(inner2[innerKey2]);
+                        if (buffer && inner2[innerKey2]?.fileName) filename = inner2[innerKey2].fileName;
+                    }
+                }
+            }
+
+            if (!buffer) return reply('❌ Unsupported message type. Send or reply to an image, video, audio, document or sticker, or provide a URL.');
         }
 
         // Prepare Catbox upload
