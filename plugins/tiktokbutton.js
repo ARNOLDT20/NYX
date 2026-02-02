@@ -18,18 +18,63 @@ cmd({
 
             reply("⏳ Fetching TikTok video, please wait...");
 
-            const apiUrl = `https://delirius-apiofc.vercel.app/download/tiktok?url=${encodeURIComponent(q)}`;
-            const { data } = await axios.get(apiUrl);
+            // Multiple API fallbacks for TikTok download
+            const apis = [
+                { url: `https://api.davidcyriltech.my.id/download/tiktok?url=${encodeURIComponent(urlText)}` },
+                { url: `https://api.vihangayt.com/download?url=${encodeURIComponent(urlText)}&type=video` },
+                { url: `https://yt-api.p.rapidapi.com/dl?url=${encodeURIComponent(urlText)}`, headers: { 'X-RapidAPI-Key': 'demo', 'X-RapidAPI-Host': 'yt-api.p.rapidapi.com' } },
+                { url: `https://api.siputzx.my.id/api/d/tiktok?url=${encodeURIComponent(urlText)}` }
+            ];
 
-            if (!data || !data.status || !data.data || !data.data.meta) {
-                return reply("⚠️ Couldn't retrieve the video. Please try another link.");
+            let title = 'TikTok Video';
+            let videoUrl = null;
+            let author = { nickname: 'Unknown', username: 'unknown' };
+            let meta = { likes: 0, comments: 0, shares: 0 };
+
+            for (const apiConfig of apis) {
+                try {
+                    const { data } = await axios.get(apiConfig.url, { 
+                        timeout: 30000,
+                        headers: apiConfig.headers || {}
+                    });
+
+                    // Try to extract from different response formats
+                    if (data) {
+                        // Format 1: davidcyriltech
+                        if (data.data?.video) {
+                            videoUrl = data.data.video;
+                            title = data.data.title || 'TikTok Video';
+                            author = { nickname: data.data.author || 'Unknown', username: data.data.author || 'unknown' };
+                            break;
+                        }
+                        // Format 2: vihangayt
+                        if (data.result?.video || data.url) {
+                            videoUrl = data.result?.video || data.url;
+                            title = data.title || 'TikTok Video';
+                            break;
+                        }
+                        // Format 3: rapidapi / generic
+                        if (data.data?.url || data.url || data.result?.download) {
+                            videoUrl = data.data?.url || data.url || data.result?.download;
+                            title = data.title || data.data?.title || 'TikTok Video';
+                            break;
+                        }
+                        // Format 4: siputzx
+                        if (data.data?.url) {
+                            videoUrl = data.data.url;
+                            title = data.data.title || 'TikTok Video';
+                            break;
+                        }
+                    }
+                } catch (err) {
+                    console.warn(`TikTok API failed: ${apiConfig.url} -`, err.message);
+                    continue;
+                }
             }
 
-            const { title, like, comment, share, author, meta } = data.data;
-            const videoData = meta.media.find(v => v.type === "video");
-
-            if (!videoData || !videoData.org) return reply("❌ Video URL not found.");
-            const videoUrl = videoData.org;
+            if (!videoUrl) {
+                return reply("⚠️ Couldn't retrieve the video. Please try another link or ensure it's publicly available.");
+            }
 
             // Prepare list
             const sections = [
@@ -60,7 +105,7 @@ cmd({
 
 👤 User: ${author.nickname} (@${author.username})
 📖 Title: ${title}
-👍 Likes: ${like} | 💬 Comments: ${comment} | 🔁 Shares: ${share}
+👍 Likes: ${meta.likes} | 💬 Comments: ${meta.comments} | 🔁 Shares: ${meta.shares}
 
 Select how you'd like to download below:`,
                 footer: "NYX-XMD TikTok Downloader",
