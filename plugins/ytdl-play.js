@@ -143,7 +143,7 @@ cmd({
                 break;
 
             } catch (err) {
-                console.warn(`⚠️ API failed: ${api} -`, err.message);
+                console.warn(`⚠️ API failed: ${apiConfig.url} -`, err.message);
                 continue;
             }
         }
