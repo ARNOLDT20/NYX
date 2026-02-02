@@ -1,69 +1,72 @@
-const { cmd, commands } = require('../command');
-const { getPrefix } = require('../lib/prefix');
 const config = require('../config');
 const moment = require('moment-timezone');
+const { cmd } = require('../command');
+const { runtime } = require('../lib/functions');
+const { getPrefix } = require('../lib/prefix');
 
 cmd({
     pattern: 'menu2',
-    alias: ['menu2'],
-    desc: 'Show all bot commands (full list menu)',
+    alias: ['panel', 'menus'],
+    desc: 'Show button menu',
     category: 'menu',
     react: '👌',
     filename: __filename
-}, async (conn, mek, m, { from, sender, reply }) => {
-    try {
-        const prefix = getPrefix();
-        const timezone = config.TIMEZONE || 'Africa/Nairobi';
-        const time = moment().tz(timezone).format('HH:mm:ss');
-        const date = moment().tz(timezone).format('dddd, DD MMMM YYYY');
+},
+    async (conn, mek, m, { from, sender }) => {
 
-        // Build the list of menu categories dynamically
-        const categoryMap = {
-            main: 'Main Menu',
-            download: 'Download Menu',
-            movie: 'Movie Menu',
-            convert: 'Convert Menu',
-            group: 'Group Menu',
-            ai: 'AI Menu',
-            fun: 'Fun Menu',
-            anime: 'Anime Menu',
-            reactions: 'Reaction Menu',
-            owner: 'Owner Menu',
-            other: 'Other Menu',
-            search: 'Search Menu'
-        };
+        try {
 
-        const rows = Object.keys(categoryMap).map(cat => ({
-            title: categoryMap[cat],
-            rowId: `${prefix}${cat}menu`,
-            description: `Open ${categoryMap[cat]}`
-        }));
+            const prefix = getPrefix();
 
-        // Menu text / caption
-        const menuText = `*👋 Hello, welcome to NYX-XD ❄️*\n\nSelect a menu below:`;
+            const time = moment().tz(config.TIMEZONE || 'Africa/Nairobi').format('HH:mm:ss');
+            const date = moment().format('DD/MM/YYYY');
 
-        // Build list message
-        const listMessage = {
-            text: menuText,
-            footer: "🌟 NYX-XD Bot | Blaze Tech 🌟",
-            buttonText: "Open Menu",
-            sections: [
+            const caption = `
+╔══════════════════════╗
+   ✨ *NYX-XD MENU PANEL* ✨
+╚══════════════════════╝
+
+👤 User: @${sender.split("@")[0]}
+⏱ Runtime: ${runtime(process.uptime())}
+🕒 ${time} | ${date}
+
+_Select a menu below 👇_
+`;
+
+            const imageUrl = "https://files.catbox.moe/rw0yfd.png";
+
+            // ✅ NORMAL BUTTONS (NOT type 4)
+            const buttons = [
+
+                { buttonId: `${prefix}mainmenu`, buttonText: { displayText: "🏠 MAIN MENU" }, type: 1 },
+                { buttonId: `${prefix}dlmenu`, buttonText: { displayText: "⬇️ DOWNLOAD" }, type: 1 },
+                { buttonId: `${prefix}groupmenu`, buttonText: { displayText: "👥 GROUP" }, type: 1 },
+
+                { buttonId: `${prefix}aimenu`, buttonText: { displayText: "🤖 AI MENU" }, type: 1 },
+                { buttonId: `${prefix}searchmenu`, buttonText: { displayText: "🔍 SEARCH" }, type: 1 },
+                { buttonId: `${prefix}funmenu`, buttonText: { displayText: "🎮 FUN" }, type: 1 },
+
+                { buttonId: `${prefix}ownermenu`, buttonText: { displayText: "👑 OWNER" }, type: 1 },
+                { buttonId: `${prefix}othermenu`, buttonText: { displayText: "📦 OTHER" }, type: 1 },
+                { buttonId: `${prefix}menu`, buttonText: { displayText: "📜 FULL MENU" }, type: 1 }
+            ];
+
+            await conn.sendMessage(
+                from,
                 {
-                    title: "NYX-XD Bot Menus",
-                    rows: rows
-                }
-            ],
-            headerType: 1,
-            contextInfo: { mentionedJid: [sender] },
-            // Optional: add image header
-            image: { url: "https://files.catbox.moe/rw0yfd.png" }
-        };
+                    image: { url: imageUrl },
+                    caption,
+                    buttons,
+                    headerType: 1,
+                    viewOnce: true,
+                    contextInfo: {
+                        mentionedJid: [sender]
+                    }
+                },
+                { quoted: mek }
+            );
 
-        // Send list menu
-        await conn.sendMessage(from, listMessage, { quoted: mek });
-
-    } catch (e) {
-        console.error('Menu2 Error:', e);
-        await reply(`❌ Error: ${e.message}`);
-    }
-});
+        } catch (e) {
+            console.log(e);
+        }
+    });
