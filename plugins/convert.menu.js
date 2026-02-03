@@ -1,3 +1,8 @@
+const { cmd } = require('../command');
+const { getPrefix } = require('../lib/prefix');
+const config = require('../config');
+const moment = require('moment-timezone');
+
 cmd({
     pattern: 'convertmenu',
     alias: ['convert'],

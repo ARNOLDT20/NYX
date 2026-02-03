@@ -6,14 +6,20 @@ cmd({
     pattern: "tiny",
     alias: ['short', 'shorturl'],
     react: "🫧",
-    desc: "Makes URL tiny.",
-    category: "convert",
-    use: "<url>",
-    filename: __filename,
-},
-}, async (conn, mek, m, { from, reply, q }) => {
+    const { cmd } = require("../command");
+    const axios = require("axios");
+
+    cmd({
+        pattern: "tiny",
+        alias: ['short', 'shorturl'],
+        react: "🫧",
+        desc: "Makes URL tiny.",
+        category: "convert",
+        use: "<url>",
+        filename: __filename,
+    }, async (conn, mek, m, { from, reply, q }) => {
         if (!q) {
-            return reply("*🏷️ ᴘʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴍᴇ ᴀ ʟɪɴᴋ.*\n\nExample: .tiny https://example.com");
+            return reply("*🏷️ ᴘʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴀ ʟɪɴᴋ.*\n\nExample: .tiny https://example.com");
         }
 
         try {
