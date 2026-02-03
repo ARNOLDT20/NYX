@@ -29,29 +29,28 @@ cmd({
 
         // ========= 2. MEDIA (FIXED PART) =========
         else {
-            const mediaMsg = m.quoted || m;
+            const quotedMsg = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
 
-            if (!mediaMsg.message)
-                return reply('❌ Send or reply to a media file.');
+            if (!quotedMsg) {
+                return reply('❌ Reply to media or provide a URL.\n\nExample: .url2 https://example.com/file.jpg');
+            }
 
-            const type = Object.keys(mediaMsg.message)[0];
+            const msgType = Object.keys(quotedMsg)[0];
+            const allowed = ['imageMessage', 'videoMessage', 'audioMessage', 'documentMessage', 'stickerMessage'];
 
-            const allowed = [
-                'imageMessage',
-                'videoMessage',
-                'audioMessage',
-                'documentMessage',
-                'stickerMessage'
-            ];
+            if (!allowed.includes(msgType)) {
+                const supported = allowed.map(t => t.replace('Message', '')).join(', ');
+                return reply('❌ Unsupported media type.\n\nSupported: ' + supported);
+            }
 
-            if (!allowed.includes(type))
-                return reply('❌ Unsupported media type.');
-
-            buffer = await conn.downloadMediaMessage(mediaMsg);
-
-            filename =
-                mediaMsg.message[type]?.fileName ||
-                `${type}.${type.replace('Message', '')}`;
+            try {
+                buffer = await conn.downloadMediaMessage(quotedMsg[msgType]);
+                if (!buffer) return reply('❌ Failed to download media.');
+                filename = quotedMsg[msgType]?.fileName || `file.${msgType.replace('Message', '')}`;
+            } catch (downloadErr) {
+                console.error('[url2] Download error:', downloadErr.message);
+                return reply('❌ Failed to download media: ' + (downloadErr.message || 'Unknown error'));
+            }
         }
 
         // ========= 3. UPLOAD =========

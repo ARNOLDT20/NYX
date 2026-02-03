@@ -62,22 +62,17 @@ cmd({
             });
         }
 
-        // Send with image and buttons if links exist
-        if (buttons.length > 0) {
-            await conn.sendMessage(from, {
-                image: { url: 'https://files.catbox.moe/rw0yfd.png' },
-                caption: text,
-                buttons: buttons,
-                headerType: 1,
+        buttons: buttons,
+            headerType: 1,
                 contextInfo: { mentionedJid: [sender] }
-            }, { quoted: mek });
+    }, { quoted: mek });
         } else {
-            // Fallback to plain text if no links configured
-            await conn.sendMessage(from, { text, contextInfo: { mentionedJid: [sender] } }, { quoted: mek });
-        }
+    // Fallback to plain text if no links configured
+    await conn.sendMessage(from, { text, contextInfo: { mentionedJid: [sender] } }, { quoted: mek });
+}
 
     } catch (e) {
-        console.error('Error in botinfo command:', e);
-        reply(`An error occurred: ${e.message}`);
-    }
+    console.error('Error in botinfo command:', e);
+    reply(`An error occurred: ${e.message}`);
+}
 });
