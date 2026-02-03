@@ -11,16 +11,13 @@ cmd({
     use: "<url>",
     filename: __filename,
 },
-    async (conn, mek, m, { from, quoted, isOwner, isAdmins, reply, args }) => {
-        console.log("Command tiny triggered"); // Ajoutez ceci pour vérifier si la commande est déclenchée
-
-        if (!args[0]) {
-            console.log("No URL provided"); // Ajoutez ceci pour vérifier si l'URL est fournie
-            return reply("*🏷️ ᴘʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴍᴇ ᴀ ʟɪɴᴋ.*");
+}, async (conn, mek, m, { from, reply, q }) => {
+        if (!q) {
+            return reply("*🏷️ ᴘʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴍᴇ ᴀ ʟɪɴᴋ.*\n\nExample: .tiny https://example.com");
         }
 
         try {
-            let link = args[0].toString();
+            let link = q.toString();
             if (!/^https?:\/\//i.test(link)) link = `http://${link}`;
             const encoded = encodeURIComponent(link);
             const response = await axios.get(`https://tinyurl.com/api-create.php?url=${encoded}`);
