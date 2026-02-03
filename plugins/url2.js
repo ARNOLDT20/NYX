@@ -10,8 +10,11 @@ cmd({
     category: 'download',
     react: '📤',
     filename: __filename
-}, async (conn, mek, m, { from, sender, reply, q }) => {
+}, async (conn, mek, m, { from, sender, reply, q, quoted }) => {
     try {
+        console.log('[url2] command invoked by', sender, 'q=', !!q, 'hasQuoted=', !!quoted);
+        // immediate feedback so users know the bot is processing
+        try { await conn.sendMessage(from, { text: '⏳ Uploading... please wait' }, { quoted: m }); } catch (e) { }
         const urlRegex = /(https?:\/\/[^\s]+)/i;
         let buffer = null;
         let filename = 'file';
@@ -32,12 +35,13 @@ cmd({
                     if (base) filename = base;
                 } catch (e) { }
             } catch (e) {
+                console.error('[url2] failed to fetch URL:', e && e.message ? e.message : e);
                 return reply('❌ Failed to fetch the provided URL.');
             }
         } else {
             // Try to download quoted media
             const supportedTypes = ['imageMessage', 'videoMessage', 'audioMessage', 'documentMessage', 'stickerMessage'];
-            const quotedMsg = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+            const quotedMsg = quoted || mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
 
             if (quotedMsg) {
                 const msgType = Object.keys(quotedMsg)[0];
@@ -48,7 +52,7 @@ cmd({
                             filename = quotedMsg[msgType].fileName;
                         }
                     } catch (e) {
-                        console.error('Download error:', e.message);
+                        console.error('[url2] Download error:', e && e.message ? e.message : e);
                     }
                 }
             }
@@ -64,11 +68,15 @@ cmd({
 
         // Upload to Catbox
         const { data } = await axios.post('https://catbox.moe/user/api.php', form, {
-            headers: form.getHeaders()
+            headers: form.getHeaders(),
+            maxContentLength: Infinity,
+            maxBodyLength: Infinity,
+            timeout: 120000
         });
 
         // Prepare buttons for user to copy or visit the uploaded URL
         const uploadedUrl = String(data).trim();
+        console.log('[url2] uploaded URL:', uploadedUrl);
         const buttons = [
             {
                 buttonId: `copyurl_${uploadedUrl}`,
