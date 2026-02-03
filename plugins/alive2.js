@@ -9,9 +9,9 @@ cmd({
     desc: "Check bot Commands.",
     category: "main",
     filename: __filename
-}, async (conn, mek, m, { reply }) => {
+}, async (conn, mek, m, { from, reply }) => {
     try {
-        const senderName = m.pushName || "User"
+        const senderName = m.pushName || "User";
 
         let caption = `
 *👋 Hello ${senderName}, Welcome to NYX-XD ❄️*
@@ -29,35 +29,18 @@ cmd({
 
         const imageUrl = "https://files.catbox.moe/joo2gt.jpg";
 
-        const templateButtons = [
-            {
-                index: 1,
-                urlButton: {
-                    displayText: "👨‍💻 Contact Owner",
-                    url: "https://wa.me/+255627417402?text=Hello👨‍💻"
-                }
-            },
-            {
-                index: 2,
-                quickReplyButton: {
-                    displayText: "📜 MENU",
-                    id: ".menu"
-                }
-            },
-            {
-                index: 3,
-                quickReplyButton: {
-                    displayText: "🏓 PING",
-                    id: ".ping"
-                }
-            }
+        const buttons = [
+            { buttonId: 'id1', buttonText: { displayText: '👨‍💻 Contact Owner' }, type: 1 },
+            { buttonId: 'id2', buttonText: { displayText: '📜 MENU' }, type: 1 },
+            { buttonId: 'id3', buttonText: { displayText: '🏓 PING' }, type: 1 }
         ];
 
-        await conn.sendMessage(m.chat, {
+        await conn.sendMessage(from, {
             image: { url: imageUrl },
             caption,
             footer: "© NYX-XD Bot",
-            templateButtons,
+            buttons: buttons,
+            headerType: 1,
             mentions: [m.sender]
         }, { quoted: mek });
 
