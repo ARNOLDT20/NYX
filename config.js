@@ -46,8 +46,9 @@ module.exports = {
     LIVE_MSG: process.env.LIVE_MSG || ">NYX MD IS ALIVE😍",
     // add alive msg here
     // Newsletter and links
-    NEWSLETTER_JID: process.env.NEWSLETTER_JID || '120363424512102809@newsletter',
+    NEWSLETTER_JID: process.env.NEWSLETTER_JID || '120363421014261315@newsletter',
     CHANNEL_LINK: process.env.CHANNEL_LINK || 'https://whatsapp.com/channel/0029VbC49Bb2P59togOaEF2E',
+    CHANNEL_JID: process.env.CHANNEL_JID || '120363421014261315@newsletter',
     GROUP_LINK: process.env.GROUP_LINK || 'https://chat.whatsapp.com/IrmNcI7Wn0C4bdLC70xVPJ',
     DEFAULT_GROUP_JID: process.env.DEFAULT_GROUP_JID || '120363406591837257@g.us',
     // secondary owner (used by .owner and internal checks)

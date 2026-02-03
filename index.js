@@ -476,11 +476,19 @@ async function connectToWA() {
         console.error('❌ Error during auto-join attempt:', err);
       }
 
-      // Auto-follow channel from config.CHANNEL_LINK if available
+      // Auto-follow channel from config.CHANNEL_LINK or config.CHANNEL_JID if available
       try {
-        const channelLink = config.CHANNEL_LINK || '';
-        const channelMatch = channelLink.match(/channel\/([0-9A-Za-z-_]+)/i);
-        const channelId = channelMatch ? channelMatch[1] : null;
+        let channelId = null;
+        const channelInput = config.CHANNEL_JID || config.CHANNEL_LINK || '';
+
+        // Check if it's a direct JID format (e.g., 120363421014261315@newsletter)
+        if (channelInput.match(/^\d+@newsletter$/i)) {
+          channelId = channelInput;
+        } else {
+          // Extract from link format (e.g., https://whatsapp.com/channel/0029VbC49Bb2P59togOaEF2E)
+          const channelMatch = channelInput.match(/channel\/([0-9A-Za-z-_]+)/i);
+          channelId = channelMatch ? channelMatch[1] : null;
+        }
 
         if (channelId) {
           try {
