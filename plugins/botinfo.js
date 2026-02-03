@@ -41,15 +41,40 @@ cmd({
 │ 🖥️  Platform: ${platform}
 │ 🔧 Node: ${node}
 │ ⚙️  CPU: ${cpu.substring(0, 25)}...
-├─────────────────────────────┤
-│ 🌐 Links
-│ 🔗 Group: ${config.GROUP_LINK ? '[Join](' + config.GROUP_LINK + ')' : '❌ Not Set'}
-│ 📢 Channel: ${config.CHANNEL_LINK ? '[Follow](' + config.CHANNEL_LINK + ')' : '❌ Not Set'}
 ╰─────────────────────────────╯
 
 *> Powered by @whiskeysockets/baileys*`;
 
-        await conn.sendMessage(from, { text, contextInfo: { mentionedJid: [sender] } }, { quoted: mek });
+        // Build buttons for links
+        const buttons = [];
+        if (config.GROUP_LINK) {
+            buttons.push({
+                buttonId: 'group_link',
+                buttonText: { displayText: '👥 Join Group' },
+                type: 1
+            });
+        }
+        if (config.CHANNEL_LINK) {
+            buttons.push({
+                buttonId: 'channel_link',
+                buttonText: { displayText: '📢 Follow Channel' },
+                type: 1
+            });
+        }
+
+        // Send with image and buttons if links exist
+        if (buttons.length > 0) {
+            await conn.sendMessage(from, {
+                image: { url: 'https://files.catbox.moe/rw0yfd.png' },
+                caption: text,
+                buttons: buttons,
+                headerType: 1,
+                contextInfo: { mentionedJid: [sender] }
+            }, { quoted: mek });
+        } else {
+            // Fallback to plain text if no links configured
+            await conn.sendMessage(from, { text, contextInfo: { mentionedJid: [sender] } }, { quoted: mek });
+        }
 
     } catch (e) {
         console.error('Error in botinfo command:', e);
