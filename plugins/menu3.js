@@ -79,48 +79,45 @@ Select a menu below:
     }
 });
 
-// Register per-category handlers so selecting a category shows its commands
+// Helper to normalize category names
 const normalize = (str) => (str || '').toString().toLowerCase().replace(/\s+menu$/, '').trim();
 
-const registerCategoryHandlers = () => {
-    const prefix = getPrefix();
-    for (const cat of Object.keys({
-        main: 'Main Menu',
-        download: 'Download Menu',
-        movie: 'Movie Menu',
-        convert: 'Convert Menu',
-        group: 'Group Menu',
-        ai: 'AI Menu',
-        fun: 'Fun Menu',
-        anime: 'Anime Menu',
-        reactions: 'Reaction Menu',
-        owner: 'Owner',
-        other: 'Other Menu',
-        search: 'Search Menu'
-    })) {
-        // pattern like 'downloadmenu'
-        const pattern = `${cat}menu`;
-        cmd({
-            pattern,
-            desc: `Show ${cat} commands`,
-            category: 'menu',
-            filename: __filename,
-        }, async (conn2, mek2, m2, { from: from2, sender: sender2, reply: reply2 }) => {
-            try {
-                const all = commands || [];
-                const list = all.filter(c => normalize(c.category) === cat && c.pattern && !c.dontAdd).map(c => c.pattern.split('|')[0]);
-                if (!list || !list.length) return reply2(`⚠️ No commands found for ${cat} menu.`);
-
-                const header = `╭─── ${cat.toUpperCase()} MENU ───╮\nSelect a command to run:\n`;
-                const body = list.map(p => `• ${prefix}${p}`).join('\n');
-                const text = header + '\n' + body + '\n\nUse the command by typing it.`;
-                await conn2.sendMessage(from2, { text }, { quoted: mek2 });
-            } catch (err) {
-                console.error(`Error in ${pattern} handler:`, err);
-                await reply2('❌ Failed to build category menu.');
-            }
-        });
-    }
+// Simple category menu handlers
+const categories = {
+    main: 'Main Menu',
+    download: 'Download Menu',
+    movie: 'Movie Menu',
+    convert: 'Convert Menu',
+    group: 'Group Menu',
+    ai: 'AI Menu',
+    fun: 'Fun Menu',
+    anime: 'Anime Menu',
+    reactions: 'Reaction Menu',
+    owner: 'Owner',
+    other: 'Other Menu',
+    search: 'Search Menu'
 };
 
-registerCategoryHandlers();
+Object.entries(categories).forEach(([cat, label]) => {
+    cmd({
+        pattern: `${cat}menu`,
+        desc: `Show ${label} commands`,
+        category: 'menu',
+        filename: __filename,
+    }, async (conn, mek, m, { from, reply }) => {
+        try {
+            const prefix = getPrefix();
+            const list = commands.filter(c => normalize(c.category) === cat && c.pattern && !c.dontAdd).map(c => c.pattern.split('|')[0]);
+            if (!list || !list.length) return reply(`⚠️ No commands found for ${label}.`);
+
+            const header = `╭─── ${label.toUpperCase()} ───╮\n`;
+            const body = list.map(p => `• ${prefix}${p}`).join('\n');
+            const footer = `\n╰──────────────────────╯`;
+            const text = header + body + footer;
+            await conn.sendMessage(from, { text }, { quoted: mek });
+        } catch (err) {
+            console.error(`Error in ${cat}menu handler:`, err);
+            reply('❌ Failed to build menu.');
+        }
+    });
+});
