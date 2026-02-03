@@ -67,10 +67,34 @@ cmd({
             headers: form.getHeaders()
         });
 
-        // Send result
-        await conn.sendMessage(from, {
-            text: `✅ Uploaded Successfully!\n\n${data}`
-        }, { quoted: m });
+        // Prepare buttons for user to copy or visit the uploaded URL
+        const uploadedUrl = String(data).trim();
+        const buttons = [
+            {
+                buttonId: `copyurl_${uploadedUrl}`,
+                buttonText: { displayText: '📋 Copy URL' },
+                type: 1
+            },
+            {
+                buttonId: `visiturl_${uploadedUrl}`,
+                buttonText: { displayText: '🔗 Visit' },
+                type: 1
+            }
+        ];
+
+        const message = {
+            text: `✅ Uploaded Successfully!\n\n${uploadedUrl}\n\nTap a button to copy or visit the link.`,
+            footer: '✨ NYX-XD Upload',
+            buttons: buttons,
+            headerType: 1
+        };
+
+        try {
+            await conn.sendMessage(from, message, { quoted: m });
+        } catch (e) {
+            // Fallback to plain text if buttons fail
+            await conn.sendMessage(from, { text: `✅ Uploaded Successfully!\n\n${uploadedUrl}` }, { quoted: m });
+        }
 
     } catch (err) {
         console.error('URL2 Error:', err);

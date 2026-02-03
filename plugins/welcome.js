@@ -26,29 +26,24 @@ module.exports.handleWelcome = async (conn, id, participants, groupMetadata) => 
 
         const groupName = groupMetadata.subject || 'Group';
 
-        for (const participant of participants) {
+        // Send welcome messages concurrently for faster response
+        const sendPromises = participants.map(async (participant) => {
             try {
-                // Validate participant
                 if (!participant || typeof participant !== 'string') {
                     console.warn('⚠️ Invalid participant:', participant);
-                    continue;
+                    return;
                 }
 
-                const userName = await conn.getName(participant) || 'New Member';
+                const userName = (await conn.getName(participant)) || 'New Member';
                 const memberNumber = participant.replace('@s.whatsapp.net', '');
 
-                // Validate memberNumber
                 if (!memberNumber || memberNumber.length === 0) {
                     console.warn('⚠️ Invalid member number extracted');
-                    continue;
+                    return;
                 }
 
-                let welcomeMsg = config.WELCOME_MESSAGE || `Welcome ${userName} to ${groupName}!
-You are member #${groupMetadata.participants.length}.
+                let welcomeMsg = config.WELCOME_MESSAGE || `Welcome ${userName} to ${groupName}!\nYou are member #${groupMetadata.participants.length}.\n\nPlease introduce yourself and follow the group rules.`;
 
-Please introduce yourself and follow the group rules.`;
-
-                // Replace placeholders if custom message is set
                 if (config.WELCOME_MESSAGE && typeof config.WELCOME_MESSAGE === 'string') {
                     welcomeMsg = config.WELCOME_MESSAGE
                         .replace(/{name}/g, userName)
@@ -57,20 +52,20 @@ Please introduce yourself and follow the group rules.`;
                         .replace(/{group}/g, groupName);
                 }
 
-                // Validate message before sending
                 if (!welcomeMsg || welcomeMsg.length === 0) {
                     console.warn('⚠️ Welcome message is empty');
-                    continue;
+                    return;
                 }
 
-                await conn.sendMessage(id, { text: welcomeMsg });
-                console.log(`✅ Welcome message sent to ${userName} in ${groupName}`);
+                // Mention the new user for visibility
+                await conn.sendMessage(id, { text: welcomeMsg }, { contextInfo: { mentionedJid: [participant] } });
+                console.log(`✅ Welcome message queued for ${userName} in ${groupName}`);
             } catch (err) {
-                console.error('❌ Error sending welcome message for participant:', err.message);
-                // Continue with next participant instead of breaking
-                continue;
+                console.error('❌ Error sending welcome message for participant:', err && err.message ? err.message : err);
             }
-        }
+        });
+
+        await Promise.allSettled(sendPromises);
     } catch (err) {
         console.error('❌ Error in welcome handler:', err.message);
         console.error('Stack trace:', err.stack);

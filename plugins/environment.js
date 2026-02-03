@@ -6,19 +6,19 @@ const config = require('../config');
 // Restore full implementation later if you need advanced settings.
 
 cmd({
-  pattern: 'environment',
-  alias: ['env'],
-  desc: 'Show basic environment info (placeholder)',
-  category: 'settings',
-  filename: __filename,
+    pattern: 'environment',
+    alias: ['env'],
+    desc: 'Show basic environment info (placeholder)',
+    category: 'settings',
+    filename: __filename,
 }, async (conn, mek, m, { from, reply }) => {
-  try {
-    const msg = `*Environment (placeholder)*\n\nPREFIX: ${config.PREFIX || 'N/A'}\nMODE: ${config.MODE || 'N/A'}`;
-    return reply(msg);
-  } catch (e) {
-    console.error('Environment plugin error:', e);
-    return reply('Error retrieving environment info');
-  }
+    try {
+        const msg = `*Environment (placeholder)*\n\nPREFIX: ${config.PREFIX || 'N/A'}\nMODE: ${config.MODE || 'N/A'}`;
+        return reply(msg);
+    } catch (e) {
+        console.error('Environment plugin error:', e);
+        return reply('Error retrieving environment info');
+    }
 });
 //---------------------------------------------------------------------------
 //           nyx-md

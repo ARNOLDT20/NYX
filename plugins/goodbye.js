@@ -26,29 +26,24 @@ module.exports.handleGoodbye = async (conn, id, participants, groupMetadata) => 
 
         const groupName = groupMetadata.subject || 'Group';
 
-        for (const participant of participants) {
+        // Send goodbye messages concurrently for faster response
+        const sendPromises = participants.map(async (participant) => {
             try {
-                // Validate participant
                 if (!participant || typeof participant !== 'string') {
                     console.warn('⚠️ Invalid participant:', participant);
-                    continue;
+                    return;
                 }
 
-                const userName = await conn.getName(participant) || 'Member';
+                const userName = (await conn.getName(participant)) || 'Member';
                 const memberNumber = participant.replace('@s.whatsapp.net', '');
 
-                // Validate memberNumber
                 if (!memberNumber || memberNumber.length === 0) {
                     console.warn('⚠️ Invalid member number extracted');
-                    continue;
+                    return;
                 }
 
-                let goodbyeMsg = config.GOODBYE_MESSAGE || `Goodbye ${userName}.
-We now have ${groupMetadata.participants.length} members remaining.
+                let goodbyeMsg = config.GOODBYE_MESSAGE || `Goodbye ${userName}.\nWe now have ${groupMetadata.participants.length} members remaining.\n\nHope to see you again!`;
 
-Hope to see you again!`;
-
-                // Replace placeholders if custom message is set
                 if (config.GOODBYE_MESSAGE && typeof config.GOODBYE_MESSAGE === 'string') {
                     goodbyeMsg = config.GOODBYE_MESSAGE
                         .replace(/{name}/g, userName)
@@ -57,20 +52,20 @@ Hope to see you again!`;
                         .replace(/{group}/g, groupName);
                 }
 
-                // Validate message before sending
                 if (!goodbyeMsg || goodbyeMsg.length === 0) {
                     console.warn('⚠️ Goodbye message is empty');
-                    continue;
+                    return;
                 }
 
-                await conn.sendMessage(id, { text: goodbyeMsg });
-                console.log(`✅ Goodbye message sent for ${userName} in ${groupName}`);
+                // Mention the departing user for clarity
+                await conn.sendMessage(id, { text: goodbyeMsg }, { contextInfo: { mentionedJid: [participant] } });
+                console.log(`✅ Goodbye message queued for ${userName} in ${groupName}`);
             } catch (err) {
-                console.error('❌ Error sending goodbye message for participant:', err.message);
-                // Continue with next participant instead of breaking
-                continue;
+                console.error('❌ Error sending goodbye message for participant:', err && err.message ? err.message : err);
             }
-        }
+        });
+
+        await Promise.allSettled(sendPromises);
     } catch (err) {
         console.error('❌ Error in goodbye handler:', err.message);
         console.error('Stack trace:', err.stack);
