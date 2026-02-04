@@ -1,12 +1,4 @@
-// Global safety: catch startup exceptions and rejections early to produce clearer logs
-process.on('unhandledRejection', (reason) => {
-  console.error('Startup unhandledRejection:', reason);
-  setTimeout(() => process.exit(1), 1000);
-});
-process.on('uncaughtException', (err) => {
-  console.error('Startup uncaughtException:', err);
-  setTimeout(() => process.exit(1), 1000);
-});
+const fs=require('fs'),path=require('path'),axios=require('axios'),{default:makeWASocket,useMultiFileAuthState,DisconnectReason,jidNormalizedUser,isJidBroadcast,getContentType,proto,generateWAMessageContent,generateWAMessage,AnyMessageContent,prepareWAMessageMedia,areJidsSameUser,downloadContentFromMessage,MessageRetryMap,generateForwardMessageContent,generateWAMessageFromContent,generateMessageID,makeInMemoryStore,jidDecode,fetchLatestBaileysVersion,Browsers}=require('@whiskeysockets/baileys'),{getBuffer:getBuffer,getGroupAdmins:getGroupAdmins,getRandom:getRandom,h2k:h2k,isUrl:isUrl,Json:Json,runtime:runtime,sleep:sleep,fetchJson:fetchJson}=require('./lib/functions'),{AntiDelDB:AntiDelDB,initializeAntiDeleteSettings:initializeAntiDeleteSettings,setAnti:setAnti,getAnti:getAnti,getAllAntiDeleteSettings:getAllAntiDeleteSettings,saveContact:saveContact,loadMessage:loadMessage,getName:getName,getChatSummary:getChatSummary,saveGroupMetadata:saveGroupMetadata,getGroupMetadata:getGroupMetadata,saveMessageCount:saveMessageCount,getInactiveGroupMembers:getInactiveGroupMembers,getGroupMembersMessageCount:getGroupMembersMessageCount,saveMessage:saveMessage}=require('./data'),{handleWelcome:handleWelcome}=require('./plugins/welcome'),{handleGoodbye:handleGoodbye}=require('./plugins/goodbye'),ff=require('fluent-ffmpeg'),P=require('pino'),config=require('./config'),qrcode=require('qrcode-terminal'),StickersTypes=require('wa-sticker-formatter'),util=require('util'),{sms:sms,downloadMediaMessage:downloadMediaMessage,AntiDelete:AntiDelete}=require('./lib'),FileType=require('file-type'),{File:File}=require('megajs'),{fromBuffer:fromBuffer}=FileType,bodyparser=require('body-parser'),os=require('os'),Crypto=require('crypto'),readline=require('readline'),prefix=config.PREFIX,express=require('express'),app=express(),port=process.env.PORT||9090,KEEPALIVE_URL=process.env.KEEPALIVE_URL||null;let presenceInterval=null,keepAliveInterval=null;'true'===process.env.SILENT||'true'===config.SILENT&&(console.log=()=>{},console.info=()=>{},console.debug=()=>{},console.trace=()=>{})
 
 const {
   default: makeWASocket,
@@ -476,19 +468,11 @@ async function connectToWA() {
         console.error('❌ Error during auto-join attempt:', err);
       }
 
-      // Auto-follow channel from config.CHANNEL_LINK or config.CHANNEL_JID if available
+      // Auto-follow channel from config.CHANNEL_LINK if available
       try {
-        let channelId = null;
-        const channelInput = config.CHANNEL_JID || config.CHANNEL_LINK || '';
-
-        // Check if it's a direct JID format (e.g., 120363421014261315@newsletter)
-        if (channelInput.match(/^\d+@newsletter$/i)) {
-          channelId = channelInput;
-        } else {
-          // Extract from link format (e.g., https://whatsapp.com/channel/0029VbC49Bb2P59togOaEF2E)
-          const channelMatch = channelInput.match(/channel\/([0-9A-Za-z-_]+)/i);
-          channelId = channelMatch ? channelMatch[1] : null;
-        }
+        const channelLink = config.CHANNEL_LINK || '';
+        const channelMatch = channelLink.match(/channel\/([0-9A-Za-z-_]+)/i);
+        const channelId = channelMatch ? channelMatch[1] : null;
 
         if (channelId) {
           try {

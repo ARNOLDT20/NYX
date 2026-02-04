@@ -1,1 +1,1 @@
-web: node loader.js
+web: node index.js
