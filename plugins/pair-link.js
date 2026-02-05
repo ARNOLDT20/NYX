@@ -13,7 +13,7 @@ cmd({
         // Check if user is owner
         const config = require('../config');
         const ownerNumbers = [config.OWNER_NUMBER, config.OWNER_NUMBER2].filter(n => n);
-        
+
         if (!ownerNumbers.includes(senderNumber)) {
             return await reply("❌ Only the bot owner can use this command!");
         }
@@ -61,7 +61,7 @@ ${pairingURL}
 
         // Send clickable button/link message
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
+
         await conn.sendMessage(from, {
             text: "🔗 *Click here to visit:*\n" + pairingURL,
             contextInfo: {
@@ -78,7 +78,7 @@ ${pairingURL}
     } catch (error) {
         console.error("Pair link error:", error);
         const pairingURL = "https://queen-jusmy-pair.onrender.com/";
-        
+
         await reply(`╔══════════════════════════════════╗
 ║    🔗 PAIRING LINK GENERATOR 🔗   ║
 ╚══════════════════════════════════╝
@@ -103,7 +103,7 @@ cmd({
         // Check if user is owner
         const config = require('../config');
         const ownerNumbers = [config.OWNER_NUMBER, config.OWNER_NUMBER2].filter(n => n);
-        
+
         if (!ownerNumbers.includes(senderNumber)) {
             return await reply("❌ Only the bot owner can use this command!");
         }
@@ -141,7 +141,7 @@ cmd({
     try {
         const config = require('../config');
         const ownerNumbers = [config.OWNER_NUMBER, config.OWNER_NUMBER2].filter(n => n);
-        
+
         if (!ownerNumbers.includes(senderNumber)) {
             return await reply("❌ Only the bot owner can use this command!");
         }
