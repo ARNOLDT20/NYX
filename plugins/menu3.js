@@ -33,13 +33,6 @@ cmd({
             search: 'Search Menu'
         };
 
-        const rows = Object.keys(categoryMap).map(cat => ({
-            title: categoryMap[cat],
-            rowId: `${prefix}${cat}menu`,
-            description: `Open ${categoryMap[cat]}`
-        }));
-
-        // Classic header text like menu1
         let menuHeader = `╔══════════════════════════╗
 ✨ *NYX-XD BOT MENU* ✨
 ╚══════════════════════════╝
@@ -53,7 +46,23 @@ cmd({
 Select a menu below:
 `;
 
-        // Build the list message
+        // For groups: Send simple text menu (lists don't work in groups)
+        if (isGroup) {
+            let textMenu = menuHeader;
+            Object.entries(categoryMap).forEach(([key, value]) => {
+                textMenu += `\n▸ ${prefix}${key}menu - ${value}`;
+            });
+            await conn.sendMessage(from, { text: textMenu }, { quoted: mek });
+            return;
+        }
+
+        // For DM: Try list message first
+        const rows = Object.keys(categoryMap).map(cat => ({
+            title: categoryMap[cat],
+            rowId: `${prefix}${cat}menu`,
+            description: `Open ${categoryMap[cat]}`
+        }));
+
         const listMessage = {
             text: menuHeader,
             footer: "🌟 NYX-XD Bot | Blaze Tech 🌟",
@@ -65,47 +74,19 @@ Select a menu below:
                 }
             ],
             headerType: 1,
-            contextInfo: { mentionedJid: [sender] },
-            image: { url: "https://files.catbox.moe/rw0yfd.png" }
+            contextInfo: { mentionedJid: [sender] }
         };
 
-        // Send menu with fallback for groups
         try {
             await conn.sendMessage(from, listMessage, { quoted: mek });
+            return;
         } catch (listErr) {
-            // Fallback: Send as text with interactive buttons
-            let textMenu = menuHeader + '\n';
+            // Fallback: Send as text menu
+            let textMenu = menuHeader;
             Object.entries(categoryMap).forEach(([key, value]) => {
                 textMenu += `\n▸ ${prefix}${key}menu - ${value}`;
             });
-
-            try {
-                await conn.sendMessage(from, {
-                    text: textMenu,
-                    buttons: [
-                        {
-                            buttonId: `${prefix}menu`,
-                            buttonText: { displayText: "📜 FULL MENU" },
-                            type: 1
-                        },
-                        {
-                            buttonId: `${prefix}dlmenu`,
-                            buttonText: { displayText: "⬇️ DOWNLOAD" },
-                            type: 1
-                        },
-                        {
-                            buttonId: `${prefix}groupmenu`,
-                            buttonText: { displayText: "👥 GROUP" },
-                            type: 1
-                        }
-                    ],
-                    headerType: 0,
-                    contextInfo: { mentionedJid: [sender] }
-                }, { quoted: mek });
-            } catch (btnErr) {
-                // Final fallback: Plain text
-                await reply(textMenu);
-            }
+            await conn.sendMessage(from, { text: textMenu }, { quoted: mek });
         }
 
     } catch (e) {

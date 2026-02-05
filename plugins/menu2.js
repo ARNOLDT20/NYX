@@ -28,8 +28,6 @@ cmd({
 
 _Select a menu below 👇_`;
 
-            const gifUrl = "https://files.catbox.moe/qmh4d8.mp4";
-
             const buttons = [
                 { buttonId: `${prefix}menu`, buttonText: { displayText: "🏠 MAIN MENU" }, type: 1 },
                 { buttonId: `${prefix}dlmenu`, buttonText: { displayText: "⬇️ DOWNLOAD" }, type: 1 },
@@ -42,10 +40,17 @@ _Select a menu below 👇_`;
                 { buttonId: `${prefix}menu`, buttonText: { displayText: "📜 FULL MENU" }, type: 1 }
             ];
 
-            // Primary: Try GIF with buttons
+            // In groups: Send simple text menu (buttons/GIFs don't work in groups)
+            if (isGroup) {
+                const textMenu = caption + `\n\n*Quick Access:*\n${buttons.map(b => `${b.buttonText.displayText}`).join('\n')}`;
+                await conn.sendMessage(from, { text: textMenu }, { quoted: mek });
+                return;
+            }
+
+            // In DM: Try GIF with buttons first
             try {
                 await conn.sendMessage(from, {
-                    video: { url: gifUrl },
+                    video: { url: "https://files.catbox.moe/qmh4d8.mp4" },
                     caption,
                     buttons,
                     headerType: 1,
@@ -58,35 +63,9 @@ _Select a menu below 👇_`;
                 console.log('GIF with buttons failed:', err1.message);
             }
 
-            // Fallback 1: Try GIF without buttons
-            try {
-                await conn.sendMessage(from, {
-                    video: { url: gifUrl },
-                    caption,
-                    gifPlayback: true,
-                    mimetype: 'video/mp4',
-                    contextInfo: { mentionedJid: [sender] }
-                }, { quoted: mek });
-                return;
-            } catch (err2) {
-                console.log('GIF alone failed:', err2.message);
-            }
-
-            // Fallback 2: Send text menu
-            const textMenu = caption + `\n\n*Quick Access:*\n${buttons.map(b => `• ${b.buttonText.displayText}`).join('\n')}`;
-            await conn.sendMessage(from, {
-                text: textMenu,
-                contextInfo: {
-                    externalAdReply: {
-                        title: "🔗 NYX-XD MENU",
-                        body: "Tap to access menus",
-                        mediaType: 1,
-                        sourceUrl: "https://chat.whatsapp.com/",
-                        thumbnail: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64')
-                    },
-                    mentionedJid: [sender]
-                }
-            }, { quoted: mek });
+            // Fallback: Send text menu in DM
+            const textMenu = caption + `\n\n*Quick Access:*\n${buttons.map(b => `${b.buttonText.displayText}`).join('\n')}`;
+            await conn.sendMessage(from, { text: textMenu }, { quoted: mek });
 
         } catch (error) {
             console.error('Menu2 Error:', error);
