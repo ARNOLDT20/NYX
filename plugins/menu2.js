@@ -33,7 +33,8 @@ cmd({
 _Select a menu below 👇_
 `;
 
-            const imageUrl = "https://files.catbox.moe/rw0yfd.png";
+            // GIF URL that will play automatically
+            const gifUrl = "https://files.catbox.moe/qmh4d8.mp4";
 
             // ✅ NORMAL BUTTONS (NOT type 4)
             const buttons = [
@@ -52,15 +53,16 @@ _Select a menu below 👇_
             ];
 
             try {
-                // Try button message first (works best in DM)
+                // Try sending GIF with buttons (plays automatically)
                 await conn.sendMessage(
                     from,
                     {
-                        image: { url: imageUrl },
+                        video: { url: gifUrl },
                         caption,
                         buttons,
                         headerType: 1,
-                        viewOnce: true,
+                        gifPlayback: true,  // Enable GIF playback
+                        mimetype: 'video/mp4',
                         contextInfo: {
                             mentionedJid: [sender]
                         }
@@ -68,23 +70,39 @@ _Select a menu below 👇_
                     { quoted: mek }
                 );
             } catch (buttonErr) {
-                // Fallback for groups: send text with external ad reply (clickable link preview)
-                const textMenu = caption + `\n\n*Quick Access:*\n${buttons.map(b => `• ${b.buttonText.displayText}`).join('\n')}`;
-
-                await conn.sendMessage(from, {
-                    text: textMenu,
-                    contextInfo: {
-                        externalAdReply: {
-                            title: "🔗 NYX-XD MENU",
-                            body: "Tap to access menus",
-                            mediaType: 1,
-                            sourceUrl: "https://chat.whatsapp.com/",
-                            thumbnail: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64'),
+                // Fallback: Try without buttons (for groups)
+                try {
+                    await conn.sendMessage(
+                        from,
+                        {
+                            video: { url: gifUrl },
+                            caption,
+                            gifPlayback: true,
+                            mimetype: 'video/mp4',
+                            contextInfo: {
+                                mentionedJid: [sender]
+                            }
                         },
-                        mentionedJid: [sender]
-                    }
-                }, { quoted: mek });
-            }
+                        { quoted: mek }
+                    );
+                } catch (gifErr) {
+                    // Final fallback for groups: send text with external ad reply
+                    const textMenu = caption + `\n\n*Quick Access:*\n${buttons.map(b => `• ${b.buttonText.displayText}`).join('\n')}`;
+
+                    await conn.sendMessage(from, {
+                        text: textMenu,
+                        contextInfo: {
+                            externalAdReply: {
+                                title: "🔗 NYX-XD MENU",
+                                body: "Tap to access menus",
+                                mediaType: 1,
+                                sourceUrl: "https://chat.whatsapp.com/",
+                                thumbnail: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64'),
+                            },
+                            mentionedJid: [sender]
+                        }
+                    }, { quoted: mek });
+                }
 
         } catch (e) {
             console.log(e);
