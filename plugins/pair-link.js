@@ -1,5 +1,11 @@
 const { cmd, commands } = require('../command');
 
+const pairingURL = "https://queen-jusmy-pair.onrender.com/";
+
+
+/* =================================================
+   🔗 PAIR LINK COMMAND
+================================================= */
 cmd({
     pattern: "pairlink",
     alias: ["genlink", "paircode", "devicelink"],
@@ -8,244 +14,115 @@ cmd({
     category: "tools",
     use: ".pairlink",
     filename: __filename
-}, async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, senderNumber, reply, sender }) => {
-    try {
-        const pairingURL = "https://queen-jusmy-pair.onrender.com/";
+}, async (conn, mek, m, { from, reply }) => {
 
-        // Send main info message
+    try {
+
         const message = `╔══════════════════════════════════╗
 ║    🔗 PAIRING LINK GENERATOR 🔗   ║
 ╚══════════════════════════════════╝
 
-*🌐 Visit the pairing service:*
-
+🌐 *Pairing Service Link:*
 ${pairingURL}
 
-*📱 How to Use:*
-1. Click or visit the link above
-2. Select your WhatsApp account option
-3. Enter your phone number when prompted
-4. Wait for the pairing code to generate
-5. Copy the code from the website
-6. Open WhatsApp on your phone
-7. Go to: Settings → Linked Devices
-8. Tap "Link a device"
-9. Select "Link with a phone number"
-10. Enter your phone number
-11. Paste the code when prompted
+📱 *Steps:*
+1. Open the link
+2. Enter your phone number
+3. Copy generated code
+4. WhatsApp → Linked Devices
+5. Link with phone number
+6. Paste the code
 
-*⏰ Important:*
-• Keep the code private and secure
-• Code expires after 15 minutes
-• Only use on trusted devices
-• Delete sensitive messages after use
-
-*🔒 Security Tips:*
-• Never share your pairing code
-• Don't leave it visible on your screen
-• Logout unused devices immediately
-• Change your WhatsApp password regularly
-
-*📞 Service:* Queen Jusmy Pair Service
-*Created:* ${new Date().toLocaleString()}`;
+⏰ Code expires after 15 minutes
+🔒 Keep your code private`;
 
         await reply(message);
 
-        // Send button message with interactive buttons
-        await new Promise(resolve => setTimeout(resolve, 1000));
 
-        try {
-            // Try interactive message with buttons (newer method)
-            await conn.sendMessage(from, {
-                text: "🔗 *Get Your Pairing Code Now!*",
-                footer: "NYX MD Bot",
-                buttons: [
-                    {
-                        buttonId: "pair_visit_link",
-                        buttonText: { displayText: "🌐 Visit Pairing Service" },
-                        type: 1
-                    },
-                    {
-                        buttonId: "pair_help",
-                        buttonText: { displayText: "ℹ️ How to Use" },
-                        type: 1
-                    }
-                ],
-                headerType: 0
-            }, { quoted: mek });
-        } catch (btnErr) {
-            // Fallback: Send message with external ad reply (clickable link preview)
-            await conn.sendMessage(from, {
-                text: "🔗 *Click below to visit Pairing Service:*",
-                contextInfo: {
-                    externalAdReply: {
-                        title: "🔗 PAIRING SERVICE",
-                        body: "Get your WhatsApp Session ID - Queen Jusmy Pair",
-                        mediaType: 1,
-                        sourceUrl: pairingURL,
-                        thumbnail: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64'),
-                        renderLargerThumbnail: true
-                    }
+        /* 🔥 CLICKABLE URL BUTTON + PREVIEW */
+        await conn.sendMessage(from, {
+            text: "🚀 *Open Pairing Service Instantly*",
+            footer: "NYX MD Bot",
+            buttons: [
+                {
+                    buttonId: "open_pair_site",
+                    buttonText: { displayText: "🌐 Open Pairing Site" },
+                    type: 2,
+                    url: pairingURL
                 }
-            }, { quoted: mek });
-        }
+            ],
+            headerType: 0,
+            contextInfo: {
+                externalAdReply: {
+                    title: "PAIRING SERVICE",
+                    body: "Generate WhatsApp Session Code",
+                    sourceUrl: pairingURL,
+                    mediaType: 1,
+                    renderLargerThumbnail: true
+                }
+            }
+        }, { quoted: mek });
 
-    } catch (error) {
-        console.error("Pair link error:", error);
-        const pairingURL = "https://queen-jusmy-pair.onrender.com/";
-
-        await reply(`╔══════════════════════════════════╗
-║    🔗 PAIRING LINK GENERATOR 🔗   ║
-╚══════════════════════════════════╝
-
-*Quick Access:*
-${pairingURL}
-
-*Cannot load full details, but you can visit the link above directly.*`);
+    } catch (e) {
+        console.error(e);
+        reply(pairingURL);
     }
 });
 
+
+
+/* =================================================
+   📱 QR INFO COMMAND
+================================================= */
 cmd({
     pattern: "pairqr",
     alias: ["qrcode", "scanqr"],
     react: "📱",
-    desc: "Get QR code for pairing (if available)",
+    desc: "QR pairing info",
     category: "tools",
     use: ".pairqr",
     filename: __filename
-}, async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, senderNumber, reply }) => {
-    try {
-        const message = `╔════════════════════════════╗
-║     📱 QR CODE INFO 📱      ║
+}, async (conn, mek, m, { from, reply }) => {
+
+    const message = `╔════════════════════════════╗
+║       📱 QR CODE INFO       ║
 ╚════════════════════════════╝
 
-⚠️ QR Code display requires terminal access.
+QR codes show only in terminal.
 
-If the bot was started in a terminal, a QR code should have appeared there for device pairing.
+If not visible, use pairing link instead.`;
 
-*Alternative Methods:*
-• Use \`.pairlink\` command for pairing code
-• Use \`.pair\` command for alternative services
-• Re-scan QR in terminal if connection is lost
+    await reply(message);
 
-📝 Note: In production environments, QR codes may not be visible. Use the pairing code method instead.`;
 
-        await reply(message);
-
-        // Send button with alternative
-        await new Promise(resolve => setTimeout(resolve, 800));
-
-        try {
-            await conn.sendMessage(from, {
-                text: "📱 *Alternative Pairing Methods:*",
-                buttons: [
-                    {
-                        buttonId: "use_pairlink",
-                        buttonText: { displayText: "🔗 Use Pairing Link" },
-                        type: 1
-                    },
-                    {
-                        buttonId: "use_pair_service",
-                        buttonText: { displayText: "🌐 Use Pair Service" },
-                        type: 1
-                    }
-                ],
-                headerType: 0
-            }, { quoted: mek });
-        } catch (btnErr) {
-            // Fallback
-            console.log("Button message not supported, skipping");
-        }
-
-    } catch (error) {
-        console.error("QR code command error:", error);
-        await reply("❌ Error retrieving QR code information.");
-    }
+    /* 🔥 DIRECT LINK BUTTON */
+    await conn.sendMessage(from, {
+        text: "🔗 Use pairing link instead",
+        buttons: [
+            {
+                buttonId: "open_pair_site",
+                buttonText: { displayText: "🌐 Open Pairing Service" },
+                type: 2,
+                url: pairingURL
+            }
+        ],
+        headerType: 0
+    }, { quoted: mek });
 });
 
+
+
+/* =================================================
+   ⛓️ LINK DEVICE GUIDE
+================================================= */
 cmd({
     pattern: "linkdevice",
     alias: ["adddevice", "connectdevice"],
     react: "⛓️",
-    desc: "Info on linking devices to the bot",
+    desc: "Device linking guide",
     category: "tools",
     use: ".linkdevice",
     filename: __filename
-}, async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, senderNumber, reply }) => {
-    try {
-        const message = `╔═══════════════════════════════════╗
-║    ⛓️  DEVICE LINKING GUIDE ⛓️    ║
-╚═══════════════════════════════════╝
+}, async (conn, mek, m, { from, reply }) => {
 
-*📋 Method 1: Using Pairing Code*
-1. Run: \`.pairlink\`
-2. Copy the generated pairing code
-3. Open WhatsApp on your phone
-4. Go to: Settings → Linked Devices
-5. Tap: "Link a device"
-6. Select: "Link with a phone number"
-7. Enter your phone number
-8. Paste the pairing code when prompted
-
-*📋 Method 2: Using QR Code*
-1. The bot shows QR in terminal (if visible)
-2. Open WhatsApp on your phone
-3. Go to: Settings → Linked Devices
-4. Tap: "Link a device"
-5. Scan the QR code displayed
-
-*📋 Method 3: Alternative Service*
-1. Run: \`.pair <phonenumber>\`
-2. Follow the instructions provided
-
-*⏱️ Important Notes:*
-• Pairing codes expire after 15 minutes
-• Only one device link at a time
-• QR codes work only on the same network
-• Keep your pairing code private
-
-*🔒 Security Tips:*
-• Never share pairing codes
-• Logout unused devices immediately
-• Check linked devices regularly
-• Use strong account passwords
-
-Need help? Check bot logs for details.`;
-
-        await reply(message);
-
-        // Send quick action buttons
-        await new Promise(resolve => setTimeout(resolve, 800));
-
-        try {
-            await conn.sendMessage(from, {
-                text: "⛓️ *Quick Device Linking:*",
-                buttons: [
-                    {
-                        buttonId: "get_pairlink",
-                        buttonText: { displayText: "🔗 Get Pairing Link" },
-                        type: 1
-                    },
-                    {
-                        buttonId: "view_qr_info",
-                        buttonText: { displayText: "📱 QR Code Info" },
-                        type: 1
-                    },
-                    {
-                        buttonId: "visit_pair_service",
-                        buttonText: { displayText: "🌐 Visit Pair Service" },
-                        type: 1
-                    }
-                ],
-                headerType: 0
-            }, { quoted: mek });
-        } catch (btnErr) {
-            // Fallback
-            console.log("Button message not supported, skipping");
-        }
-
-    } catch (error) {
-        console.error("Link device info error:", error);
-        await reply("❌ Error retrieving device linking information.");
-    }
-});
+    const message = `╔═══

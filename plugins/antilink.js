@@ -108,11 +108,19 @@ cmd({
 
     // Attempt to delete the offending message immediately
     try {
-      await conn.sendMessage(from, { delete: m.key });
+      // For group messages, we need to ensure proper key structure
+      const deleteKey = {
+        remoteJid: from,
+        fromMe: false,
+        id: m.key.id
+      };
+      await conn.sendMessage(from, { delete: deleteKey });
     } catch (e) {
       try {
-        await conn.sendMessage(from, { delete: m.key }, { quoted: m });
+        // Fallback: try with the original key
+        await conn.sendMessage(from, { delete: m.key });
       } catch (err) {
+        // If both deletion methods fail, log it but continue with warning
         console.error('Failed to delete link message:', err && err.message ? err.message : err);
       }
     }
