@@ -82,21 +82,42 @@ cmd({
     // Skip if not a group or bot is not admin
     if (!isGroup || !isBotAdmins) return;
 
+    // Skip if antilink is disabled
+    if (config.ANTI_LINK !== 'true') return;
+
     // Allow admins to send links without penalty
     if (isAdmins) return;
 
-    const containsLink = linkPatterns.some(pattern => pattern.test(body || ''));
-
-    if (!(containsLink && config.ANTI_LINK === 'true')) return;
-
-    // Delete the offending message
-    try {
-      await conn.sendMessage(from, { delete: m.key }, { quoted: m });
-    } catch (e) {
-      // ignore delete errors
+    // Normalize message text to cover captions and extended messages
+    let text = (body || '').toString();
+    const msg = m.message || {};
+    if (!text || text.length === 0) {
+      if (msg.conversation) text = msg.conversation;
+      else if (msg.extendedTextMessage && msg.extendedTextMessage.text) text = msg.extendedTextMessage.text;
+      else if (msg.imageMessage && msg.imageMessage.caption) text = msg.imageMessage.caption;
+      else if (msg.videoMessage && msg.videoMessage.caption) text = msg.videoMessage.caption;
+      else if (msg.documentMessage && msg.documentMessage.caption) text = msg.documentMessage.caption;
+      else if (msg.buttonsResponseMessage && msg.buttonsResponseMessage.selectedButtonId) text = msg.buttonsResponseMessage.selectedButtonId;
+      else if (msg.templateButtonReplyMessage && msg.templateButtonReplyMessage.selectedId) text = msg.templateButtonReplyMessage.selectedId;
+      else text = '';
     }
 
-    // Warn tracking persisted to store/antilink_warns.json
+    const containsLink = linkPatterns.some(pattern => pattern.test(text || ''));
+
+    if (!containsLink) return;
+
+    // Attempt to delete the offending message immediately
+    try {
+      await conn.sendMessage(from, { delete: m.key });
+    } catch (e) {
+      try {
+        await conn.sendMessage(from, { delete: m.key }, { quoted: m });
+      } catch (err) {
+        console.error('Failed to delete link message:', err && err.message ? err.message : err);
+      }
+    }
+
+    // Log deletion (optional) and persist warns
     const warnsFile = path.join(process.cwd(), 'store', 'antilink_warns.json');
 
     const readWarns = async () => {
