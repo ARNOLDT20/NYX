@@ -12,7 +12,7 @@ cmd({
     react: '👌',
     filename: __filename
 },
-    async (conn, mek, m, { from, sender }) => {
+    async (conn, mek, m, { from, sender, isGroup, reply }) => {
 
         try {
 
@@ -51,22 +51,43 @@ _Select a menu below 👇_
                 { buttonId: `${prefix}menu`, buttonText: { displayText: "📜 FULL MENU" }, type: 1 }
             ];
 
-            await conn.sendMessage(
-                from,
-                {
-                    image: { url: imageUrl },
-                    caption,
-                    buttons,
-                    headerType: 1,
-                    viewOnce: true,
+            try {
+                // Try button message first (works best in DM)
+                await conn.sendMessage(
+                    from,
+                    {
+                        image: { url: imageUrl },
+                        caption,
+                        buttons,
+                        headerType: 1,
+                        viewOnce: true,
+                        contextInfo: {
+                            mentionedJid: [sender]
+                        }
+                    },
+                    { quoted: mek }
+                );
+            } catch (buttonErr) {
+                // Fallback for groups: send text with external ad reply (clickable link preview)
+                const textMenu = caption + `\n\n*Quick Access:*\n${buttons.map(b => `• ${b.buttonText.displayText}`).join('\n')}`;
+
+                await conn.sendMessage(from, {
+                    text: textMenu,
                     contextInfo: {
+                        externalAdReply: {
+                            title: "🔗 NYX-XD MENU",
+                            body: "Tap to access menus",
+                            mediaType: 1,
+                            sourceUrl: "https://chat.whatsapp.com/",
+                            thumbnail: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64'),
+                        },
                         mentionedJid: [sender]
                     }
-                },
-                { quoted: mek }
-            );
+                }, { quoted: mek });
+            }
 
         } catch (e) {
             console.log(e);
+            reply("❌ Error displaying menu. Please try again.");
         }
     });

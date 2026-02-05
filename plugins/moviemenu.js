@@ -44,12 +44,24 @@ cmd({
 
         menuText += `╚═════════════════════════╝`;
 
-        // Send as message with an image header
-        await conn.sendMessage(from, {
-            image: { url: "https://files.catbox.moe/rw0yfd.png" },
-            caption: menuText,
-            contextInfo: { mentionedJid: [sender] }
-        }, { quoted: mek });
+        // Send as message with a video header instead of image
+        try {
+            await conn.sendMessage(from, {
+                video: { url: "https://files.catbox.moe/qmh4d8.mp4" },
+                caption: menuText,
+                contextInfo: { mentionedJid: [sender] },
+                gifPlayback: false,
+                mimetype: 'video/mp4'
+            }, { quoted: mek });
+        } catch (videoErr) {
+            // Fallback to image if video fails
+            console.log('Video send failed, falling back to image:', videoErr.message);
+            await conn.sendMessage(from, {
+                image: { url: "https://files.catbox.moe/rw0yfd.png" },
+                caption: menuText,
+                contextInfo: { mentionedJid: [sender] }
+            }, { quoted: mek });
+        }
 
     } catch (e) {
         console.error('Movie Menu Error:', e);

@@ -10,7 +10,7 @@ cmd({
     category: 'menu',
     react: '👌',
     filename: __filename
-}, async (conn, mek, m, { from, sender, reply }) => {
+}, async (conn, mek, m, { from, sender, isGroup, reply }) => {
     try {
         const prefix = getPrefix();
         const timezone = config.TIMEZONE || 'Africa/Nairobi';
@@ -49,7 +49,6 @@ cmd({
 ⚙ Mode: ${config.MODE}
 🔑 Prefix: ${prefix}
 📅 ${time} • ${date}
-📦 Commands: ${commands.length}
 
 Select a menu below:
 `;
@@ -70,8 +69,44 @@ Select a menu below:
             image: { url: "https://files.catbox.moe/rw0yfd.png" }
         };
 
-        // Send menu
-        await conn.sendMessage(from, listMessage, { quoted: mek });
+        // Send menu with fallback for groups
+        try {
+            await conn.sendMessage(from, listMessage, { quoted: mek });
+        } catch (listErr) {
+            // Fallback: Send as text with interactive buttons
+            let textMenu = menuHeader + '\n';
+            Object.entries(categoryMap).forEach(([key, value]) => {
+                textMenu += `\n▸ ${prefix}${key}menu - ${value}`;
+            });
+
+            try {
+                await conn.sendMessage(from, {
+                    text: textMenu,
+                    buttons: [
+                        {
+                            buttonId: `${prefix}menu`,
+                            buttonText: { displayText: "📜 FULL MENU" },
+                            type: 1
+                        },
+                        {
+                            buttonId: `${prefix}dlmenu`,
+                            buttonText: { displayText: "⬇️ DOWNLOAD" },
+                            type: 1
+                        },
+                        {
+                            buttonId: `${prefix}groupmenu`,
+                            buttonText: { displayText: "👥 GROUP" },
+                            type: 1
+                        }
+                    ],
+                    headerType: 0,
+                    contextInfo: { mentionedJid: [sender] }
+                }, { quoted: mek });
+            } catch (btnErr) {
+                // Final fallback: Plain text
+                await reply(textMenu);
+            }
+        }
 
     } catch (e) {
         console.error('Menu3 Error:', e);

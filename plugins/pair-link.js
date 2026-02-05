@@ -93,7 +93,7 @@ ${pairingURL}
     } catch (error) {
         console.error("Pair link error:", error);
         const pairingURL = "https://queen-jusmy-pair.onrender.com/";
-        
+
         await reply(`╔══════════════════════════════════╗
 ║    🔗 PAIRING LINK GENERATOR 🔗   ║
 ╚══════════════════════════════════╝
