@@ -5,23 +5,15 @@ cmd({
     alias: ["genlink", "paircode", "devicelink"],
     react: "🔗",
     desc: "Get pairing link for connecting new devices to the bot",
-    category: "owner",
+    category: "tools",
     use: ".pairlink",
     filename: __filename
 }, async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, senderNumber, reply, sender }) => {
     try {
-        // Check if user is owner
-        const config = require('../config');
-        const ownerNumbers = [config.OWNER_NUMBER, config.OWNER_NUMBER2].filter(n => n);
-
-        if (!ownerNumbers.includes(senderNumber)) {
-            return await reply("❌ Only the bot owner can use this command!");
-        }
-
         const pairingURL = "https://queen-jusmy-pair.onrender.com/";
 
-        const message = `
-╔══════════════════════════════════╗
+        // Send main info message
+        const message = `╔══════════════════════════════════╗
 ║    🔗 PAIRING LINK GENERATOR 🔗   ║
 ╚══════════════════════════════════╝
 
@@ -59,26 +51,49 @@ ${pairingURL}
 
         await reply(message);
 
-        // Send clickable button/link message
+        // Send button message with interactive buttons
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        await conn.sendMessage(from, {
-            text: "🔗 *Click here to visit:*\n" + pairingURL,
-            contextInfo: {
-                externalAdReply: {
-                    title: "🔗 Pairing Service",
-                    body: "Get your Session ID",
-                    mediaType: 1,
-                    sourceUrl: pairingURL,
-                    thumbnail: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64'),
+        try {
+            // Try interactive message with buttons (newer method)
+            await conn.sendMessage(from, {
+                text: "🔗 *Get Your Pairing Code Now!*",
+                footer: "NYX MD Bot",
+                buttons: [
+                    {
+                        buttonId: "pair_visit_link",
+                        buttonText: { displayText: "🌐 Visit Pairing Service" },
+                        type: 1
+                    },
+                    {
+                        buttonId: "pair_help",
+                        buttonText: { displayText: "ℹ️ How to Use" },
+                        type: 1
+                    }
+                ],
+                headerType: 0
+            }, { quoted: mek });
+        } catch (btnErr) {
+            // Fallback: Send message with external ad reply (clickable link preview)
+            await conn.sendMessage(from, {
+                text: "🔗 *Click below to visit Pairing Service:*",
+                contextInfo: {
+                    externalAdReply: {
+                        title: "🔗 PAIRING SERVICE",
+                        body: "Get your WhatsApp Session ID - Queen Jusmy Pair",
+                        mediaType: 1,
+                        sourceUrl: pairingURL,
+                        thumbnail: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64'),
+                        renderLargerThumbnail: true
+                    }
                 }
-            }
-        });
+            }, { quoted: mek });
+        }
 
     } catch (error) {
         console.error("Pair link error:", error);
         const pairingURL = "https://queen-jusmy-pair.onrender.com/";
-
+        
         await reply(`╔══════════════════════════════════╗
 ║    🔗 PAIRING LINK GENERATOR 🔗   ║
 ╚══════════════════════════════════╝
@@ -95,20 +110,12 @@ cmd({
     alias: ["qrcode", "scanqr"],
     react: "📱",
     desc: "Get QR code for pairing (if available)",
-    category: "owner",
+    category: "tools",
     use: ".pairqr",
     filename: __filename
 }, async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, senderNumber, reply }) => {
     try {
-        // Check if user is owner
-        const config = require('../config');
-        const ownerNumbers = [config.OWNER_NUMBER, config.OWNER_NUMBER2].filter(n => n);
-
-        if (!ownerNumbers.includes(senderNumber)) {
-            return await reply("❌ Only the bot owner can use this command!");
-        }
-
-        await reply(`╔════════════════════════════╗
+        const message = `╔════════════════════════════╗
 ║     📱 QR CODE INFO 📱      ║
 ╚════════════════════════════╝
 
@@ -121,7 +128,34 @@ If the bot was started in a terminal, a QR code should have appeared there for d
 • Use \`.pair\` command for alternative services
 • Re-scan QR in terminal if connection is lost
 
-📝 Note: In production environments, QR codes may not be visible. Use the pairing code method instead.`);
+📝 Note: In production environments, QR codes may not be visible. Use the pairing code method instead.`;
+
+        await reply(message);
+
+        // Send button with alternative
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        try {
+            await conn.sendMessage(from, {
+                text: "📱 *Alternative Pairing Methods:*",
+                buttons: [
+                    {
+                        buttonId: "use_pairlink",
+                        buttonText: { displayText: "🔗 Use Pairing Link" },
+                        type: 1
+                    },
+                    {
+                        buttonId: "use_pair_service",
+                        buttonText: { displayText: "🌐 Use Pair Service" },
+                        type: 1
+                    }
+                ],
+                headerType: 0
+            }, { quoted: mek });
+        } catch (btnErr) {
+            // Fallback
+            console.log("Button message not supported, skipping");
+        }
 
     } catch (error) {
         console.error("QR code command error:", error);
@@ -134,20 +168,12 @@ cmd({
     alias: ["adddevice", "connectdevice"],
     react: "⛓️",
     desc: "Info on linking devices to the bot",
-    category: "owner",
+    category: "tools",
     use: ".linkdevice",
     filename: __filename
 }, async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, senderNumber, reply }) => {
     try {
-        const config = require('../config');
-        const ownerNumbers = [config.OWNER_NUMBER, config.OWNER_NUMBER2].filter(n => n);
-
-        if (!ownerNumbers.includes(senderNumber)) {
-            return await reply("❌ Only the bot owner can use this command!");
-        }
-
-        const message = `
-╔═══════════════════════════════════╗
+        const message = `╔═══════════════════════════════════╗
 ║    ⛓️  DEVICE LINKING GUIDE ⛓️    ║
 ╚═══════════════════════════════════╝
 
@@ -187,6 +213,36 @@ cmd({
 Need help? Check bot logs for details.`;
 
         await reply(message);
+
+        // Send quick action buttons
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        try {
+            await conn.sendMessage(from, {
+                text: "⛓️ *Quick Device Linking:*",
+                buttons: [
+                    {
+                        buttonId: "get_pairlink",
+                        buttonText: { displayText: "🔗 Get Pairing Link" },
+                        type: 1
+                    },
+                    {
+                        buttonId: "view_qr_info",
+                        buttonText: { displayText: "📱 QR Code Info" },
+                        type: 1
+                    },
+                    {
+                        buttonId: "visit_pair_service",
+                        buttonText: { displayText: "🌐 Visit Pair Service" },
+                        type: 1
+                    }
+                ],
+                headerType: 0
+            }, { quoted: mek });
+        } catch (btnErr) {
+            // Fallback
+            console.log("Button message not supported, skipping");
+        }
 
     } catch (error) {
         console.error("Link device info error:", error);
