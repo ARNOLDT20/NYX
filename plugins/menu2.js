@@ -103,9 +103,9 @@ _Select a menu below 👇_
                         }
                     }, { quoted: mek });
                 }
-
-        } catch (e) {
-            console.log(e);
-            reply("❌ Error displaying menu. Please try again.");
+            } catch (e) {
+                console.log(e);
+                reply("❌ Error displaying menu. Please try again.");
+            }
         }
     });
