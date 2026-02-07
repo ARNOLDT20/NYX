@@ -49,7 +49,21 @@ cmd({
     const containsLink = linkPatterns.some(pattern => pattern.test(body));
 
     if (containsLink && config.DELETE_LINKS === 'true') {
-      await conn.sendMessage(from, { delete: m.key }, { quoted: m });
+      try {
+        const delKey = {
+          remoteJid: from,
+          fromMe: false,
+          id: m.key && m.key.id ? m.key.id : (m.id || ''),
+          participant: m.key && m.key.participant ? m.key.participant : (m.participant || undefined)
+        };
+        await conn.sendMessage(from, { delete: delKey }, { quoted: m });
+      } catch (err) {
+        try {
+          await conn.sendMessage(from, { delete: m.key }, { quoted: m });
+        } catch (e) {
+          console.error('Failed to delete link message (delete-links):', e && e.message ? e.message : e);
+        }
+      }
     }
   } catch (error) {
     console.error(error);

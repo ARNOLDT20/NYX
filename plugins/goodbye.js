@@ -12,11 +12,20 @@ module.exports.handleGoodbye = async (conn, id, participants, groupMetadata) => 
 
         if (config.GOODBYE !== 'true') return;
 
-        // Ensure participants is an array
+        // Ensure participants is an array and normalize participant IDs
         if (!Array.isArray(participants)) {
             console.error('❌ Participants is not an array:', typeof participants);
             return;
         }
+
+        // Normalize participants to JID strings if provided as objects
+        participants = participants.map(p => {
+            if (!p) return p;
+            if (typeof p === 'string') return p;
+            if (p.id) return p.id;
+            if (p.jid) return p.jid;
+            return String(p);
+        }).filter(Boolean);
 
         // Ensure groupMetadata exists and has participants
         if (!groupMetadata.participants || !Array.isArray(groupMetadata.participants)) {
@@ -35,7 +44,7 @@ module.exports.handleGoodbye = async (conn, id, participants, groupMetadata) => 
                 }
 
                 const userName = (await conn.getName(participant)) || 'Member';
-                const memberNumber = participant.replace('@s.whatsapp.net', '');
+                const memberNumber = (participant || '').toString().replace('@s.whatsapp.net', '');
 
                 if (!memberNumber || memberNumber.length === 0) {
                     console.warn('⚠️ Invalid member number extracted');
@@ -58,7 +67,7 @@ module.exports.handleGoodbye = async (conn, id, participants, groupMetadata) => 
                 }
 
                 // Mention the departing user for clarity
-                await conn.sendMessage(id, { text: goodbyeMsg }, { contextInfo: { mentionedJid: [participant] } });
+                await conn.sendMessage(id, { text: goodbyeMsg, mentions: [participant] });
                 console.log(`✅ Goodbye message queued for ${userName} in ${groupName}`);
             } catch (err) {
                 console.error('❌ Error sending goodbye message for participant:', err && err.message ? err.message : err);
