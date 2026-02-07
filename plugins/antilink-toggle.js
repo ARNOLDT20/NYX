@@ -32,7 +32,18 @@ cmd({
         console.error('Failed to write config.js (antilink on):', err);
         return reply('❌ Failed to persist ANTI_LINK change to config.js');
       }
-      return reply('✅ ANTI_LINK enabled');
+
+      // Clear per-group overrides so global applies everywhere
+      try {
+        const pluginSettings = require('../lib/pluginSettings');
+        const all = await pluginSettings.readAll();
+        Object.keys(all).forEach(chat => { if (all[chat] && all[chat].hasOwnProperty('antilink')) delete all[chat]['antilink']; });
+        await pluginSettings.writeAll(all);
+      } catch (err) {
+        console.error('Failed to clear per-group antilink overrides:', err);
+      }
+
+      return reply('✅ ANTI_LINK enabled (global)');
     }
 
     if (['off', 'false', 'disable'].includes(sub)) {
@@ -46,7 +57,18 @@ cmd({
         console.error('Failed to write config.js (antilink off):', err);
         return reply('❌ Failed to persist ANTI_LINK change to config.js');
       }
-      return reply('✅ ANTI_LINK disabled');
+
+      // Clear per-group overrides so global off applies everywhere
+      try {
+        const pluginSettings = require('../lib/pluginSettings');
+        const all = await pluginSettings.readAll();
+        Object.keys(all).forEach(chat => { if (all[chat] && all[chat].hasOwnProperty('antilink')) delete all[chat]['antilink']; });
+        await pluginSettings.writeAll(all);
+      } catch (err) {
+        console.error('Failed to clear per-group antilink overrides:', err);
+      }
+
+      return reply('✅ ANTI_LINK disabled (global)');
     }
 
     if (sub === 'deleteon' || sub === 'delete-on' || (sub === 'delete' && args[1] === 'on')) {
