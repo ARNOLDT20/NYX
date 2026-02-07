@@ -2,16 +2,10 @@ const config = require('../config');
 const { cmd } = require('../command');
 const axios = require('axios');
 
-// Common contextInfo configuration for downloads
 const getContextInfo = (title = '', userJid = '', thumbnailUrl = '') => ({
     mentionedJid: [userJid],
     forwardingScore: 999,
     isForwarded: true,
-    forwardedNewsletterMessageInfo: {
-        newsletterJid: "120363421014261315@newsletter",
-        newsletterName: config.BOT_NAME || "NYX Bot",
-        serverMessageId: Math.floor(100000 + Math.random() * 900000),
-    },
     externalAdReply: {
         showAdAttribution: true,
         title: config.BOT_NAME || 'YouTube Downloader',
@@ -23,7 +17,23 @@ const getContextInfo = (title = '', userJid = '', thumbnailUrl = '') => ({
     }
 });
 
-// YouTube Audio Download
+// Utility: Try multiple APIs with fallback
+async function tryMultipleAPIs(apis) {
+    for (const api of apis) {
+        try {
+            const response = await axios.get(api.url, { timeout: api.timeout || 30000 });
+            if (api.validate(response.data)) {
+                return { success: true, data: response.data, type: api.type };
+            }
+        } catch (err) {
+            console.error(`API ${api.type} failed:`, err.message);
+            continue;
+        }
+    }
+    return { success: false };
+}
+
+// YouTube Audio Download with Fallbacks
 cmd({
     pattern: "play",
     alias: ["song", "audio", "mp3", "ytmp3", "yta"],
@@ -31,67 +41,95 @@ cmd({
     category: "download",
     react: "🎵",
     filename: __filename
-}, async (conn, m, { from, quoted, sender, reply, arg }) => {
+}, async (conn, m, { from, sender, reply, arg }) => {
     try {
         if (!arg[0]) {
-            return reply("Please provide a song name or YouTube URL.\nExample: .play Imagine Dragons Believer");
+            return reply("🎵 *Usage:* .play <song name or YouTube URL>\n\nExample: .play Imagine Dragons Believer");
         }
 
         const query = arg.join(" ");
         let videoUrl, videoTitle, videoThumbnail;
 
-        // Check if input is a YouTube URL
+        // Extract YouTube URL if provided
         if (query.match(/(youtube\.com|youtu\.be)/i)) {
             videoUrl = query;
             const videoId = videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i)?.[1];
             if (!videoId) {
-                return reply("Invalid YouTube URL provided.");
+                return reply("❌ Invalid YouTube URL provided.");
             }
             videoTitle = "YouTube Audio";
             videoThumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
         } else {
-            // Search for the video using Keith API
+            // Search for video
             await conn.sendMessage(from, {
-                text: "🔍 Searching YouTube... This may take a moment...",
+                text: "🔍 *Searching YouTube...* Please wait",
                 contextInfo: getContextInfo("Searching", sender)
             }, { quoted: m });
 
             try {
-                const searchResponse = await axios.get(`https://apiskeith.vercel.app/search/yts?query=${encodeURIComponent(query)}`, { timeout: 15000 });
-                const videos = searchResponse.data?.result;
+                // Try multiple search APIs
+                const searchAPIs = [
+                    {
+                        type: 'keith',
+                        url: `https://apiskeith.vercel.app/search/yts?query=${encodeURIComponent(query)}`,
+                        timeout: 15000,
+                        validate: (data) => data?.result && Array.isArray(data.result) && data.result.length > 0
+                    },
+                    {
+                        type: 'rest-lily',
+                        url: `https://rest-lily.vercel.app/api/search/yt?query=${encodeURIComponent(query)}`,
+                        timeout: 15000,
+                        validate: (data) => data?.result && Array.isArray(data.result) && data.result.length > 0
+                    }
+                ];
 
-                if (!Array.isArray(videos) || videos.length === 0) {
-                    return reply("No videos found for your search query.");
+                const searchResult = await tryMultipleAPIs(searchAPIs);
+                if (!searchResult.success) {
+                    return reply("❌ No videos found or search service unavailable. Please try a direct YouTube URL.");
                 }
 
-                const firstVideo = videos[0];
-                videoUrl = firstVideo.url;
+                const firstVideo = searchResult.data.result[0];
+                videoUrl = firstVideo.url || firstVideo.link;
                 videoTitle = firstVideo.title;
-                videoThumbnail = firstVideo.thumbnail;
+                videoThumbnail = firstVideo.thumbnail || firstVideo.image;
             } catch (searchError) {
                 console.error('YouTube search error:', searchError);
-                return reply("Failed to search YouTube. Please try again.");
+                return reply("❌ Failed to search YouTube. Try providing a direct URL instead.");
             }
         }
 
-        // Download audio using Keith API
+        // Download audio
         await conn.sendMessage(from, {
-            text: "⬇️ Downloading audio... This may take a moment...",
+            text: "⬇️ *Downloading audio...* This may take a moment",
             contextInfo: getContextInfo("Downloading", sender, videoThumbnail)
         }, { quoted: m });
 
         try {
-            const downloadResponse = await axios.get(`https://apiskeith.vercel.app/download/audio?url=${encodeURIComponent(videoUrl)}`, { timeout: 30000 });
-            const downloadUrl = downloadResponse.data?.result;
+            const downloadAPIs = [
+                {
+                    type: 'keith',
+                    url: `https://apiskeith.vercel.app/download/audio?url=${encodeURIComponent(videoUrl)}`,
+                    timeout: 30000,
+                    validate: (data) => data?.result && typeof data.result === 'string'
+                },
+                {
+                    type: 'rest-lily',
+                    url: `https://rest-lily.vercel.app/api/download/yta?url=${encodeURIComponent(videoUrl)}`,
+                    timeout: 30000,
+                    validate: (data) => data?.result && typeof data.result === 'string'
+                }
+            ];
 
-            if (!downloadUrl) {
-                throw new Error("Failed to get download URL from API.");
+            const downloadResult = await tryMultipleAPIs(downloadAPIs);
+            if (!downloadResult.success) {
+                return reply("❌ Download failed. The video may be unavailable or too long. Try another video.");
             }
 
-            const fileName = `${videoTitle}.mp3`.replace(/[^\w\s.-]/gi, '');
+            const downloadUrl = downloadResult.data.result;
+            const fileName = `${videoTitle.replace(/[^\w\s.-]/gi, '')}.mp3`.slice(0, 50);
             const contextInfo = getContextInfo(videoTitle, sender, videoThumbnail);
 
-            // Send audio stream
+            // Send audio
             await conn.sendMessage(from, {
                 audio: { url: downloadUrl },
                 mimetype: "audio/mpeg",
@@ -99,32 +137,18 @@ cmd({
                 contextInfo: contextInfo
             }, { quoted: m });
 
-            // Send document stream (Optional)
-            await conn.sendMessage(from, {
-                document: { url: downloadUrl },
-                mimetype: "audio/mpeg",
-                fileName: fileName,
-                contextInfo: {
-                    ...contextInfo,
-                    externalAdReply: {
-                        ...contextInfo.externalAdReply,
-                        body: 'Document version'
-                    }
-                }
-            }, { quoted: m });
-
         } catch (downloadError) {
             console.error('Download error:', downloadError);
-            return reply(`Download failed: ${downloadError.message}`);
+            return reply(`❌ Download failed: ${downloadError.message}`);
         }
 
     } catch (error) {
         console.error('Audio download error:', error);
-        reply(`Error: ${error.message}`);
+        reply(`❌ Error: ${error.message}`);
     }
 });
 
-// YouTube Video Download
+// YouTube Video Download with Fallbacks
 cmd({
     pattern: "video",
     alias: ["videodoc", "film", "mp4", "ytmp4", "ytv"],
@@ -132,67 +156,82 @@ cmd({
     category: "download",
     react: "🎥",
     filename: __filename
-}, async (conn, m, { from, quoted, sender, reply, arg }) => {
+}, async (conn, m, { from, sender, reply, arg }) => {
     try {
         if (!arg[0]) {
-            return reply("Please provide a video name or YouTube URL.\nExample: .video Taylor Swift Anti-Hero");
+            return reply("🎥 *Usage:* .video <video name or YouTube URL>\n\nExample: .video Taylor Swift Anti-Hero");
         }
 
         const query = arg.join(" ");
         let videoUrl, videoTitle, videoThumbnail;
 
-        // Check if input is a YouTube URL
+        // Extract YouTube URL if provided
         if (query.match(/(youtube\.com|youtu\.be)/i)) {
             videoUrl = query;
             const videoId = videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i)?.[1];
             if (!videoId) {
-                return reply("Invalid YouTube URL provided.");
+                return reply("❌ Invalid YouTube URL provided.");
             }
             videoTitle = "YouTube Video";
             videoThumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
         } else {
-            // Search for the video using Keith API
+            // Search for video
             await conn.sendMessage(from, {
-                text: "🔍 Searching YouTube... This may take a moment...",
+                text: "🔍 *Searching YouTube...* Please wait",
                 contextInfo: getContextInfo("Searching", sender)
             }, { quoted: m });
 
             try {
-                const searchResponse = await axios.get(`https://apiskeith.vercel.app/search/yts?query=${encodeURIComponent(query)}`, { timeout: 15000 });
-                const videos = searchResponse.data?.result;
+                const searchAPIs = [
+                    {
+                        type: 'keith',
+                        url: `https://apiskeith.vercel.app/search/yts?query=${encodeURIComponent(query)}`,
+                        timeout: 15000,
+                        validate: (data) => data?.result && Array.isArray(data.result) && data.result.length > 0
+                    }
+                ];
 
-                if (!Array.isArray(videos) || videos.length === 0) {
-                    return reply("No videos found for your search query.");
+                const searchResult = await tryMultipleAPIs(searchAPIs);
+                if (!searchResult.success) {
+                    return reply("❌ No videos found. Please try a direct YouTube URL.");
                 }
 
-                const firstVideo = videos[0];
-                videoUrl = firstVideo.url;
+                const firstVideo = searchResult.data.result[0];
+                videoUrl = firstVideo.url || firstVideo.link;
                 videoTitle = firstVideo.title;
-                videoThumbnail = firstVideo.thumbnail;
+                videoThumbnail = firstVideo.thumbnail || firstVideo.image;
             } catch (searchError) {
                 console.error('YouTube search error:', searchError);
-                return reply("Failed to search YouTube. Please try again.");
+                return reply("❌ Failed to search YouTube.");
             }
         }
 
-        // Download video using Keith API
+        // Download video
         await conn.sendMessage(from, {
-            text: "⬇️ Downloading video... This may take a moment...",
+            text: "⬇️ *Downloading video...* This may take a moment",
             contextInfo: getContextInfo("Downloading", sender, videoThumbnail)
         }, { quoted: m });
 
         try {
-            const downloadResponse = await axios.get(`https://apiskeith.vercel.app/download/video?url=${encodeURIComponent(videoUrl)}`, { timeout: 30000 });
-            const downloadUrl = downloadResponse.data?.result;
+            const downloadAPIs = [
+                {
+                    type: 'keith',
+                    url: `https://apiskeith.vercel.app/download/video?url=${encodeURIComponent(videoUrl)}`,
+                    timeout: 30000,
+                    validate: (data) => data?.result && typeof data.result === 'string'
+                }
+            ];
 
-            if (!downloadUrl) {
-                throw new Error("Failed to get download URL from API.");
+            const downloadResult = await tryMultipleAPIs(downloadAPIs);
+            if (!downloadResult.success) {
+                return reply("❌ Download failed. The video may be unavailable. Try another video.");
             }
 
-            const fileName = `${videoTitle}.mp4`.replace(/[^\w\s.-]/gi, '');
+            const downloadUrl = downloadResult.data.result;
+            const fileName = `${videoTitle.replace(/[^\w\s.-]/gi, '')}.mp4`.slice(0, 50);
             const contextInfo = getContextInfo(videoTitle, sender, videoThumbnail);
 
-            // Send video stream
+            // Send video
             await conn.sendMessage(from, {
                 video: { url: downloadUrl },
                 mimetype: "video/mp4",
@@ -200,29 +239,14 @@ cmd({
                 contextInfo: contextInfo
             }, { quoted: m });
 
-            // Send document stream (Optional)
-            await conn.sendMessage(from, {
-                document: { url: downloadUrl },
-                mimetype: "video/mp4",
-                fileName: fileName,
-                caption: `📁 *${videoTitle}* (Document)`,
-                contextInfo: {
-                    ...contextInfo,
-                    externalAdReply: {
-                        ...contextInfo.externalAdReply,
-                        body: 'Document version'
-                    }
-                }
-            }, { quoted: m });
-
         } catch (downloadError) {
             console.error('Download error:', downloadError);
-            return reply(`Download failed: ${downloadError.message}`);
+            return reply(`❌ Download failed: ${downloadError.message}`);
         }
 
     } catch (error) {
         console.error('Video download error:', error);
-        reply(`Error: ${error.message}`);
+        reply(`❌ Error: ${error.message}`);
     }
 });
 
@@ -234,50 +258,58 @@ cmd({
     category: "download",
     react: "🔍",
     filename: __filename
-}, async (conn, m, { from, quoted, sender, reply, arg }) => {
+}, async (conn, m, { from, sender, reply, arg }) => {
     try {
         if (!arg[0]) {
-            return reply("Please provide a search query.\nExample: .ytsearch Imagine Dragons");
+            return reply("🔍 *Usage:* .ytsearch <search query>\n\nExample: .ytsearch Imagine Dragons");
         }
 
         const query = arg.join(" ");
 
         await conn.sendMessage(from, {
-            text: "🔍 Searching YouTube...",
+            text: "🔍 *Searching YouTube...*",
             contextInfo: getContextInfo("Searching", sender)
         }, { quoted: m });
 
         try {
-            const searchResponse = await axios.get(`https://apiskeith.vercel.app/search/yts?query=${encodeURIComponent(query)}`, { timeout: 15000 });
-            const videos = searchResponse.data?.result;
+            const searchAPIs = [
+                {
+                    type: 'keith',
+                    url: `https://apiskeith.vercel.app/search/yts?query=${encodeURIComponent(query)}`,
+                    timeout: 15000,
+                    validate: (data) => data?.result && Array.isArray(data.result) && data.result.length > 0
+                }
+            ];
 
-            if (!Array.isArray(videos) || videos.length === 0) {
-                return reply("No videos found for your search query.");
+            const searchResult = await tryMultipleAPIs(searchAPIs);
+            if (!searchResult.success) {
+                return reply("❌ No videos found for that search.");
             }
 
-            let message = `🔍 *YouTube Search Results for: ${query}*\n\n`;
-            videos.slice(0, 5).forEach((video, index) => {
-                message += `${index + 1}. *${video.title}*\n`;
-                message += `📺 Channel: ${video.channel || 'Unknown'}\n`;
-                message += `🔗 URL: ${video.url}\n`;
-                message += `⏱️ Duration: ${video.duration || 'Unknown'}\n\n`;
+            const videos = searchResult.data.result.slice(0, 5);
+            let message = `🔍 *YouTube Search Results*\n*Query:* ${query}\n\n`;
+
+            videos.forEach((video, index) => {
+                message += `${index + 1}. *${video.title || 'Unknown'}*\n`;
+                message += `📺 ${video.channel || 'Unknown Channel'}\n`;
+                message += `🔗 ${video.url}\n\n`;
             });
 
-            message += `\n_Use .play or .video to download the media_`;
+            message += `\n_Use .play or .video to download_`;
 
             await conn.sendMessage(from, {
-                image: { url: videos[0].thumbnail },
+                image: { url: videos[0].thumbnail || videos[0].image },
                 caption: message,
                 contextInfo: getContextInfo(`Search: ${query}`, sender, videos[0].thumbnail)
             }, { quoted: m });
 
         } catch (searchError) {
             console.error('YouTube search error:', searchError);
-            return reply("Failed to search YouTube. Please try again.");
+            return reply("❌ Failed to search YouTube.");
         }
 
     } catch (error) {
         console.error('Search error:', error);
-        reply(`Error: ${error.message}`);
+        reply(`❌ Error: ${error.message}`);
     }
 });
