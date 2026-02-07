@@ -1,5 +1,6 @@
 const { cmd } = require('../command');
 const config = require('../config');
+const pluginSettings = require('../lib/pluginSettings');
 
 // Export welcome handler function
 module.exports.handleWelcome = async (conn, id, participants, groupMetadata) => {
@@ -10,7 +11,15 @@ module.exports.handleWelcome = async (conn, id, participants, groupMetadata) => 
             return;
         }
 
-        if (config.WELCOME !== 'true') return;
+        // Check global setting and per-group override
+        let welcomeEnabled = config.WELCOME === 'true';
+        try {
+            const override = await pluginSettings.get(id, 'welcome');
+            if (override !== undefined) welcomeEnabled = (override === true || String(override) === 'true' || String(override).toLowerCase() === 'on');
+        } catch (err) {
+            console.error('Error reading plugin setting (welcome):', err);
+        }
+        if (!welcomeEnabled) return;
 
         // Ensure participants is an array and normalize participant IDs
         if (!Array.isArray(participants)) {
@@ -51,23 +60,31 @@ module.exports.handleWelcome = async (conn, id, participants, groupMetadata) => 
                     return;
                 }
 
-                let welcomeMsg = config.WELCOME_MESSAGE || `Welcome ${userName} to ${groupName}!\nYou are member #${groupMetadata.participants.length}.\n\nPlease introduce yourself and follow the group rules.`;
+                let welcomeMsg = config.WELCOME_MESSAGE || `Welcome {name} to {group}!\nYou are member #{members}.\n\nPlease introduce yourself and follow the group rules.`;
 
                 if (config.WELCOME_MESSAGE && typeof config.WELCOME_MESSAGE === 'string') {
-                    welcomeMsg = config.WELCOME_MESSAGE
-                        .replace(/{name}/g, userName)
-                        .replace(/{number}/g, memberNumber)
-                        .replace(/{members}/g, String(groupMetadata.participants.length))
-                        .replace(/{group}/g, groupName);
+                    welcomeMsg = config.WELCOME_MESSAGE;
                 }
 
-                if (!welcomeMsg || welcomeMsg.length === 0) {
+                // Replace placeholders
+                const caption = welcomeMsg
+                    .replace(/{name}/g, userName)
+                    .replace(/{number}/g, memberNumber)
+                    .replace(/{members}/g, String(groupMetadata.participants.length))
+                    .replace(/{group}/g, groupName);
+
+                if (!caption || caption.length === 0) {
                     console.warn('⚠️ Welcome message is empty');
                     return;
                 }
 
-                // Mention the new user for visibility
-                await conn.sendMessage(id, { text: welcomeMsg, mentions: [participant] });
+                // Prefer sending an image with caption for nicer format; fallback to text
+                try {
+                    await conn.sendMessage(id, { image: { url: config.ALIVE_IMG || config.MENU_IMAGE_URL }, caption }, { mentions: [participant] });
+                } catch (err) {
+                    // fallback to plain text with mentions
+                    await conn.sendMessage(id, { text: caption, mentions: [participant] });
+                }
                 console.log(`✅ Welcome message queued for ${userName} in ${groupName}`);
             } catch (err) {
                 console.error('❌ Error sending welcome message for participant:', err && err.message ? err.message : err);

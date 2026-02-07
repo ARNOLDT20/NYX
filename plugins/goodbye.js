@@ -1,5 +1,6 @@
 const { cmd } = require('../command');
 const config = require('../config');
+const pluginSettings = require('../lib/pluginSettings');
 
 // Export goodbye handler function
 module.exports.handleGoodbye = async (conn, id, participants, groupMetadata) => {
@@ -10,7 +11,15 @@ module.exports.handleGoodbye = async (conn, id, participants, groupMetadata) => 
             return;
         }
 
-        if (config.GOODBYE !== 'true') return;
+        // Check global setting and per-group override
+        let goodbyeEnabled = config.GOODBYE === 'true';
+        try {
+            const override = await pluginSettings.get(id, 'goodbye');
+            if (override !== undefined) goodbyeEnabled = (override === true || String(override) === 'true' || String(override).toLowerCase() === 'on');
+        } catch (err) {
+            console.error('Error reading plugin setting (goodbye):', err);
+        }
+        if (!goodbyeEnabled) return;
 
         // Ensure participants is an array and normalize participant IDs
         if (!Array.isArray(participants)) {
@@ -51,23 +60,29 @@ module.exports.handleGoodbye = async (conn, id, participants, groupMetadata) => 
                     return;
                 }
 
-                let goodbyeMsg = config.GOODBYE_MESSAGE || `Goodbye ${userName}.\nWe now have ${groupMetadata.participants.length} members remaining.\n\nHope to see you again!`;
+                let goodbyeMsg = config.GOODBYE_MESSAGE || `Goodbye {name}.\nWe now have {members} members remaining.\n\nHope to see you again!`;
 
                 if (config.GOODBYE_MESSAGE && typeof config.GOODBYE_MESSAGE === 'string') {
-                    goodbyeMsg = config.GOODBYE_MESSAGE
-                        .replace(/{name}/g, userName)
-                        .replace(/{number}/g, memberNumber)
-                        .replace(/{members}/g, String(groupMetadata.participants.length))
-                        .replace(/{group}/g, groupName);
+                    goodbyeMsg = config.GOODBYE_MESSAGE;
                 }
 
-                if (!goodbyeMsg || goodbyeMsg.length === 0) {
+                const caption = goodbyeMsg
+                    .replace(/{name}/g, userName)
+                    .replace(/{number}/g, memberNumber)
+                    .replace(/{members}/g, String(groupMetadata.participants.length))
+                    .replace(/{group}/g, groupName);
+
+                if (!caption || caption.length === 0) {
                     console.warn('⚠️ Goodbye message is empty');
                     return;
                 }
 
-                // Mention the departing user for clarity
-                await conn.sendMessage(id, { text: goodbyeMsg, mentions: [participant] });
+                // Prefer sending an image with caption for nicer format; fallback to text
+                try {
+                    await conn.sendMessage(id, { image: { url: config.ALIVE_IMG || config.MENU_IMAGE_URL }, caption }, { mentions: [participant] });
+                } catch (err) {
+                    await conn.sendMessage(id, { text: caption, mentions: [participant] });
+                }
                 console.log(`✅ Goodbye message queued for ${userName} in ${groupName}`);
             } catch (err) {
                 console.error('❌ Error sending goodbye message for participant:', err && err.message ? err.message : err);

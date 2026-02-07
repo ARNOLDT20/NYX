@@ -41,6 +41,15 @@ cmd({
       return;
     }
 
+    // Check per-group override for delete_links
+    let deleteLinksEnabled = config.DELETE_LINKS === 'true';
+    try {
+      const override = await (require('../lib/pluginSettings')).get(from, 'delete_links');
+      if (override !== undefined) deleteLinksEnabled = (override === true || String(override) === 'true' || String(override).toLowerCase() === 'on');
+    } catch (err) {
+      console.error('Error reading plugin setting (delete_links):', err);
+    }
+
     // Allow admins to send links without deletion
     if (isAdmins) {
       return;
@@ -48,7 +57,7 @@ cmd({
 
     const containsLink = linkPatterns.some(pattern => pattern.test(body));
 
-    if (containsLink && config.DELETE_LINKS === 'true') {
+    if (containsLink && deleteLinksEnabled) {
       try {
         const delKey = {
           remoteJid: from,

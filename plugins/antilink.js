@@ -1,5 +1,6 @@
 const { cmd } = require('../command');
 const config = require("../config");
+const pluginSettings = require('../lib/pluginSettings');
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -82,8 +83,15 @@ cmd({
     // Skip if not a group or bot is not admin
     if (!isGroup || !isBotAdmins) return;
 
-    // Skip if antilink is disabled
-    if (config.ANTI_LINK !== 'true') return;
+    // Check global setting and per-group override for anti-link
+    let antiLinkEnabled = config.ANTI_LINK === 'true';
+    try {
+      const override = await pluginSettings.get(from, 'antilink');
+      if (override !== undefined) antiLinkEnabled = (override === true || String(override) === 'true' || String(override).toLowerCase() === 'on');
+    } catch (err) {
+      console.error('Error reading plugin setting (antilink):', err);
+    }
+    if (!antiLinkEnabled) return;
 
     // Allow admins to send links without penalty
     if (isAdmins) return;
