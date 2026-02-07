@@ -9,10 +9,10 @@ cmd({
     filename: __filename
 },
     async (conn, mek, m, {
-        from, isGroup, isBotAdmins, reply, groupMetadata, isCreator
+        from, isGroup, isBotAdmins, reply, groupMetadata, isCreator, isAdmins
     }) => {
         if (!isGroup) return reply("❌ This command can only be used in groups.");
-        if (!isCreator) return reply("❌ Only the *owner* can use this command.");
+        if (!isAdmins && !isCreator) return reply("❌ Only group admins or owner can use this command.");
         if (!isBotAdmins) return reply("❌ I need to be *admin* to use this command.");
 
         try {

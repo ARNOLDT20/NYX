@@ -8,11 +8,11 @@ cmd(
     category: "group",
     filename: __filename,
   },
-  async (conn, mek, m, { from, quoted, args, reply, isGroup, isBotAdmins, isCreator }) => {
+  async (conn, mek, m, { from, quoted, args, reply, isGroup, isBotAdmins, isCreator, isAdmins }) => {
     try {
-      if (!isCreator) {
+      if (!isCreator && !isAdmins) {
         return await conn.sendMessage(from, {
-          text: "*📛 This is an owner command.*"
+          text: "*📛 This is an owner or admin command.*"
         }, { quoted: mek });
       }
 
@@ -20,10 +20,10 @@ cmd(
       if (!isBotAdmins) return reply("_I'm not admin_");
       if (!args[0] && !quoted) return reply("_Mention user to add_");
 
-      let jid = m.mentionedJid?.[0] 
-            || (m.quoted?.sender ?? null)
-            || (args[0]?.replace(/[^0-9]/g, '') + "@s.whatsapp.net");
-            
+      let jid = m.mentionedJid?.[0]
+        || (m.quoted?.sender ?? null)
+        || (args[0]?.replace(/[^0-9]/g, '') + "@s.whatsapp.net");
+
       await conn.groupParticipantsUpdate(from, [jid], "add");
       return reply(`@${jid.split("@")[0]} added`, { mentions: [jid] });
     } catch (e) {

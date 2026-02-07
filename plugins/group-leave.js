@@ -11,11 +11,15 @@ cmd({
     filename: __filename
 },
 async (conn, mek, m, {
-    from, isGroup, isCreator, reply
+    from, isGroup, isCreator, reply, isAdmins
 }) => {
     try {
         if (!isGroup) {
             return reply("❗ This command can only be used in *groups*.");
+        }
+
+        if (!isAdmins && !isCreator) {
+            return reply("❌ Only group admins or owner can use this command.");
         }
 
         if (!isCreator) {

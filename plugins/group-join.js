@@ -13,11 +13,11 @@ cmd({
 }, async (conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isCreator, isDev, isAdmins, reply }) => {
     try {
         const msr = {
-            own_cmd: "You don't have permission to use this command."
+            own_cmd: "❌ Only group admins or owner can use this command."
         };
 
-        // Only allow the creator to use the command
-        if (!isCreator) return reply(msr.own_cmd);
+        // Only allow admins or creator
+        if (!isAdmins && !isCreator) return reply(msr.own_cmd);
 
         // If there's no input, check if the message is a reply with a link
         if (!q && !quoted) return reply("*Please write the Group Link*️ 🖇️");
