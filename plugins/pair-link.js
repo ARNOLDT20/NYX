@@ -3,38 +3,20 @@ const { cmd, commands } = require('../command');
 const pairingURL = "https://queen-jusmy-pair.onrender.com/";
 
 
-/* ===============================================
-   🔥 Helper → Send Visit Site Button Smartly
-   Private = Button
-   Group   = Text link
-================================================ */
-async function sendVisitButton(conn, from, mek, isGroup, text = "🌐 Open Pairing Service") {
-
-    if (isGroup) {
-        return conn.sendMessage(from, {
-            text: `${text}\n\n🔗 ${pairingURL}`
-        }, { quoted: mek });
-    }
-
+/* =================================================
+   🔥 UNIVERSAL PREVIEW SENDER (works everywhere)
+================================================= */
+async function sendPreview(conn, from, mek, title, body) {
     return conn.sendMessage(from, {
-        text: "👇 Tap below to continue",
-        footer: "NYX MD Bot",
-        buttons: [
-            {
-                buttonId: "visit_site",
-                buttonText: { displayText: "🌐 Visit Site" },
-                type: 2,
-                url: pairingURL
-            }
-        ],
-        headerType: 0,
+        text: `🌐 ${pairingURL}`, // backup clickable text
         contextInfo: {
             externalAdReply: {
-                title: "PAIRING SERVICE",
-                body: "Generate WhatsApp Pair Code Instantly",
+                title: title,
+                body: body,
                 sourceUrl: pairingURL,
                 mediaType: 1,
-                renderLargerThumbnail: true
+                renderLargerThumbnail: true,
+                showAdAttribution: false
             }
         }
     }, { quoted: mek });
@@ -49,11 +31,11 @@ cmd({
     pattern: "pairlink",
     alias: ["genlink", "paircode", "devicelink"],
     react: "🔗",
-    desc: "Get pairing link for connecting new devices to the bot",
+    desc: "Get pairing link for connecting new devices",
     category: "tools",
     use: ".pairlink",
     filename: __filename
-}, async (conn, mek, m, { from, reply, isGroup }) => {
+}, async (conn, mek, m, { from, reply }) => {
 
     try {
 
@@ -61,19 +43,25 @@ cmd({
 ║    🔗 PAIRING LINK GENERATOR 🔗   ║
 ╚══════════════════════════════════╝
 
-📱 *Steps:*
-1. Tap Visit Site
+📱 Steps:
+1. Open the site
 2. Enter phone number
 3. Copy pairing code
 4. WhatsApp → Linked Devices
-5. Paste the code
+5. Paste code
 
 ⏰ Expires in 15 minutes
 🔒 Keep private`;
 
         await reply(message);
 
-        await sendVisitButton(conn, from, mek, isGroup, "🚀 Open Pairing Service");
+        await sendPreview(
+            conn,
+            from,
+            mek,
+            "🔗 VISIT PAIRING SERVICE",
+            "Tap to generate your WhatsApp pairing code instantly"
+        );
 
     } catch (e) {
         console.error(e);
@@ -94,19 +82,25 @@ cmd({
     category: "tools",
     use: ".pairqr",
     filename: __filename
-}, async (conn, mek, m, { from, reply, isGroup }) => {
+}, async (conn, mek, m, { from, reply }) => {
 
     const message = `╔════════════════════════════╗
 ║       📱 QR CODE INFO       ║
 ╚════════════════════════════╝
 
-QR only shows in terminal.
+QR appears only in terminal.
 
-Use pairing link instead 👇`;
+If not visible, use pairing website instead.`;
 
     await reply(message);
 
-    await sendVisitButton(conn, from, mek, isGroup, "🔗 Use Pairing Service");
+    await sendPreview(
+        conn,
+        from,
+        mek,
+        "📱 USE PAIRING WEBSITE",
+        "Open the site and connect easily without QR"
+    );
 });
 
 
@@ -122,22 +116,29 @@ cmd({
     category: "tools",
     use: ".linkdevice",
     filename: __filename
-}, async (conn, mek, m, { from, reply, isGroup }) => {
+}, async (conn, mek, m, { from, reply }) => {
 
-    const message = `╔═════════════════════════════════╗
+    const guide = `╔═════════════════════════════════╗
 ║   ⛓️ DEVICE LINKING GUIDE ⛓️    ║
 ╚═════════════════════════════════╝
 
-📋 Steps:
-• Tap Visit Site
+How to connect:
+
+• Open pairing site
 • Generate code
 • WhatsApp → Linked Devices
 • Link with phone number
 • Paste code
 
-✅ Done in 10 seconds`;
+✅ Done in seconds`;
 
-    await reply(message);
+    await reply(guide);
 
-    await sendVisitButton(conn, from, mek, isGroup, "⚡ Quick Access");
+    await sendPreview(
+        conn,
+        from,
+        mek,
+        "⚡ QUICK DEVICE LINK",
+        "Tap here to connect your device instantly"
+    );
 });
