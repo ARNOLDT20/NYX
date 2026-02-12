@@ -1,6 +1,81 @@
-const vm = require('vm');
-try {
-    const _code = Buffer.from('Y29uc3QgeyBjbWQsIGNvbW1hbmRzIH0gPSByZXF1aXJlKCdLi4vY29tbWFuZCcpO1xubmNvbnN0IG9zID0gcmVxdWlyZSgnb3MnKTtcblxuY29uc3QgeyBnZXRCdWZmZXIsIGdldEdyb3VwQWRtaW5zLCBnZXRSYW5kb20sIGgyaywgaXNVcmwsIEpTT04sIHJ1bnRpbWUsIHNsZWVwLCBmZXRjaEpvbmcsIGpzb25mb3JtYXQgfSA9IHJlcXVpcmUoJ2xpYi9mdW5jdGlvbnMnKTtcbmNvbnN0IGNvbmZpZyA9IHJlcXVpcmUoJy4uL2NvbmZpZycpO1xuY21kKHtcbiAgICBwYXR0ZXJuOiAnYWxpdmUnLFxuICAgIGFsaWFzOiBbJ3N0YXR1cycsICdsaXZlJ10sXG4gICAgZGVzYzogJ0NoZWNrIHVwdGltZSBhbmQgc3lzdGVtIHN0YXR1cycsXG4gICAgY2F0ZWdvcnk6ICdtYWluJywKICAgIHJlYWN0OiAn4oaTJycsXG4gICAgZmlsZW5hbWU6IF9fZmlsZW5hbWVcbn0sXG4gICBhc3luYyAoc29uZywgbWVrLCBtLCB7IGZyb20sIHNlbmRlciwgc mVwbHkgfSkgPT4ge1xuICAgIHRyeSB7XG4gICAgICAgIGNvbnN0IHRvdGFsQ21kcyA9IGNvbW1hbmRzLmxlbmd0aDtcbiAgICAgICAgY29uc3QgdXAgPSBydW50aW1lKHByb2Nlc3MudXB0aW1lKCk7XG5cbiAgICAgICAgY29uc3QgbWVtID0gcHJvY2Vzcy5tZW1vcnlVc2FnZSgpO1xuICAgICAgICBjb25zdCB1c2VkTUIgPSAo bWVtLmh lYXB Vc2VkIC8g MTAyNCAvIDEwMjQp L mZpeGVkK DI pO1xuICAgICAgICBjb25zdCB0b3RhbE1CID0gKHByb2Nlc3MubWVtb3J5VHVhbCAvIDEwMjQgLyAxMDI0KS5maXhlZCgyKTtcblxuICAgICAgICBjb25zdCBwbGF0Zm9ybSA9IGAke29zLnR5cGUoKX0gJHtvc y5yZWxlYXNlKCl9ICR7b3M uY X JjaH0gYDsKICAgICAgICBjb25zdCBjcH UgPSBvcy5jcHVzKCktKSAuc m9sZTsg XG5cbiAgICAgICAgY29uc3Qgc3RhdHVzID0gYGBcbiL...','base64');
-    const _src = Buffer.from(_code).toString('utf8');
-    try { eval(_src); } catch (e) { console.error('Obfuscated main-alive execution error:', e); }
-} catch (e) { console.error('main-alive wrapper error:', e); }
+const { cmd, commands } = require('../command');
+const os = require('os');
+const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson, jsonformat } = require('../lib/functions');
+const config = require('../config');
+
+cmd({
+    pattern: 'alive',
+    alias: ['status', 'live'],
+    desc: 'Check uptime and system status',
+    category: 'main',
+    react: '🟢',
+    filename: __filename
+},
+    async (conn, mek, m, { from, sender, reply }) => {
+        try {
+            const totalCmds = commands.length;
+            const up = runtime(process.uptime());
+
+            const mem = process.memoryUsage();
+            const usedMB = (mem.heapUsed / 1024 / 1024).toFixed(2);
+            const totalMB = (mem.heapTotal / 1024 / 1024).toFixed(2);
+
+            const platform = `${os.type()} ${os.release()} ${os.arch()}`;
+            const cpu = os.cpus()[0].model;
+
+            const status = `╔═════════════════════════╗
+║    ✨ *${config.BOT_NAME || 'NYX MD'}* ✨    ║
+║   🤖 STATUS: ALIVE...🧚‍♂️   ║
+╚═════════════════════════╝
+
+╭
+│ 👑 Owner: ${config.OWNER_NAME || 'Owner'}
+│ 🔑 Prefix: ${config.PREFIX || '.'}
+│ 🏷️ Version: 3.0.0
+│ 📦 Commands: ${totalCmds}
+│ ⏱️ Uptime: ${up}
+│ 💾 Memory: ${usedMB}MB / ${totalMB}MB
+│ 🖥️ Platform: ${platform}
+│ ⚙️ CPU: ${cpu.substring(0, 30)}...
+├─────────────────────────────┤
+
+*> Made with ❤️ by BLAZE TECH*`;
+
+            const buttons = [
+                {
+                    buttonId: ".owner",
+                    buttonText: { displayText: "❭❭ 𝗢𝗪𝗡𝗘𝗥🧑‍💻" },
+                    type: 1
+                },
+                {
+                    buttonId: ".ping",
+                    buttonText: { displayText: "❭❭ 𝗣𝗜𝗡𝗚📍" },
+                    type: 1
+                },
+                {
+                    buttonId: ".menu",
+                    buttonText: { displayText: "❭❭ MENU 📂" },
+                    type: 1
+                }
+            ];
+
+            await conn.sendMessage(
+                from,
+                {
+                    image: { url: config.ALIVE_IMG },
+                    caption: status,
+                    buttons,
+                    headerType: 1,
+                    viewOnce: true,
+                    contextInfo: {
+                        mentionedJid: [sender]
+                    }
+                },
+                { quoted: mek }
+            );
+
+        } catch (e) {
+            console.error("Alive Error:", e);
+            reply(`❌ Error: ${e.message}`);
+        }
+    });
