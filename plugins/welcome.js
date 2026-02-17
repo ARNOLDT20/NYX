@@ -14,8 +14,10 @@ module.exports.handleWelcome = async (conn, id, participants, groupMetadata) => 
 
         // Check global setting and per-group override
         let welcomeEnabled = config.WELCOME === 'true';
+        let welcomeOverride = undefined;
         try {
             const override = await pluginSettings.get(id, 'welcome');
+            welcomeOverride = override;
             if (override !== undefined) welcomeEnabled = (override === true || String(override) === 'true' || String(override).toLowerCase() === 'on');
         } catch (err) {
             console.error('Error reading plugin setting (welcome):', err);
@@ -74,11 +76,18 @@ module.exports.handleWelcome = async (conn, id, participants, groupMetadata) => 
                 }
 
                 // Replace placeholders
-                const caption = welcomeMsg
+                let caption = welcomeMsg
                     .replace(/{name}/g, userName)
                     .replace(/{number}/g, memberNumber)
                     .replace(/{members}/g, String(groupMetadata.participants.length))
                     .replace(/{group}/g, groupName);
+                // Append small footer indicating source of the setting (group override or global)
+                try {
+                    const source = (welcomeOverride !== undefined) ? 'group override' : 'global';
+                    caption = `${caption}\n\n⚙️ Welcome: ON (${source})`;
+                } catch (e) {
+                    // ignore footer errors
+                }
 
                 if (!caption || caption.length === 0) {
                     console.warn('⚠️ Welcome message is empty');

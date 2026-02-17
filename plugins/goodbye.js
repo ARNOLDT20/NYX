@@ -14,8 +14,10 @@ module.exports.handleGoodbye = async (conn, id, participants, groupMetadata) => 
 
         // Check global setting and per-group override
         let goodbyeEnabled = config.GOODBYE === 'true';
+        let goodbyeOverride = undefined;
         try {
             const override = await pluginSettings.get(id, 'goodbye');
+            goodbyeOverride = override;
             if (override !== undefined) goodbyeEnabled = (override === true || String(override) === 'true' || String(override).toLowerCase() === 'on');
         } catch (err) {
             console.error('Error reading plugin setting (goodbye):', err);
@@ -73,11 +75,16 @@ module.exports.handleGoodbye = async (conn, id, participants, groupMetadata) => 
                     goodbyeMsg = config.GOODBYE_MESSAGE;
                 }
 
-                const caption = goodbyeMsg
+                let caption = goodbyeMsg
                     .replace(/{name}/g, userName)
                     .replace(/{number}/g, memberNumber)
                     .replace(/{members}/g, String(groupMetadata.participants.length))
                     .replace(/{group}/g, groupName);
+                try {
+                    const source = (goodbyeOverride !== undefined) ? 'group override' : 'global';
+                    caption = `${caption}\n\n⚙️ Goodbye: ON (${source})`;
+                } catch (e) {
+                }
 
                 if (!caption || caption.length === 0) {
                     console.warn('⚠️ Goodbye message is empty');
