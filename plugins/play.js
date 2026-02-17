@@ -44,16 +44,14 @@ cmd({
         // Send video info
         await conn.sendMessage(from, {
             image: { url: vid.thumbnail },
-            caption: `
-╭───〘 🎬 𝚈𝙾𝚄𝚃𝚄𝙱𝙴 𝙸𝙽𝙵𝙾 〙───◆
-│ 📝 *ᴛɪᴛʟᴇ:* ${vid.title}
-│ ⏱️ *ᴅᴜʀᴀᴛɪᴘɴ:* ${duration}
-│ 👁️ *ᴠɪᴇᴡs:* ${views}
-│ 👤 *ᴀᴜᴛʜᴏʀ:* ${author}
-│ 🔗 *ᴜʀʟ:* ${videoUrl}
-╰───────────────◆
-🎧 *Downloading audio...*
-            `.trim()
+            caption: `╭───〔 🎵 YouTube Audio 〕───
+• Title : ${vid.title}
+• Duration : ${duration}
+• Views : ${views}
+• Author : ${author}
+• URL : ${videoUrl}
+╰──────────────────
+🔔 Downloading audio — this may take a little while. I'll send the MP3 when ready.`.trim()
         }, { quoted: mek });
 
         // Multiple API endpoints as fallbacks
@@ -371,15 +369,14 @@ cmd({
 
         const vid = yt.results[0];
 
-        const caption =
-            `*YT AUDIO DOWNLOADER*
-╭━━❐━⪼
-┇๏ *Title*    –  ${vid.title}
-┇๏ *Duration* –  ${vid.timestamp}
-┇๏ *Views*    –  ${vid.views}
-┇๏ *Author*   –  ${vid.author.name}
-╰━━❑━⪼
-> *Downloading Audio File ♡*`;
+        const caption = `*YT AUDIO DOWNLOADER*
+    ╭──────────────────
+    • Title : ${vid.title}
+    • Duration : ${vid.timestamp}
+    • Views : ${vid.views}
+    • Author : ${vid.author.name}
+    ╰──────────────────
+    🔔 Downloading audio — please wait...`;
 
         // Step 2: Send video info with thumbnail
         await conn.sendMessage(from, {

@@ -91,11 +91,22 @@ module.exports.handleGoodbye = async (conn, id, participants, groupMetadata) => 
                     return;
                 }
 
-                // Prefer sending an image with caption for nicer format; fallback to text
+                // Try to fetch the participant's profile picture, fall back to configured image
                 try {
-                    await conn.sendMessage(id, { image: { url: config.ALIVE_IMG || config.MENU_IMAGE_URL }, caption }, { mentions: [participant] });
+                    let ppUrl = null;
+                    try {
+                        if (typeof conn.profilePictureUrl === 'function') ppUrl = await conn.profilePictureUrl(participant, 'image');
+                    } catch (e) {
+                        ppUrl = null;
+                    }
+                    const imageUrl = ppUrl || config.ALIVE_IMG || config.MENU_IMAGE_URL;
+                    await conn.sendMessage(id, { image: { url: imageUrl }, caption }, { mentions: [participant] });
                 } catch (err) {
-                    await conn.sendMessage(id, { text: caption, mentions: [participant] });
+                    try {
+                        await conn.sendMessage(id, { text: caption, mentions: [participant] });
+                    } catch (e) {
+                        console.error('Failed to send goodbye message:', e);
+                    }
                 }
                 console.log(`✅ Goodbye message queued for ${userName} in ${groupName}`);
             } catch (err) {
