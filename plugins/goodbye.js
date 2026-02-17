@@ -1,6 +1,7 @@
 const { cmd } = require('../command');
 const config = require('../config');
 const pluginSettings = require('../lib/pluginSettings');
+const store = require('../data/store');
 
 // Export goodbye handler function
 module.exports.handleGoodbye = async (conn, id, participants, groupMetadata) => {
@@ -52,7 +53,13 @@ module.exports.handleGoodbye = async (conn, id, participants, groupMetadata) => 
                     return;
                 }
 
-                const userName = (await conn.getName(participant)) || 'Member';
+                let userName = 'Member';
+                try {
+                    if (typeof conn.getName === 'function') userName = (await conn.getName(participant)) || userName;
+                    if (!userName || userName === participant) userName = await store.getName(participant) || userName;
+                } catch (e) {
+                    userName = await store.getName(participant) || userName;
+                }
                 const memberNumber = (participant || '').toString().replace('@s.whatsapp.net', '');
 
                 if (!memberNumber || memberNumber.length === 0) {

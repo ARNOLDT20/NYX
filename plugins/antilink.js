@@ -114,25 +114,49 @@ cmd({
 
     if (!containsLink) return;
 
-    // Attempt to delete the offending message immediately
+    // Respect config.DELETE_LINKS or per-group override: if enabled, simply delete the message and skip warns
+    let deleteOnly = String(config.DELETE_LINKS) === 'true';
     try {
-      // Build a robust delete key. For groups include the participant field.
-      const deleteKey = {
-        remoteJid: from,
-        fromMe: false,
-        id: m.key && m.key.id ? m.key.id : (m.id || ''),
-        participant: m.key && m.key.participant ? m.key.participant : (m.participant || undefined)
-      };
+      const dlOverride = await pluginSettings.get(from, 'delete_links');
+      if (dlOverride !== undefined) deleteOnly = (dlOverride === true || String(dlOverride) === 'true');
+    } catch (err) {
+      console.error('Error reading plugin setting (delete_links):', err);
+    }
 
-      // Try to delete using the constructed key
-      await conn.sendMessage(from, { delete: deleteKey });
-    } catch (e) {
+    if (deleteOnly) {
       try {
-        // Fallback: original key object
-        await conn.sendMessage(from, { delete: m.key });
-      } catch (err) {
-        console.error('Failed to delete link message:', err && err.message ? err.message : err);
+        const deleteKey = {
+          remoteJid: from,
+          fromMe: false,
+          id: m.key && m.key.id ? m.key.id : (m.id || ''),
+          participant: m.key && m.key.participant ? m.key.participant : (m.participant || undefined)
+        };
+        await conn.sendMessage(from, { delete: deleteKey });
+      } catch (e) {
+        try {
+          await conn.sendMessage(from, { delete: m.key });
+        } catch (err) {
+          console.error('Failed to delete link message:', err && err.message ? err.message : err);
+        }
       }
+      return;
+    }
+
+    // If ANTI_LINK_KICK is true, remove the user immediately instead of warns
+    const kickImmediately = String(config.ANTI_LINK_KICK) === 'true';
+
+    if (kickImmediately) {
+      try {
+        await conn.sendMessage(from, {
+          text: `🚫 @${sender.split('@')[0]} posted a link and will be removed.`,
+          mentions: [sender]
+        }, { quoted: m });
+        await conn.groupParticipantsUpdate(from, [sender], 'remove');
+      } catch (err) {
+        console.error('Failed to remove user for link (kickImmediately):', err);
+        reply('Could not remove the user, make sure the bot has admin rights.');
+      }
+      return;
     }
 
     // Log deletion (optional) and persist warns
