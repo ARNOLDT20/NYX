@@ -93,6 +93,16 @@ cmd({
     }
     if (!antiLinkEnabled) return;
 
+    // Determine action mode (global default + per-group override)
+    const defaultAction = config.DELETE_LINKS === 'true' ? 'delete_warn' : 'warn';
+    let antilinkAction = (config.ANTI_LINK_ACTION || defaultAction).toString().toLowerCase();
+    try {
+      const actionOverride = await pluginSettings.get(from, 'antilink_action');
+      if (actionOverride) antilinkAction = String(actionOverride).toLowerCase();
+    } catch (err) {
+      console.error('Error reading plugin setting (antilink_action):', err);
+    }
+
     // Allow admins to send links without penalty
     if (isAdmins) return;
 
@@ -114,48 +124,31 @@ cmd({
 
     if (!containsLink) return;
 
-    // Delete the offending message first
-    try {
-      const deleteKey = {
-        remoteJid: from,
-        fromMe: false,
-        id: m.key && m.key.id ? m.key.id : (m.id || ''),
-        participant: m.key && m.key.participant ? m.key.participant : (m.participant || undefined)
-      };
-      await conn.sendMessage(from, { delete: deleteKey });
-    } catch (e) {
+    const shouldDelete = antilinkAction.startsWith('delete');
+    const shouldWarn = antilinkAction.includes('warn');
+    const shouldKick = antilinkAction.includes('kick') || String(config.ANTI_LINK_KICK) === 'true';
+
+    // Delete offending message first if configured
+    if (shouldDelete) {
       try {
-        await conn.sendMessage(from, { delete: m.key });
-      } catch (err) {
-        console.error('Failed to delete link message:', err && err.message ? err.message : err);
+        const deleteKey = {
+          remoteJid: from,
+          fromMe: false,
+          id: m.key && m.key.id ? m.key.id : (m.id || ''),
+          participant: m.key && m.key.participant ? m.key.participant : (m.participant || undefined)
+        };
+        await conn.sendMessage(from, { delete: deleteKey });
+      } catch (e) {
+        try {
+          await conn.sendMessage(from, { delete: m.key });
+        } catch (err) {
+          console.error('Failed to delete link message:', err && err.message ? err.message : err);
+        }
       }
     }
 
-    // Respect config.DELETE_LINKS or per-group override: if enabled, just warn without tracking warns/kicks
-    let deleteOnly = String(config.DELETE_LINKS) === 'true';
-    try {
-      const dlOverride = await pluginSettings.get(from, 'delete_links');
-      if (dlOverride !== undefined) deleteOnly = (dlOverride === true || String(dlOverride) === 'true');
-    } catch (err) {
-      console.error('Error reading plugin setting (delete_links):', err);
-    }
-
-    if (deleteOnly) {
-      try {
-        await conn.sendMessage(from, {
-          text: `⚠️ @${sender.split('@')[0]} Posting links is not allowed. Your message has been deleted.`,
-          mentions: [sender]
-        }, { quoted: m });
-      } catch (err) {
-        reply('⚠️ Posting links is not allowed. Your message has been deleted.');
-      }
-      return;
-    }
-
-    // If ANTI_LINK_KICK is true, remove the user immediately instead of warns
-    const kickImmediately = String(config.ANTI_LINK_KICK) === 'true';
-
-    if (kickImmediately) {
+    // If configured to kick immediately, do so now
+    if (shouldKick) {
       try {
         await conn.sendMessage(from, {
           text: `🚫 @${sender.split('@')[0]} posted a link and will be removed.`,
@@ -168,6 +161,12 @@ cmd({
       }
       return;
     }
+
+    // If warnings are disabled, stop here (message already deleted)
+    if (!shouldWarn) return;
+
+    // Log deletion (optional) and persist warns
+    const warnsFile = path.join(process.cwd(), 'store', 'antilink_warns.json');
 
     // Log deletion (optional) and persist warns
     const warnsFile = path.join(process.cwd(), 'store', 'antilink_warns.json');

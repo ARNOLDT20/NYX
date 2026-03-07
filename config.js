@@ -32,8 +32,10 @@ module.exports = {
     // make this true for custum emoji react
     CUSTOM_REACT_EMOJIS: process.env.CUSTOM_REACT_EMOJIS || "💝,💖,💗,❤️‍🩹,❤️,🧡,💛,💚,💙,💜,🤎,🖤,🤍",
     // chose custom react emojis by yourself
-    DELETE_LINKS: process.env.DELETE_LINKS || "false",
-    // automatic delete links witho remove member
+    DELETE_LINKS: process.env.DELETE_LINKS || "true",
+    // automatic delete links without removing member
+    ANTI_LINK_ACTION: process.env.ANTI_LINK_ACTION || "delete_warn",
+    // actions for anti-link: delete_warn (default), delete_only, delete_kick
     OWNER_NUMBER: process.env.OWNER_NUMBER || "255627417402",
     // add your bot owner number
     // add your bot owner number

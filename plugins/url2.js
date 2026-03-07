@@ -4,7 +4,7 @@ const FormData = require('form-data');
 const path = require('path');
 
 cmd({
-    pattern: 'url2',
+    pattern: 'url',
     alias: ['upload'],
     desc: 'Upload media to Catbox and get URL',
     category: 'download',
@@ -72,4 +72,3 @@ cmd({
         reply('❌ Error: ' + e.message);
     }
 });
-  
