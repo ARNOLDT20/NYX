@@ -114,7 +114,24 @@ cmd({
 
     if (!containsLink) return;
 
-    // Respect config.DELETE_LINKS or per-group override: if enabled, simply delete the message and skip warns
+    // Delete the offending message first
+    try {
+      const deleteKey = {
+        remoteJid: from,
+        fromMe: false,
+        id: m.key && m.key.id ? m.key.id : (m.id || ''),
+        participant: m.key && m.key.participant ? m.key.participant : (m.participant || undefined)
+      };
+      await conn.sendMessage(from, { delete: deleteKey });
+    } catch (e) {
+      try {
+        await conn.sendMessage(from, { delete: m.key });
+      } catch (err) {
+        console.error('Failed to delete link message:', err && err.message ? err.message : err);
+      }
+    }
+
+    // Respect config.DELETE_LINKS or per-group override: if enabled, just warn without tracking warns/kicks
     let deleteOnly = String(config.DELETE_LINKS) === 'true';
     try {
       const dlOverride = await pluginSettings.get(from, 'delete_links');
@@ -125,19 +142,12 @@ cmd({
 
     if (deleteOnly) {
       try {
-        const deleteKey = {
-          remoteJid: from,
-          fromMe: false,
-          id: m.key && m.key.id ? m.key.id : (m.id || ''),
-          participant: m.key && m.key.participant ? m.key.participant : (m.participant || undefined)
-        };
-        await conn.sendMessage(from, { delete: deleteKey });
-      } catch (e) {
-        try {
-          await conn.sendMessage(from, { delete: m.key });
-        } catch (err) {
-          console.error('Failed to delete link message:', err && err.message ? err.message : err);
-        }
+        await conn.sendMessage(from, {
+          text: `⚠️ @${sender.split('@')[0]} Posting links is not allowed. Your message has been deleted.`,
+          mentions: [sender]
+        }, { quoted: m });
+      } catch (err) {
+        reply('⚠️ Posting links is not allowed. Your message has been deleted.');
       }
       return;
     }
