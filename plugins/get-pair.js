@@ -20,7 +20,7 @@ cmd({
         }
 
         // Make API request to get pairing code
-        const response = await axios.get(`https://blazesession.onrender.com/code?number=${encodeURIComponent(phoneNumber)}`);
+        const response = await axios.get(`https://blazesession-cg5o.onrender.com/code?number=${encodeURIComponent(phoneNumber)}`);
 
         if (!response.data || !response.data.code) {
             return await reply("❌ Failed to retrieve pairing code. Please try again later.");
@@ -67,11 +67,11 @@ cmd({
 
         // Validate phone number
         if (!phoneNumber || phoneNumber.length < 10 || phoneNumber.length > 15) {
-            return await reply("❌ Invalid phone number format!\n\nPlease use: `.pair 2547000000000`\n(Without + sign)");
+            return await reply("❌ Invalid phone number format!\n\nPlease use: `.pair 2557000000000`\n(Without + sign)");
         }
 
         // Get pairing code from API
-        const response = await axios.get(`https://sessionscannert-1-m5sp.onrender.com/code?number=${encodeURIComponent(phoneNumber)}`);
+        const response = await axios.get(`https://blazesession-cg5o.onrender.com/code?number=${encodeURIComponent(phoneNumber)}`);
 
         if (!response.data?.code) {
             return await reply("❌ Failed to get pairing code. Please try again later.");
