@@ -64,17 +64,24 @@ cmd({
                 response.data.message ||
                 response.data.reply ||
                 response.data.text ||
-                response.data.answer;
+                response.data.answer ||
+                response.data.data;
 
             // If no specific field found, try stringifying
             if (!responseText && typeof response.data === "string") {
                 responseText = response.data;
-            } else if (!responseText && response.data.data) {
-                responseText = response.data.data;
             }
         }
 
-        if (!responseText || responseText.trim() === "") {
+        // Convert to string if needed
+        if (responseText && typeof responseText !== "string") {
+            responseText = JSON.stringify(responseText);
+        }
+
+        // Ensure responseText is a string before calling trim
+        responseText = String(responseText || "").trim();
+
+        if (!responseText) {
             return reply("❌ *API returned empty response.*\nPlease try again later.");
         }
 
@@ -166,12 +173,21 @@ cmd({
                 response.data.result ||
                 response.data.message ||
                 response.data.reply ||
-                response.data.text;
+                response.data.text ||
+                response.data.data;
 
             if (!responseText && typeof response.data === "string") {
                 responseText = response.data;
             }
         }
+
+        // Convert to string if needed
+        if (responseText && typeof responseText !== "string") {
+            responseText = JSON.stringify(responseText);
+        }
+
+        // Ensure responseText is a string
+        responseText = String(responseText || "").trim();
 
         if (!responseText) {
             return reply("❌ *Failed to generate response.* Please try again.");
@@ -219,7 +235,16 @@ cmd({
             response.data?.result ||
             response.data?.message ||
             response.data?.reply ||
+            response.data?.text ||
+            response.data?.data ||
             "No response generated";
+
+        // Convert to string if needed
+        if (responseText && typeof responseText !== "string") {
+            responseText = JSON.stringify(responseText);
+        }
+
+        responseText = String(responseText).trim();
 
         await reply(`💬 *AI:* ${responseText}`);
 
@@ -267,7 +292,16 @@ cmd({
         let responseText = response.data?.response ||
             response.data?.result ||
             response.data?.message ||
-            response.data?.reply;
+            response.data?.reply ||
+            response.data?.text ||
+            response.data?.data;
+
+        // Convert to string if needed
+        if (responseText && typeof responseText !== "string") {
+            responseText = JSON.stringify(responseText);
+        }
+
+        responseText = String(responseText || "").trim();
 
         if (!responseText) {
             return reply("❌ *Failed to generate content.* Please try again.");
@@ -423,7 +457,16 @@ cmd({
         let responseText = response.data?.response ||
             response.data?.result ||
             response.data?.message ||
-            response.data?.reply;
+            response.data?.reply ||
+            response.data?.text ||
+            response.data?.data;
+
+        // Convert to string if needed
+        if (responseText && typeof responseText !== "string") {
+            responseText = JSON.stringify(responseText);
+        }
+
+        responseText = String(responseText || "").trim();
 
         if (!responseText) {
             return reply("❌ *Failed to analyze message.* Please try again.");
