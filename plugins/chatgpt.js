@@ -17,14 +17,11 @@ function cleanResponse(text) {
     cleaned = cleaned.replace(/---[\s\S]*?Pollinations\.AI/gi, '');
     cleaned = cleaned.replace(/"source":\s*"pollinations"/gi, '');
     cleaned = cleaned.replace(/"model":\s*"[^"]*"/gi, '');
-    cleaned = cleaned.replace(/\n\n+/g, '\n\n'); // Remove excessive newlines
 
-    return cleaned.trim();
-}
+    // Remove JSON container wrappers if response text looks like JSON content
+    cleaned = cleaned.replace(/^\s*\{\s*"response"\s*:\s*"([\s\S]*?)"\s*\}\s*$/i, '$1');
+    cleaned = cleaned.replace(/\{\s*"response"\s*:\s*"([\s\S]*?)"\s*\,?\s*\}/gi, '$1');
 
-cmd({
-    pattern: "chatgpt",
-    alias: ["gpt", "ask", "ai"],
     react: "🤖",
     desc: "Chat with AI using ChatGPT",
     category: "ai",
