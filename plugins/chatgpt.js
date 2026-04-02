@@ -23,9 +23,9 @@ function cleanResponse(text) {
     cleaned = cleaned.replace(/\{\s*"response"\s*:\s*"([\s\S]*?)"\s*\,?\s*\}/gi, '$1');
 
     react: "🤖",
-    desc: "Chat with AI using ChatGPT",
-    category: "ai",
-    filename: __filename
+        desc: "Chat with AI using ChatGPT",
+            category: "ai",
+                filename: __filename
 }, async (conn, mek, m, { from, q, reply }) => {
     try {
         // Get quoted message context if replying to an AI message
