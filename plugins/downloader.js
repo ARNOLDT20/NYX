@@ -43,6 +43,42 @@ function describeSources() {
     return lines.join("\n");
 }
 
+function isUrl(input) {
+    return typeof input === "string" && /^https?:\/\//i.test(input.trim());
+}
+
+async function getYouTubeLinkFromQuery(query) {
+    const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+    const resp = await axios.get(searchUrl, { timeout: 15000 });
+    const html = resp.data;
+    const match = html.match(/ytInitialData\s*=\s*(\{.*?\});/s);
+    if (!match || !match[1]) return null;
+
+    let parsed;
+    try {
+        parsed = JSON.parse(match[1]);
+    } catch (e) {
+        return null;
+    }
+
+    const sections = parsed.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents;
+    if (!Array.isArray(sections)) return null;
+
+    for (const section of sections) {
+        const items = section?.itemSectionRenderer?.contents;
+        if (!Array.isArray(items)) continue;
+
+        for (const item of items) {
+            const videoRenderer = item?.videoRenderer;
+            if (videoRenderer && videoRenderer.videoId) {
+                return `https://www.youtube.com/watch?v=${videoRenderer.videoId}`;
+            }
+        }
+    }
+
+    return null;
+}
+
 async function runShareDownloader(conn, mek, from, source, url, reply, requestedType) {
     if (!url || !/^https?:\/\//i.test(url)) {
         return reply(`❌ Please provide a valid URL. Example: .${requestedType} https://...`);
@@ -145,42 +181,66 @@ cmd({
     pattern: "song",
     alias: ["music", "mp3"],
     react: "🎵",
-    desc: "Download song / audio from URL (Spotify / YouTube / TikTok)",
+    desc: "Download song / audio from URL or title query",
     category: "downloader",
     filename: __filename
 }, async (conn, mek, m, { from, q, reply }) => {
-    const url = q ? q.trim() : "";
-    if (!url) return reply("❌ Usage: .song <url>\nTry .youtube or .spotify links");
-    const source = sourceForType("song", url);
-    await runShareDownloader(conn, mek, from, source, url, reply, "song");
+    let input = q ? q.trim() : "";
+    if (!input) return reply("❌ Usage: .song <url or song name>");
+
+    if (!isUrl(input)) {
+        await reply(`🔎 Searching YouTube for '${input}'...`);
+        const found = await getYouTubeLinkFromQuery(input);
+        if (!found) return reply("❌ Could not find video for that song name.");
+        input = found;
+    }
+
+    const source = sourceForType("song", input);
+    await runShareDownloader(conn, mek, from, source, input, reply, "song");
 });
 
 cmd({
     pattern: "audio",
-    alias: ["mp3", "sound"],
+    alias: ["sound"],
     react: "🎧",
-    desc: "Download audio from any supported URL",
+    desc: "Download audio from URL or title query",
     category: "downloader",
     filename: __filename
 }, async (conn, mek, m, { from, q, reply }) => {
-    const url = q ? q.trim() : "";
-    if (!url) return reply("❌ Usage: .audio <url>");
-    const source = sourceForType("audio", url);
-    await runShareDownloader(conn, mek, from, source, url, reply, "audio");
+    let input = q ? q.trim() : "";
+    if (!input) return reply("❌ Usage: .audio <url or song name>");
+
+    if (!isUrl(input)) {
+        await reply(`🔎 Searching YouTube for '${input}'...`);
+        const found = await getYouTubeLinkFromQuery(input);
+        if (!found) return reply("❌ Could not find video for that audio name.");
+        input = found;
+    }
+
+    const source = sourceForType("audio", input);
+    await runShareDownloader(conn, mek, from, source, input, reply, "audio");
 });
 
 cmd({
     pattern: "video",
     alias: ["mp4", "vid"],
     react: "🎬",
-    desc: "Download video from any supported URL",
+    desc: "Download video from URL or title query",
     category: "downloader",
     filename: __filename
 }, async (conn, mek, m, { from, q, reply }) => {
-    const url = q ? q.trim() : "";
-    if (!url) return reply("❌ Usage: .video <url>");
-    const source = sourceForType("video", url);
-    await runShareDownloader(conn, mek, from, source, url, reply, "video");
+    let input = q ? q.trim() : "";
+    if (!input) return reply("❌ Usage: .video <url or video name>");
+
+    if (!isUrl(input)) {
+        await reply(`🔎 Searching YouTube for '${input}'...`);
+        const found = await getYouTubeLinkFromQuery(input);
+        if (!found) return reply("❌ Could not find video for that query.");
+        input = found;
+    }
+
+    const source = sourceForType("video", input);
+    await runShareDownloader(conn, mek, from, source, input, reply, "video");
 });
 
 cmd({
