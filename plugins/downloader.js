@@ -1,6 +1,5 @@
 const { cmd } = require("../command");
 const axios = require("axios");
-const config = require("../config");
 
 const BASE_API = "https://api.cinemind.name.ng/api";
 
@@ -80,40 +79,12 @@ async function getYouTubeLinkFromQuery(query) {
     return null;
 }
 
-async function getSpotifyToken() {
-    if (!config.SPOTIFY_CLIENT_ID || !config.SPOTIFY_CLIENT_SECRET) {
-        throw new Error("Spotify credentials not configured.");
-    }
-    const auth = Buffer.from(`${config.SPOTIFY_CLIENT_ID}:${config.SPOTIFY_CLIENT_SECRET}`).toString('base64');
-    const resp = await axios.post('https://accounts.spotify.com/api/token', 'grant_type=client_credentials', {
-        headers: {
-            'Authorization': `Basic ${auth}`,
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-    });
-    return resp.data.access_token;
-}
-
-async function getSpotifyLinkFromQuery(query) {
-    try {
-        const token = await getSpotifyToken();
-        const resp = await axios.get(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        const tracks = resp.data.tracks.items;
-        if (tracks.length > 0) {
-            return tracks[0].external_urls.spotify;
-        }
-    } catch (error) {
-        console.error("Spotify search error:", error.message);
-    }
-    return null;
-}
-
 async function runShareDownloader(conn, mek, from, source, url, reply, requestedType) {
-    if (!url || !/^https?:\/\//i.test(url)) {
+    if (!url) {
+        return reply(`❌ Please provide a valid URL or name. Example: .${requestedType} https://... or song name`);
+    }
+
+    if (source !== "spotify" && !/^https?:\/\//i.test(url)) {
         return reply(`❌ Please provide a valid URL. Example: .${requestedType} https://...`);
     }
 
@@ -124,7 +95,7 @@ async function runShareDownloader(conn, mek, from, source, url, reply, requested
     const { endpoint, label } = DOWNLOAD_SOURCES[source];
     await reply(`⏳ ${requestedType.toUpperCase()} download: retrieving data from API...`);
 
-    const apiUrl = `${BASE_API}/${endpoint}?url=${encodeURIComponent(url)}`;
+    const apiUrl = `${BASE_API}/${endpoint}?apikey=Godszeal&url=${encodeURIComponent(url)}`;
     const response = await axios.get(apiUrl, { timeout: 120000 });
 
     if (!response || !response.data) {
@@ -183,7 +154,7 @@ cmd({
         const { endpoint, label } = DOWNLOAD_SOURCES[source];
         await reply(`⏳ ${label}: retrieving data from API...`);
 
-        const apiUrl = `${BASE_API}/${endpoint}?url=${encodeURIComponent(url)}`;
+        const apiUrl = `${BASE_API}/${endpoint}?apikey=Godszeal&url=${encodeURIComponent(url)}`;
         const response = await axios.get(apiUrl, { timeout: 120000 });
 
         if (!response || !response.data) {
@@ -221,17 +192,13 @@ cmd({
     let input = q ? q.trim() : "";
     if (!input) return reply("❌ Usage: .song <url or song name>");
 
-    if (!isUrl(input)) {
-        await reply(`🔎 Searching Spotify for '${input}'...`);
-        const found = await getSpotifyLinkFromQuery(input);
-        if (found) {
-            input = found;
-        } else {
-            return reply(`❌ Song not found on Spotify. Try .song2 '${input}' for YouTube search.`);
-        }
+    let source;
+    if (isUrl(input)) {
+        source = sourceForType("song", input);
+    } else {
+        source = "spotify";
     }
 
-    const source = sourceForType("song", input);
     await runShareDownloader(conn, mek, from, source, input, reply, "song");
 });
 
@@ -246,17 +213,13 @@ cmd({
     let input = q ? q.trim() : "";
     if (!input) return reply("❌ Usage: .audio <url or song name>");
 
-    if (!isUrl(input)) {
-        await reply(`🔎 Searching Spotify for '${input}'...`);
-        const found = await getSpotifyLinkFromQuery(input);
-        if (found) {
-            input = found;
-        } else {
-            return reply(`❌ Song not found on Spotify. Try .song2 '${input}' for YouTube search.`);
-        }
+    let source;
+    if (isUrl(input)) {
+        source = sourceForType("audio", input);
+    } else {
+        source = "spotify";
     }
 
-    const source = sourceForType("audio", input);
     await runShareDownloader(conn, mek, from, source, input, reply, "audio");
 });
 
