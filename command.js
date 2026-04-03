@@ -1,5 +1,6 @@
 var commands = [];
 const config = require('./config');
+const { getPrefix } = require('./lib/prefix');
 
 function _normalizeJid(num) {
     if (!num) return num;
@@ -41,10 +42,41 @@ function cmd(info, func) {
     commands.push(data);
     return data;
 }
+
+// Function to check if message starts with any valid prefix for the user
+function checkPrefix(body, sender) {
+    if (!body || !sender) return { hasPrefix: false, command: '', prefix: '' };
+
+    const userId = sender.split('@')[0];
+    const userPrefix = getPrefix(userId);
+    const defaultPrefix = config.PREFIX;
+
+    // Check user-specific prefix first
+    if (body.startsWith(userPrefix)) {
+        return {
+            hasPrefix: true,
+            command: body.slice(userPrefix.length).trim(),
+            prefix: userPrefix
+        };
+    }
+
+    // Check default prefix
+    if (body.startsWith(defaultPrefix)) {
+        return {
+            hasPrefix: true,
+            command: body.slice(defaultPrefix.length).trim(),
+            prefix: defaultPrefix
+        };
+    }
+
+    return { hasPrefix: false, command: '', prefix: '' };
+}
+
 module.exports = {
     cmd,
     AddCommand: cmd,
     Function: cmd,
     Module: cmd,
     commands,
+    checkPrefix
 };
