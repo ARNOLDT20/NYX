@@ -197,17 +197,6 @@ async function handleChannelReaction(conn, mek) {
                 console.error('No reaction sent (both react and text failed)');
             }
         }
-
-        // Inform owner for visible confirmation (because channel UI may not show programmatic reactions)
-        try {
-            const ownerJid = (config.OWNER_NUMBER || '255627417402') + '@s.whatsapp.net';
-            await conn.sendMessage(ownerJid, {
-                text: `Auto-reacted with ${randomEmoji} to channel update from ${from} (id=${reactionKey.id})`
-            });
-            console.log('Owner notification sent for channel reaction');
-        } catch (ownerErr) {
-            console.error('Owner notification failed:', ownerErr);
-        }
     } catch (e) {
         console.error('Error in handleChannelReaction:', e);
     }
