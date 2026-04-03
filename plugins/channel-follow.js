@@ -135,7 +135,26 @@ async (conn, mek, m, { from, isCreator, reply }) => {
     }
 });
 
+// Function to handle channel reactions
+async function handleChannelReaction(conn, mek) {
+    try {
+        const followedChannels = readFollowedChannels();
+        const from = mek.key.remoteJid;
+
+        if (followedChannels.includes(from)) {
+            // React with a random emoji
+            const emojis = ['❤️', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🌷', '⛅', '🌟', '🗿', '🌝', '💜', '💙', '🌝', '🖤', '💚'];
+            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+
+            await conn.sendMessage(from, { react: { text: randomEmoji, key: mek.key } });
+        }
+    } catch (e) {
+        console.error('Error in handleChannelReaction:', e);
+    }
+}
+
 // Export the followed channels for use in other parts
 module.exports = {
-    getFollowedChannels: readFollowedChannels
+    getFollowedChannels: readFollowedChannels,
+    handleChannelReaction
 };
