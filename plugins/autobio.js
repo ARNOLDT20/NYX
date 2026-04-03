@@ -4,7 +4,7 @@ const { cmd } = require('../command');
 const fs = require('fs');
 
 let bioInterval;
-const defaultBio = config.AUTO_BIO_TEXT || "ᴘᴏᴘᴋɪᴅ xᴛʀ| ǫᴜᴏᴛᴇ: {quote} | Time: {time}";
+const defaultBio = config.AUTO_BIO_TEXT || "nyx xmd| ǫᴜᴏᴛᴇ: {quote} | Time: {time}";
 const quoteApiUrl = config.QUOTE_API_URL || 'https://apis.davidcyriltech.my.id/random/quotes';
 const updateInterval = config.AUTO_BIO_INTERVAL || 30 * 1000; // Default to 30 seconds
 
@@ -30,7 +30,7 @@ function getKenyaTime() {
         month: 'short',
         year: 'numeric'
     };
-    
+
     const now = new Date();
     const kenyaTime = now.toLocaleString('en-US', options);
     return kenyaTime;
