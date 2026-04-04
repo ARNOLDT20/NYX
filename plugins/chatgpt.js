@@ -72,9 +72,13 @@ cmd({
                 response.data.answer ||
                 response.data.data;
 
-            // If no specific field found, try stringifying
-            if (!responseText && typeof response.data === "string") {
-                responseText = response.data;
+            // If no specific field found, try stringifying the entire response
+            if (!responseText) {
+                if (typeof response.data === "string") {
+                    responseText = response.data;
+                } else {
+                    responseText = JSON.stringify(response.data);
+                }
             }
         }
 
@@ -174,8 +178,13 @@ cmd({
                 response.data.text ||
                 response.data.data;
 
-            if (!responseText && typeof response.data === "string") {
-                responseText = response.data;
+            // If no specific field found, try stringifying the entire response
+            if (!responseText) {
+                if (typeof response.data === "string") {
+                    responseText = response.data;
+                } else {
+                    responseText = JSON.stringify(response.data);
+                }
             }
         }
 
@@ -229,8 +238,16 @@ cmd({
             response.data?.message ||
             response.data?.reply ||
             response.data?.text ||
-            response.data?.data ||
-            "No response generated";
+            response.data?.data;
+
+        // If no specific field found, try stringifying the entire response
+        if (!responseText) {
+            if (typeof response.data === "string") {
+                responseText = response.data;
+            } else {
+                responseText = JSON.stringify(response.data);
+            }
+        }
 
         responseText = cleanupResponse(responseText);
 
@@ -284,6 +301,15 @@ cmd({
             response.data?.reply ||
             response.data?.text ||
             response.data?.data;
+
+        // If no specific field found, try stringifying the entire response
+        if (!responseText) {
+            if (typeof response.data === "string") {
+                responseText = response.data;
+            } else {
+                responseText = JSON.stringify(response.data);
+            }
+        }
 
         responseText = cleanupResponse(responseText);
 
@@ -441,6 +467,15 @@ cmd({
             response.data?.result ||
             response.data?.message ||
             response.data?.reply;
+
+        // If no specific field found, try stringifying the entire response
+        if (!responseText) {
+            if (typeof response.data === "string") {
+                responseText = response.data;
+            } else {
+                responseText = JSON.stringify(response.data);
+            }
+        }
 
         if (!responseText) {
             return reply("❌ *Failed to analyze message.* Please try again.");
