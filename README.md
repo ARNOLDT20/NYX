@@ -1,4 +1,4 @@
-# NYX MD - WhatsApp Bot
+# ZTX GROUP - WhatsApp Bot
 <p align="center">
   <img src="assets/nyx-banner.svg" width="100%" />
 </p>
@@ -48,10 +48,10 @@ Get a Session ID (pairing service):
 ---
 ## Deployment Options
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/NYX)
-[![Deploy to Railway](https://img.shields.io/badge/Deploy-Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)](https://railway.app/new/template?template=https://github.com/blazetech-glitch/NYX)
-[![Deploy to Render](https://img.shields.io/badge/Deploy-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://dashboard.render.com/deploy?repo=https://github.com/blazetech-glitch/NYX)
-[![Deploy to Koyeb](https://img.shields.io/badge/Deploy-Koyeb-121212?style=for-the-badge&logo=koyeb&logoColor=white)](https://app.koyeb.com/deploy?repository=https://github.com/blazetech-glitch/NYX)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/blazetech-glitch/ZTX GROUP )
+[![Deploy to Railway](https://img.shields.io/badge/Deploy-Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)](https://railway.app/new/template?template=https://github.com/blazetech-glitch/ZTX GROUP)
+[![Deploy to Render](https://img.shields.io/badge/Deploy-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://dashboard.render.com/deploy?repo=https://github.com/blazetech-glitch/ZTX GROUP)
+[![Deploy to Koyeb](https://img.shields.io/badge/Deploy-Koyeb-121212?style=for-the-badge&logo=koyeb&logoColor=white)](https://app.koyeb.com/deploy?repository=https://github.com/blazetech-glitch/ZTX GROUP)
 
 Quick access to deployment files & directories:
 
@@ -73,8 +73,8 @@ Quick access to deployment files & directories:
 ---
 ## Connect & Support
 
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/blazetech-glitch/NYX)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/blazetech-glitch/ZTX GROUP)
 [![WhatsApp](https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)]()
 [![Discord](https://img.shields.io/badge/User_Community-5865F2?style=for-the-badge&logo=discord&logoColor=white)]()
 
-Lead Developer: BLAZE TECH
+Lead Developer: TEKNOVA TECH
